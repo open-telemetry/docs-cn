@@ -7,19 +7,19 @@
 
 
 ## 索引目录
-- [] [标准概述](contents/overview.md)
-- [] [代码库(Library)指南](contents/library-guidelines.md)
-  - [] [代码库的组织布局](contents/library-layout.md)
-  - [] [并发和线程安全](contents/concurrency.md)
+- [ ] [标准概述](contents/overview.md)
+- [ ] [代码库(Library)指南](contents/library-guidelines.md)
+  - [ ] [代码库的组织布局](contents/library-layout.md)
+  - [ ] [并发和线程安全](contents/concurrency.md)
 - API规范
-  - [] [DistributedContext(分布式环境下上下文)](contents/api-distributedcontext.md)
-    - [] [Propagators(数据传播)](contents/api-propagators.md)
-  - [] [Resources](contents/api-resources.md)
-  - [] [Tracing(分布式追踪)](contents/api-tracing.md)
-    - [] [Sampling(采样频率控制)](contents/api-sampling.md)
-  - [] [Metrics(指标)](contents/api-metrics.md)
+  - [ ] [DistributedContext(分布式环境下上下文)](contents/api-distributedcontext.md)
+    - [ ] [Propagators(数据传播)](contents/api-propagators.md)
+  - [ ] [Resources](contents/api-resources.md)
+  - [ ] [Tracing(分布式追踪)](contents/api-tracing.md)
+    - [ ] [Sampling(采样频率控制)](contents/api-sampling.md)
+  - [ ] [Metrics(指标)](contents/api-metrics.md)
 - 数据规范
-  - [] [语义约定](contents/data-semantic-conventions.md)
+  - [ ] [语义约定](contents/data-semantic-conventions.md)
 - 关于该项目
   - [x] [进度时间表](#project-timeline)
   - [x] [社区贡献](#contributions)
