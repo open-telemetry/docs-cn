@@ -5,7 +5,6 @@
 
 该Specification描述了各个语言SDK在实现OpenTelemetry时需要遵照的标准要求。
 
-
 ## 索引目录
 - [ ] [标准概述](contents/overview.md)
 - [ ] [代码库(Library)指南](contents/library-guidelines.md)
@@ -22,12 +21,14 @@
   - [ ] [语义约定](contents/data-semantic-conventions.md)
 - 关于该项目
   - [x] [进度时间表](#项目时间表)
-  - [x] [社区贡献](#贡献者)
+  - [] [社区贡献](#贡献者)
   - [License](#license)
+
+注：索引条目前的☑[x]代表已经翻译
 
 ## 项目时间表
 
-OpenTelmetry当前仍在紧锣密鼓地开发中，可以查看我们的[Roadmap](milestones.md)来大致了解开发的时间节点。
+OpenTelmetry当前仍在紧锣密鼓地开发中，可以查看我们的[Milestone](milestones.md)来大致了解开发的时间节点。
 
 
 ## 贡献者
