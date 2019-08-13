@@ -1,4 +1,4 @@
-# OpenTelemetry中文资料索引
+# OpenTelemetry中文资料
 
 ![](./assets/logo.png)
 
