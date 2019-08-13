@@ -2,7 +2,7 @@
 
 欢迎大家来到OpenTelemetry技术标准(Specification)代码仓库!
 
-在开始之前，你需要先看一下OpenTelemetry通用的[贡献者协议](../CONTRIBUTING.md)。
+在开始之前，你需要先看一下OpenTelemetry通用的[贡献者协议](../community/CONTRIBUTING.md)。
 
 
 ## 重要的提议

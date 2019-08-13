@@ -1,7 +1,5 @@
 # OpenTelemetry技术标准定义(Specification)
-
-en： ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/open-telemetry/specification.svg)
-cn： ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/open-telemetry/specification.svg)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/open-telemetry/specification.svg)
 
 该Specification描述了各个语言SDK在实现OpenTelemetry时需要遵照的标准要求。
 
@@ -21,10 +19,10 @@ cn： ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/open-telem
   - [ ] [语义约定](contents/data-semantic-conventions.md)
 - 关于该项目
   - [x] [进度时间表](#项目时间表)
-  - [ ] [社区贡献](#贡献者)
+  - [x] [社区贡献](#贡献者) 
   - [License](#license)
 
-注：索引条目前的☑[x]代表已经翻译
+注：索引条目前的☑代表已经翻译
 
 ## 项目时间表
 

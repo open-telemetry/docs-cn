@@ -18,8 +18,7 @@ Agreement](https://identity.linuxfoundation.org/projects/cncf).
 
 OpenTelemetry是社区项目，因此，我们需要完全依赖社区才能提供一个富有生产力、友好和协作的环境。
 
-- 查看[Community
-  Membership](https://github.com/open-telemetry/community/blob/master/community-membership.md)
+- 查看[社区成员](./membership.md)
   获取多种贡献角色对应的责任信息
 
 # 首次贡献
@@ -154,7 +153,7 @@ Review](http://sage.thesharps.us/2014/09/01/the-gentle-art-of-patch-review/)，
 # 社区
 
 不知道你注意到没，我们已经拥有了一个十分活跃、友好的大型开源社区。我们必须要依赖大家的踊跃参与，才能变得更好，
-因此欢迎你们加入！[社区成员文档](https://github.com/open-telemetry/community/blob/master/community-membership.md)
+因此欢迎你们加入！[社区成员文档](./membership.md)
 包含了成员关系和行为准则的描述。
 
 ## 沟通交流
