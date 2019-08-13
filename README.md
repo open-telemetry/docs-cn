@@ -2,6 +2,9 @@
 
 ![](./assets/logo.png)
 
-## 资料目录
+## 目录
 - [OpenTelemetry简介](./about/Readme.md)
 - [Specification(技术标准)](./specification/Readme.md) 
+
+## 社区
+- QQ群： 773124426
