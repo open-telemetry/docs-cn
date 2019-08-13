@@ -1,4 +1,4 @@
-# OpenTelemetry技术实现标准(Specification)
+# OpenTelemetry技术标准定义(Specification)
 
 英文版本号： ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/open-telemetry/specification.svg)
 中文版本号： ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/open-telemetry/specification.svg)
@@ -21,11 +21,11 @@
 - 数据规范
   - [ ] [语义约定](contents/data-semantic-conventions.md)
 - 关于该项目
-  - [x] [进度时间表](#project-timeline)
-  - [x] [社区贡献](#contributions)
+  - [x] [进度时间表](#项目时间表)
+  - [x] [社区贡献](#贡献者)
   - [License](#license)
 
-## 项目进度时间表
+## 项目时间表
 
 OpenTelmetry当前仍在紧锣密鼓地开发中，可以查看我们的[Roadmap](milestones.md)来大致了解开发的时间节点。
 
