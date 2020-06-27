@@ -26,9 +26,9 @@ SDK配置必须由“应用程序”提供，而该应用程序取决于`opentel
 
 ## 追踪（Tracing）
 
-下面，我们介绍如何使用OpenTelemetry API追踪代码。 **注意：**永远不要调用OpenTelemetry SDK的方法。
+我们介绍如何使用OpenTelemetry API追踪代码。注意：永远不要调用OpenTelemetry SDK的方法。
 
-首先，必须获取一个Tracer，该Tracer负责创建spans和并与[上下文](#上下文传播)交互。Tracer是通过使用OpenTelemetry API来获取的，该API指定了检测要监控的检查库或应用程序的库的名称和版本。可在规范章节 [Obtaining a Tracer]中获得更多信息。
+首先必须获取一个Tracer，该Tracer负责创建spans和并与[上下文](#上下文传播)交互。Tracer是通过使用OpenTelemetry API来获取的，该API指定了检测要监控的检查库或应用程序的库的名称和版本。可在规范章节 [Obtaining a Tracer]中获得更多信息。
 
 ```java
 Tracer tracer =
@@ -52,7 +52,7 @@ try (Scope scope = tracer.withSpan(span)) {
 
 ### 创建嵌套Span
 
-很多时候，我们希望为嵌套操作关联span。OpenTelemetry支持在进程内和跨远程进程进行追踪。更多关于如何在远程进程间共享上下文的详细信息，
+很多时候我们希望为嵌套操作关联span。OpenTelemetry支持在进程内和跨远程进程进行追踪。更多关于如何在远程进程间共享上下文的详细信息，
 
 请查看[上下文传播](#上下文传播)。
 对于方法a调用方法b，可以通过以下方式手动链接span：
@@ -131,7 +131,7 @@ span.addEvent("End Computation", eventAttributes);
 
 ### 创建带链接Span
 
-一个Span可以连接一个或多个因果相关的其他Span。连接可用于表示批处理操作，其中一个Span的初始化由多个Span初始化构成，其中每个Span表示批处理中处理的单个输入项。
+一个Span可以连接一个或多个因果相关的其他Span。链接可用于表示批处理操作，其中一个Span的初始化由多个Span初始化构成，其中每个Span表示批处理中处理的单个输入项。
 
 ```java
 Link link1 = SpanData.Link.create(parentSpan1.getContext());
