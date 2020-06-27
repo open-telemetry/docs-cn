@@ -319,7 +319,7 @@ tracerProvider.updateActiveTraceConfig(
 
 ### Span处理器
 
-OpenTelemetry提供了不同的Span处理器。“SimpleSpanProcessor”立即将结束的Span转发到导出器，而“BatchSpanProcessor”对它们进行批处理并批量发送它们。“MultiSpanProcessor”将多个Span处理器配置为同时处于活动状态。
+OpenTelemetry提供了不同的Span处理器。`SimpleSpanProcessor`立即将结束的Span转发到导出器，而`BatchSpanProcessor`对它们进行批处理并批量发送它们。`MultiSpanProcessor`将多个Span处理器配置为同时处于活动状态。
 
 ```java
 tracerProvider.addSpanProcessor(
