@@ -52,9 +52,8 @@ try (Scope scope = tracer.withSpan(span)) {
 
 ### 创建嵌套Span
 
-很多时候我们希望为嵌套操作关联span。OpenTelemetry支持在进程内和跨远程进程进行追踪。更多关于如何在远程进程间共享上下文的详细信息，
+很多时候我们希望为嵌套操作关联span。OpenTelemetry支持在进程内和跨远程进程进行追踪。更多关于如何在远程进程间共享上下文的详细信息，请查看[上下文传播](#上下文传播)。
 
-请查看[上下文传播](#上下文传播)。
 对于方法a调用方法b，可以通过以下方式手动链接span：
 ```java
 void a() {
@@ -151,7 +150,7 @@ Span child = tracer.spanBuilder("childWithLink")
 进程内传播依靠 [gRPC Context](https://grpc.github.io/grpc-java/javadoc/io/grpc/Context.html)，
 一个完善的上下文传播库，包含在一个小构件中，它不依赖于整个gRPC引擎。
 
-OpenTelemetry提供了一种基于文本的方法，可以使用 [W3C Trace Context]（https://www.w3.org/TR/trace-context/）HTTP头。
+OpenTelemetry提供了一种基于文本的方法，可以使用 [W3C Trace Context](https://www.w3.org/TR/trace-context/) HTTP标头。
 以下是使用`HttpURLConnection`发出的HTTP请求的示例。
 ```java
 // Tell OpenTelemetry to inject the context in the HTTP headers
@@ -181,8 +180,8 @@ try (Scope scope = tracer.withSpan(outGoing)) {
 ...
 ```
 
-类似，基于文本的方法可用于从传入请求中读取W3C追踪上下文。
-下面提供了使用以下命令处理传入HTTP请求的示例 [HttpExchange]（https://docs.oracle.com/javase/8/docs/jre/api/net/httpserver/spec/com/sun/net/httpserver/HttpExchange.html）。
+类似的基于文本的方法可用于从传入请求中读取W3C追踪上下文。
+下面提供了使用以下命令处理传入HTTP请求的示例 [HttpExchange](https://docs.oracle.com/javase/8/docs/jre/api/net/httpserver/spec/com/sun/net/httpserver/HttpExchange.html)。
 
 ```java
 HttpTextFormat.Getter<HttpExchange> getter =
@@ -279,7 +278,7 @@ observer.setCallback(
 
 该应用程序必须安装带有输出器的span处理器，并且可以自定义OpenTelemetry SDK的行为。
 
-比如，一个基本配置实例化了SDK追踪器注册表，并设置为将追踪数据导出到日志记录流。
+比如一个基本配置实例化了SDK追踪器注册表，并设置为将追踪数据导出到日志记录流。
 
 ```java
 // Get the tracer
@@ -339,7 +338,7 @@ tracerProvider.addSpanProcessor(MultiSpanProcessor.create(Arrays.asList(
 
 Span处理器由导出器初始化，该导出器负责将遥测数据发送到特定的后端。OpenTelemetry提供了四种开箱即用的导出器：
 
-- In-Memory: 数据保存在内存中，在debug时使用.
+- In-Memory: 数据保存在内存中，在debug时使用。
 - Jaeger Exporter: 准备收集的遥测数据并将其通过gRPC发送到Jaeger后端。
 - Zipkin Exporter: 准备收集的遥测数据，并通过Zipkin API将其发送到Zipkin后端。
 - Logging Exporter: 将遥测数据保存到日志流中。
