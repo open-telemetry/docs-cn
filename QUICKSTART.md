@@ -357,8 +357,7 @@ tracerProvider.addSpanProcessor(BatchSpanProcessor.newBuilder(
     jaegerExporter
 ).build());
 ```
-
-
+> 英文原文：https://github.com/open-telemetry/opentelemetry-java/blob/master/QUICKSTART.md
 
 [AlwaysOnSampler]: https://github.com/open-telemetry/opentelemetry-java/blob/master/sdk/src/main/java/io/opentelemetry/sdk/trace/Samplers.java#L82--L105
 [AlwaysOffSampler]:https://github.com/open-telemetry/opentelemetry-java/blob/master/sdk/src/main/java/io/opentelemetry/sdk/trace/Samplers.java#L108--L131
