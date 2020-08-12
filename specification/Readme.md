@@ -26,7 +26,7 @@
 
 ## 项目时间表
 
-OpenTelmetry当前仍在紧锣密鼓地开发中，可以查看我们的[Milestone](milestones.md)来大致了解开发的时间节点。
+OpenTelemetry当前仍在紧锣密鼓地开发中，可以查看我们的[Milestone](milestones.md)来大致了解开发的时间节点。
 
 
 ## 贡献者
