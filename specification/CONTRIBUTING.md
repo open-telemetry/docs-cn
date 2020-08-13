@@ -11,7 +11,7 @@
 
 ## 编写技术标准(Specification)
 
-Specification是采用mardown格式的，所以你需要确保你提交的markdown可以在github上正确渲染。
+Specification是采用markdown格式的，所以你需要确保你提交的markdown可以在github上正确渲染。
 
 我们强烈推荐markdown中的每一行不超过80个英文字符，你也可以使用工具来高效的帮你格式化。
 
