@@ -1,6 +1,6 @@
 # OpenTelemetry贡献者指南
 
-欢迎来到OpenTelemetry! 若你想贡献代码给OpenTelemery，那么该指南将是你唯一的参考。
+欢迎来到OpenTelemetry! 若你想贡献代码给OpenTelemetry，那么该指南将是你唯一的参考。
 
 
 # 开始之前的准备
@@ -134,7 +134,7 @@ Pull requests通常缩写"PR". OpenTelemetry遵循标准的
 - 遵循项目和代码仓库的代码风格约定
 - 编写[好的commit注释](https://chris.beams.io/posts/git-commit/)
 - 把大的更新变为一系列拥有内在逻辑的小更新，每个小更新都拥有独立的意义，然后聚合在一起解决一个大的问题
-- 为PR打上合适的SIGs和代码Reiviewer的标签：你可以在PR的过程中按照bot机器人发送的规则来做
+- 为PR打上合适的SIGs和代码Reviewer的标签：你可以在PR的过程中按照bot机器人发送的规则来做
 
 Reviewer,review别人代码的人，需要先仔细阅读
  [CNCF行为准则](https://github.com/cncf/foundation/blob/master/code-of-conduct.md).

@@ -23,7 +23,7 @@ Group)被划分为多个子项目，因此这里的角色职责将限定在这�
 
 ## 成员
 
-成员是社区中持续活跃的贡献者没，组织会分配issues和PR给他们，成员很有可能会参与到SIG中。
+成员是社区中持续活跃的贡献者，组织会分配issues和PR给他们，成员很有可能会参与到SIG中。
 
 被以下定义: OpenTelemetry GitHub组织成员  
 
@@ -50,7 +50,7 @@ Group)被划分为多个子项目，因此这里的角色职责将限定在这�
 
 ### 责任 and 权利
 
-- 对于被指派的issue和RP作出响应
+- 对于被指派的issue和PR作出响应
 - 对于贡献的代码必须要持续负责和维护，除非代码所有权发生了变更
   - 代码要有良好的测试
   - 测试要确保能够长期通过
@@ -76,7 +76,7 @@ workflow](https://help.github.com/en/articles/about-code-owners).
 以下的要求限定在审核者参与的代码部分中，这个在`CODEOWNER`有定义
 
 - 代码审查持续3个月以上
-- 为10个以上的重要RPs执行过代码审查
+- 为10个以上的重要PRs执行过代码审查
 - 为30个以上的PRs执行过代码审查w和合并
 - 被一个`维护者`提名
   - 其它维护者没有异议With no objections from other maintainers
