@@ -10,21 +10,21 @@
 
 <!-- toc -->
 
-- [通用](#common)
-  * [In-band and Out-of-band Data](#in-band-and-out-of-band-data)
+- [Common](#common)
+  * [In-band and Out-of-band Data](#带内带外数据-in-band-and-out-of-band-data)
   * [Telemetry SDK](#telemetry-sdk)
   * [Exporter Library](#exporter-library)
   * [Instrumented Library](#instrumented-library)
   * [Instrumentation Library](#instrumentation-library)
   * [Tracer Name / Meter Name](#tracer-name--meter-name)
 - [Logs](#logs)
-  * [Log Record](#log-record)
-  * [Log](#log)
-  * [Embedded Log](#embedded-log)
-  * [Standalone Log](#standalone-log)
-  * [Log Attributes](#log-attributes)
-  * [Structured Logs](#structured-logs)
-  * [Flat File Logs](#flat-file-logs)
+  * [日志记录 Log Record](#日志记录-log-record)
+  * [日志 Log](#日志-log)
+  * [嵌入日志 Embedded Log](#嵌入日志-embedded-log)
+  * [独立日志 Standalone Log](#独立日志-standalone-log)
+  * [日志属性 Log Attributes](#日志属性-log-attributes)
+  * [结构化日志 Structured Logs](#结构化日志-structured-logs)
+  * [扁平化日志 Flat File Logs](#扁平化日志-flat-file-logs)
 
 <!-- tocstop -->
 
