@@ -22,14 +22,14 @@ OpenTelemetry 规范描述了所有 OpenTelemetry 协议实现的跨语言要求
 ## 目录
 
 - [Overview](specification/overview.md)
-- [Glossary](specification/glossary.md) [100%]
+- [Glossary](specification/glossary.md)  ✅
 - [Library Guidelines](specification/library-guidelines.md)
   - [Package/Library Layout](specification/library-layout.md)
   - [General error handling guidelines](specification/error-handling.md)
 - API Specification
   - [Baggage](specification/baggage/api.md)
     - [Propagators](specification/context/api-propagators.md)
-  - [Tracing](specification/trace/api.md) [50%]
+  - [Tracing](specification/trace/api.md)  🚧
   - [Metrics](specification/metrics/api.md)
 - SDK Specification
   - [Tracing](specification/trace/sdk.md)
@@ -47,37 +47,40 @@ OpenTelemetry 规范描述了所有 OpenTelemetry 协议实现的跨语言要求
   - [Contributions](#contributions)
   - [License](#license)
 
-## Project Timeline
+## 项目 Timeline
 
-The current project status as well as information on notable past releases is found at
-[the OpenTelemetry project page](https://opentelemetry.io/project-status/).
+当前项目状态与过去各重要版本的信息可以从以下网址中获取。[The OpenTelemetry project page](https://opentelemetry.io/project-status/).
 
-Information about current work and future development plans is found at the
-[specification development milestones](https://github.com/open-telemetry/opentelemetry-specification/milestones).
+当前项目工作和未来的发展计划信息可以在 [Specification development milestones](https://github.com/open-telemetry/opentelemetry-specification/milestones) 中查阅。
 
-## Notation Conventions and Compliance
+## 符号约定和合规性
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in the [specification](./specification/overview.md) are to be interpreted as described in [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.
+规范中的关键词 "MUST"、"MUST NOT"、"REQUIRED"、"SHALL"、"SHALL NOT"、"SHOULD"、"SHOULD NOT"、"RECOMMENDED"、"NOT RECOMMENDED"、"MAY "和 "OPTIONAL"，当且仅当它们以全大写字母出现时，应按 [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] 中所述进行解释。
 
-An implementation of the [specification](./specification/overview.md) is not compliant if it fails to satisfy one or more of the "MUST", "MUST NOT", "REQUIRED", "SHALL", or "SHALL NOT" requirements defined in the [specification](./specification/overview.md).
-Conversely, an implementation of the [specification](./specification/overview.md) is compliant if it satisfies all the "MUST", "MUST NOT", "REQUIRED", "SHALL", and "SHALL NOT" requirements defined in the [specification](./specification/overview.md).
+如果一个规范的实现未能满足规范中定义的 MUST", "MUST NOT", "REQUIRED", "SHALL", 或 "SHALL NOT" 中的一项或多项要求，则该实现是不合规。反之，如果一个规范的实现满足规范中定义的所有 MUST", "MUST NOT", "REQUIRED", "SHALL", 或 "SHALL NOT" 要求，则该规范的实现是合规的。
 
-## Versioning
+> 中文文档额外提示: 对本章节中的用词翻译有具体说明。请参考 中文文档使用指南。
 
-Changes to the [specification](./specification/overview.md) are versioned according to [Semantic Versioning 2.0](https://semver.org/spec/v2.0.0.html) and described in [CHANGELOG.md](CHANGELOG.md). Layout changes are not versioned. Specific implementations of the specification should specify which version they implement.
+## 版本控制
 
-Changes to the change process itself are not currently versioned but may be independently versioned in the future.
+版本号的变更将遵守 Semantic Versioning 2.0，并将会在 [CHANGELOG.md](CHANGELOG.md) 中描述。布局变更将不进行版本控制。本规范的具体实现应指定它们所实现的规范版本。
 
-## Acronym
+变更过程本身的变更目前还没有版本化，但将来可能会独立版本化。
 
-The official acronym used by the OpenTelemetry project is "OTel".
+## 缩略语
 
-Please refrain from using "OT" in order to avoid confusion with the now deprecated "OpenTracing" project.
+OpenTelemetry 项目的正式官方缩写为 "OTel"。
 
-## Contributions
+请不要使用 “OT”，以避免和现有已废弃的 “OpenTracing” 项目相混淆。
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details on contribution process.
+## 参与贡献
+
+关于如何参与 OpenTelemetry 标准制定项目，参见 [CONTRIBUTING.md](CONTRIBUTING.md)
+
+> 中文文档额外提示：对中文文档的贡献，请参考 参与中文文档贡献
 
 ## License
 
-By contributing to OpenTelemetry Specification repository, you agree that your contributions will be licensed under its [Apache 2.0 License](https://github.com/open-telemetry/specification/blob/master/LICENSE).
+您需要同意您对 OpenTelemetry Specification 项目的贡献，将在 [Apache 2.0 License ](https://github.com/open-telemetry/specification/blob/master/LICENSE)许可证下。
+
+> 您对 OpenTelemetry doc-cn 项目的贡献，也将在  [Apache 2.0 License ](https://github.com/open-telemetry/specification/blob/master/LICENSE)许可证下。
