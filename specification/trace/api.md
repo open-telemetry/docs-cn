@@ -249,133 +249,87 @@ Span 的开始时间应当设置为创建 Span 时的当前时间。Span 创建�
 
 广商可以通过实现 `Span` 接口来满足厂商自身特定的逻辑，然而其他实现严禁允许调用者直接创建 `Span`。所有的 `Span` 必须由 `Tracer` 创建
 
-### Span Creation
+### 创建 Span
 
-There MUST NOT be any API for creating a `Span` other than with a [`Tracer`](#tracer).
+除了 [`Tracer`](#tracer)  外，不准许任何其他 API 创建 `Span` 。
 
-`Span` creation MUST NOT set the newly created `Span` as the currently
-active `Span` by default, but this functionality MAY be offered additionally
-as a separate operation.
+`Span` 的创建不准许将新创建的 `Span` 默认作当前活跃的 `Span`，但该功能可以作为单独的操作提供。
 
-The API MUST accept the following parameters:
+API 必须接受以下参数：
 
-- The span name. This is a required parameter.
-- The parent `Context` or an indication that the new `Span` should be a root `Span`.
-  The API MAY also have an option for implicitly using
-  the current Context as parent as a default behavior.
-  This API MUST NOT accept a `Span` or `SpanContext` as parent, only a full `Context`.
+- Span 名称。这是必须的参数。
 
-  The semantic parent of the Span MUST be determined according to the rules
-  described in [Determining the Parent Span from a Context](#determining-the-parent-span-from-a-context).
-- [`SpanKind`](#spankind), default to `SpanKind.Internal` if not specified.
-- [`Attributes`](../common/common.md#attributes). Additionally,
-  these attributes may be used to make a sampling decision as noted in [sampling
-  description](sdk.md#sampling). An empty collection will be assumed if
-  not specified.
+- 父 `Context` 或者表明该新的 `Span` 是 `root Span`。
+  
+  API 需要提供一个选项，用于设置默认行为：将当前的 `Context` 作为父级。
+  
+  API 禁止接收 `Span` 或 `SpanContext` 作为父级，只能是完整的 `Context`。
+  
+  Span 的语义父级必须要个遵守  [Determining the Parent Span from a Context](#determining-the-parent-span-from-a-context) 中描述的规则。
+  
+- [`SpanKind`](#spankind)，默认值为: `SpanKind.Internal`。
 
-  Whenever possible, users SHOULD set any already known attributes at span creation
-  instead of calling `SetAttribute` later.
+- `[Attributes](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/common/common.md#attributes)`。此外，这些属性还可用于定义[取样详情](sdk.md#sampling)。如果没有指定，该字段将被假定是一个空的集合。只要有可能，使用者应该在创建跨度时设置相应属性，而不是在创建之后，调用SetAttribute。
+- `Link`s - 一个有序的链接序列，详情见 [here](#specifying-links).
+- `Start timestamp`，默认为当前时间。应当只能在创建时间已经发生的 Span 时才可以使用本参数。如果 API 在 Span 逻辑发生时被调用，API 使用者必须能设置该参数。
 
-- `Link`s - an ordered sequence of Links, see API definition [here](#specifying-links).
-- `Start timestamp`, default to current time. This argument SHOULD only be set
-  when span creation time has already passed. If API is called at a moment of
-  a Span logical start, API user MUST not explicitly set this argument.
 
-Each span has zero or one parent span and zero or more child spans, which
-represent causally related operations. A tree of related spans comprises a
-trace. A span is said to be a _root span_ if it does not have a parent. Each
-trace includes a single root span, which is the shared ancestor of all other
-spans in the trace. Implementations MUST provide an option to create a `Span` as
-a root span, and MUST generate a new `TraceId` for each root span created.
-For a Span with a parent, the `TraceId` MUST be the same as the parent.
-Also, the child span MUST inherit all `TraceState` values of its parent by default.
+每个 span 都有零或一个父 span 和零或多个子 span，这用于记录操作的因果关系。Spans 的关联树构成了 Trace。如果一个 span 没有父 span，那它被定义成一个 *根 (root) span*。每个 Trace 有且只有一个的 root span，它是所有其他的 Trace 中的 span 的祖先。实现必须提供一个选项用于创建一个 `Span` 作为 root span，并且必须每次创建 root span 时生成一个新的 `TraceId`。对于有父 span 的 `Span`，`TraceId` 必须与父 span 相同。此外，子 span 必须默认继承其父 span 的所有 `TraceState` 值。
 
-A `Span` is said to have a _remote parent_ if it is the child of a `Span`
-created in another process. Each propagators' deserialization must set
-`IsRemote` to true on a parent `SpanContext` so `Span` creation knows if the
-parent is remote.
+如果一个 `Span` 是被另一个进程中创建的 `Span` 的子代，那么它就被称为有一个 *remote parent*。每个传播者的反序列化时必须在父 `SpanContext` 上将 `IsRemote` 设置为 true，这样在 `Span` 的创建时就知道父 `Span` 是否是远程的。
 
-Any span that is created MUST also be ended.
-This is the responsibility of the user.
-API implementations MAY leak memory or other resources
-(including, for example, CPU time for periodic work that iterates all spans)
-if the user forgot to end the span.
+任何被创建的 `Span` 也必须被结束。这是使用者的责任。如果使用者忘记结束 `Span`，API 实现可能会泄漏内存或其他资源（例如，适用于所有 `Span` 的周期性工作的 CPU 时间）。
 
-#### Determining the Parent Span from a Context
+#### 通过 Context 创建 Parent Span
 
-When a new `Span` is created from a `Context`, the `Context` may contain a `Span`
-representing the currently active instance, and will be used as parent.
-If there is no `Span` in the `Context`, the newly created `Span` will be a root span.
+当新的 Span 通过 Context 创建时，Context 可能已经包含一个代表当前活跃实例的 Span，并将其设置为新的 Span 的父 Span。如果 Context 中没有 Span，那么新创建的 Span 将是一个 Root Span。
 
-A `SpanContext` cannot be set as active in a `Context` directly, but by
-[wrapping it into a Span](#wrapping-a-spancontext-in-a-span).
-For example, a `Propagator` performing context extraction may need this.
+`SpanContext` 不能被直接设置成活跃状态，而是通过 [包装成 Span](#wrapping-a-spancontext-in-a-span)。
 
-#### Specifying links
+例如：提取 context 的 `Propagator` 可能需要这个。
 
-During the `Span` creation user MUST have the ability to record links to other
-`Span`s. Linked `Span`s can be from the same or a different trace. See [Links
-description](../overview.md#links-between-spans). `Link`s cannot be added after
-Span creation.
+#### 指定链接
 
-A `Link` is structurally defined by the following properties:
+在创建 `Span` 时，用户必须能够记录与其他 `Span`s 的链接。链接的 `Span` 可以来自相同或不同的 `Trace`。请看链接的[描述](../overview.md#links-between-spans)。Span 创建后不能添加链接。
 
-- `SpanContext` of the `Span` to link to.
-- Zero or more [`Attributes`](../common/common.md#attributes) further describing
-  the link.
+一个 `Link` 由一下属性组成。
 
-The Span creation API MUST provide:
+- `SpanContext` ，要链接的 `Span` 所属的 `SpanContext`。
+- 零或多个 [`属性`](../common/common.md#attributes) 用于描述链接。
 
-- An API to record a single `Link` where the `Link` properties are passed as
-  arguments. This MAY be called `AddLink`. This API takes the `SpanContext` of
-  the `Span` to link to and optional `Attributes`, either as individual
-  parameters or as an immutable object encapsulating them, whichever is most
-  appropriate for the language.
+Span 创建 API 必须提供：
 
-Links SHOULD preserve the order in which they're set.
+- 一个用于记录单个链接的 API，链接的属性可以作为参数进行传递。这可以被称为 `AddLink`。这个 API 需要参数: `SpanContext` （需要被链接的 `Span`）和可选的 `Attributes`，可以是单独的参数，也可以是封装它们的不可变对象，以各自编程语言自身最合适的方式为准。
 
-### Span operations
+链接应该保留其设置的顺序。
 
-With the exception of the function to retrieve the `Span`'s `SpanContext` and
-recording status, none of the below may be called after the `Span` is finished.
+### Span 操作
 
-#### Get Context
+除了从 `SpanContext` 取出 `Span` 与记录状态的操作外，其他操作都不能在 `Span` 结束后被调用
 
-The Span interface MUST provide:
+#### 获得 Context
 
-- An API that returns the `SpanContext` for the given `Span`. The returned value
-  may be used even after the `Span` is finished. The returned value MUST be the
-  same for the entire Span lifetime. This MAY be called `GetContext`.
+Span 接口必须提供：
+
+- 返回 `SpanContext`。一个 API 返回指定的 `Span` 的 `SpanContext`。即使在 Span 结束后，该接口也可以使用。返回的值必须整个 Span 寿命周期内保持不变。可以被称为 `GetContext` 。
 
 #### IsRecording
+
+返回 `true` 当该 `Span` 正在记录信息，例如使用 `AddEvent` 操作的事件，使用 `SetAttributes` 的属性，使用 `SetStatus` 的状态等。
 
 Returns true if this `Span` is recording information like events with the
 `AddEvent` operation, attributes using `SetAttributes`, status with `SetStatus`,
 etc.
 
-After a `Span` is ended, it usually becomes non-recording and thus
-`IsRecording` SHOULD consequently return false for ended Spans.
-Note: Streaming implementations, where it is not known if a span is ended,
-are one expected case where `IsRecording` cannot change after ending a Span.
+当 `Span` 结束后，通常会变成非记录状态，因此对结束的 Span，`IsRecording`应当返回 `false`。注意：流数据的实现时，它不知道一个 `Span` 是否结束，这是一个预期的情况。`IsRecording` 在 `Span` 结束后无法被修改
 
-`IsRecording` SHOULD NOT take any parameters.
+`IsRecording` 不应当接受任何参数。
 
-This flag SHOULD be used to avoid expensive computations of a Span attributes or
-events in case when a Span is definitely not recorded. Note that any child
-span's recording is determined independently from the value of this flag
-(typically based on the `sampled` flag of a `TraceFlag` on
-[SpanContext](#spancontext)).
+这个标记应当用来避免在 Span 没记录时，处理 Span 属性和事件（这两个操作是昂贵的计算）。注意任何子 span 的记录标记都是独立于父 span 的标记来决定的（通常基于 [SpanContext](#spancontext) 上的 TraceFlags 中的采样标记）。
 
-This flag may be `true` despite the entire trace being sampled out. This
-allows to record and process information about the individual Span without
-sending it to the backend. An example of this scenario may be recording and
-processing of all incoming requests for the processing and building of
-SLA/SLO latency charts while sending only a subset - sampled spans - to the
-backend. See also the [sampling section of SDK design](sdk.md#sampling).
+这个标签可能是 `true`， 当整个事件再被采样的时候。这允许不需要发送到后端即可记录和处理单个 `Span` 的信息。这个情况的一个例子可能是记录和处理所有的传入请求，用于创建 SLA/SLO 延迟图，同事只向后端发送一个子集（采样的子集）。详情参见 [sampling section of SDK design](sdk.md#sampling)。
 
-Users of the API should only access the `IsRecording` property when
-instrumenting code and never access `SampledFlag` unless used in context
-propagators.
+API 的使用者应当通过 instrumenting 代码访问 IsRecording 属性，除非在 context 传播器中使用，否则永远不要访问SampledFlag。
 
 #### Set Attributes
 
