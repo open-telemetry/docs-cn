@@ -311,17 +311,13 @@ Span 创建 API 必须提供：
 
 Span 接口必须提供：
 
-- 返回 `SpanContext`。一个 API 返回指定的 `Span` 的 `SpanContext`。即使在 Span 结束后，该接口也可以使用。返回的值必须整个 Span 寿命周期内保持不变。可以被称为 `GetContext` 。
+- 返回 `SpanContext`。一个 API 返回指定的 `Span` 的 `SpanContext`。即使在 Span 结束后，该接口也可以使用。返回的值必须整个 Span 寿命周期内保持不变。可以被称为 `GetContext` 。
 
 #### IsRecording
 
-返回 `true` 当该 `Span` 正在记录信息，例如使用 `AddEvent` 操作的事件，使用 `SetAttributes` 的属性，使用 `SetStatus` 的状态等。
+返回 `true` 当该 `Span` 正在记录信息，例如使用 `AddEvent` 操作的事件，使用 `SetAttributes` 的属性，使用 `SetStatus` 的状态等。
 
-Returns true if this `Span` is recording information like events with the
-`AddEvent` operation, attributes using `SetAttributes`, status with `SetStatus`,
-etc.
-
-当 `Span` 结束后，通常会变成非记录状态，因此对结束的 Span，`IsRecording`应当返回 `false`。注意：流数据的实现时，它不知道一个 `Span` 是否结束，这是一个预期的情况。`IsRecording` 在 `Span` 结束后无法被修改
+当 `Span` 结束后，通常会变成非记录状态，因此对结束的 Span，`IsRecording`应当返回 `false`。注意：流数据的实现时，它不知道一个 `Span` 是否结束，这是一个预期的情况。`IsRecording` 在 `Span` 结束后无法被修改
 
 `IsRecording` 不应当接受任何参数。
 
@@ -331,186 +327,116 @@ etc.
 
 API 的使用者应当通过 instrumenting 代码访问 IsRecording 属性，除非在 context 传播器中使用，否则永远不要访问SampledFlag。
 
-#### Set Attributes
+#### 设置属性 Set Attributes
 
-A `Span` MUST have the ability to set [`Attributes`](../common/common.md#attributes) associated with it.
+`Span` 必须支持设置予以相关的  [`属性`](../common/common.md#attributes) 。
 
-The Span interface MUST provide:
+Span 接口必须提供：
 
-- An API to set a single `Attribute` where the attribute properties are passed
-  as arguments. This MAY be called `SetAttribute`. To avoid extra allocations some
-  implementations may offer a separate API for each of the possible value types.
+- 一个 API 用于设置单个`属性`，其中的 `Span` 的具体属性可作为参数传递。这被称为 `SetAttribute`。为了避免额外的分配，一些实现可以为每个可能的值类型提供单独的 API。
 
-Setting an attribute with the same key as an existing attribute SHOULD overwrite
-the existing attribute's value.
+注意：OpenTelemetry 项目中定义了一些具有语义的  ["标准属性"](semantic_conventions/README.md)。
 
-Note that the OpenTelemetry project documents certain ["standard
-attributes"](semantic_conventions/README.md) that have prescribed semantic meanings.
+注意： [Samplers](sdk.md#sampler) 只考虑在创建 `Span` 时已经存在的信息。创建后的任何改变，包括创建/修改属性，都不能改变原有的决定。
 
-Note that [Samplers](sdk.md#sampler) can only consider information already
-present during span creation. Any changes done later, including new or changed
-attributes, cannot change their decisions.
+#### 增加事件 Add Events
 
-#### Add Events
+`Span` 必须提供增加事件的功能。事件在添加进入 `span` 的时候需存在一个时间戳。
 
-A `Span` MUST have the ability to add events. Events have a time associated
-with the moment when they are added to the `Span`.
+`Event` 的结构定义遵循以下的属性：
 
-An `Event` is structurally defined by the following properties:
+- 事件名称。
+- 事件时间。事件被添加的时间或用户提供的自定义时间戳。
+- 零或多个进一步描述事件的 [`属性`](../common/common.md#attributes) 属性。
 
-- Name of the event.
-- A timestamp for the event. Either the time at which the event was
-  added or a custom timestamp provided by the user.
-- Zero or more [`Attributes`](../common/common.md#attributes) further describing
-  the event.
+Span 接口必须提供：
 
-The Span interface MUST provide:
+- 一个用于记录单个`事件`的 API，事件属性被作为参数进行传递。这个 API 可以被成为 `AddEvent`。这个 API 需要该事件的名称，可选的属性和一个可选的`时间戳`（用于指定事件的发生时间），这些既可以是单独的参数，也可以是封装他们的不可变对象，以实现语言最合适的方式为准。如果用户没有自定义时间戳，那么会自动设置时间戳为该 API 被调用的时间。
 
-- An API to record a single `Event` where the `Event` properties are passed as
-  arguments. This MAY be called `AddEvent`.
-  This API takes the name of the event, optional `Attributes` and an optional
-  `Timestamp` which can be used to specify the time at which the event occurred,
-  either as individual parameters or as an immutable object encapsulating them,
-  whichever is most appropriate for the language. If no custom timestamp is
-  provided by the user, the implementation automatically sets the time at which
-  this API is called on the event.
+时间应按记录顺序排序。这通常和时间的时间戳相匹配，但时间可能使用自定义的时间戳进行乱序记录。
 
-Events SHOULD preserve the order in which they are recorded.
-This will typically match the ordering of the events' timestamps,
-but events may be recorded out-of-order using custom timestamps.
+消费者 (Consumers) 应注意，用户可以在开始 `Span` 前或结束 `Span` 后 为事件提供时间，因此事件的时间可能早于 span 的开始时间，或晚于 span 的结束时间。本规范不对事件时间超出 `span` 时间范围的情况，进行任何标准化。
 
-Consumers should be aware that an event's timestamp might be before the start or
-after the end of the span if custom timestamps were provided by the user for the
-event or when starting or ending the span.
-The specification does not require any normalization if provided timestamps are
-out of range.
+注意：OpenTelemetry 项目文档中定义了一些具有语义的  ["标准时间名称和键"](semantic_conventions/README.md) 。
 
-Note that the OpenTelemetry project documents certain ["standard event names and
-keys"](semantic_conventions/README.md) which have prescribed semantic meanings.
+注意： [`RecordException`](#record-exception) 是一种特殊的变体，用于记录 `AddEvent` 发生的异常时间。
 
-Note that [`RecordException`](#record-exception) is a specialized variant of
-`AddEvent` for recording exception events.
 
-#### Set Status
+#### 设置状态
 
-Sets the `Status` of the `Span`. If used, this will override the default `Span`
-status, which is `Unset`.
+为 `Span`设置状态，默认为 `Unset`。
 
-`Status` is structurally defined by the following properties:
+`Status` 有以下数据定义。
 
-- `StatusCode`, one of the values listed below.
-- Optional `Description` that provides a descriptive message of the `Status`.
-  `Description` MUST only be used with the `Error` `StatusCode` value.
+- `StatusCode`，以下所列的数值之一。
+-  `Description` 可选，提供状态的描述性信息。`描述`必须当 `StatusCode` 为 `error` 时使用。
 
-`StatusCode` is one of the following values:
+`StatusCode` 是下列数值之一：
 
 - `Unset`
-  - The default status.
+  - 默认状态
 - `Ok`
-  - The operation has been validated by an Application developer or Operator to
-    have completed successfully.
+  - 表示该操作依据被软件开发者或操作者验证为完全
 - `Error`
-  - The operation contains an error.
+  - 表示所属操作存在异常。
 
-The Span interface MUST provide:
+Span 接口必须提供：
 
-- An API to set the `Status`. This SHOULD be called `SetStatus`. This API takes
-  the `StatusCode`, and an optional `Description`, either as individual
-  parameters or as an immutable object encapsulating them, whichever is most
-  appropriate for the language. `Description` MUST be IGNORED for `StatusCode`
-  `Ok` & `Unset` values.
+- 一个用于设置`状态`的 API。应当被称为 `SetStatus`。API 接受 `StatusCode` 与可选的 `Description`，这些既可以是单独的参数，也可以是封装他们的不可变对象，以各自编程语言自身最合适的方式为准。对于 `StatusCode` 值为 `Ok` 或 `Unset` 时候必须忽略 `Description`。
 
-The status code SHOULD remain unset, except for the following circumstances:
+除以下情况外，状态码应保持不变：
 
-When the status is set to `ERROR` by Instrumentation Libraries, the status codes
-SHOULD be documented and predictable. The status code should only be set to `ERROR`
-according to the rules defined within the semantic conventions. For operations
-not covered by the semantic conventions, Instrumentation Libraries SHOULD
-publish their own conventions, including status codes.
+​	当 Instrumentation 库将状态设置成 Error 时，状态码应当被记录下来并可预测。状态代码应该只能根据语义惯例中定义的规则设置为 ERROR。对于语义约定未涵盖的操作，Instrumentation Libraries 应发布自己的约定，包括状态代码。
 
-Generally, Instrumentation Libraries SHOULD NOT set the status code to `Ok`,
-unless explicitly configured to do so. Instrumention libraries SHOULD leave the
-status code as `Unset` unless there is an error, as described above.
+通常而言，Instrumentation Libraries 不应将状态码设置为 OK，除非有明确合理的目的 。另外除非出现上述错误，否则 Instrumentation Libraries 应将状态码设置为 "未设置"。
 
-Application developers and Operators may set the status code to `Ok`.
+软件开发者或操作者可以设置状态码为 `Ok` 。
 
-Analysis tools SHOULD respond to an `Ok` status by suppressing any errors they
-would otherwise generate. For example, to suppress noisy errors such as 404s.
+分析工具应当对 `Ok` 状态做出响应，抑制它们因其他原因产生的任何错误。例如，为了抑制诸如 404s 错误。
 
-Only the value of the last call will be recorded, and implementations are free
-to ignore previous calls.
+只有最后一次调用的值被记录，实现可自由处理之前的调用。
 
-#### UpdateName
+#### 更新名称
 
-Updates the `Span` name. Upon this update, any sampling behavior based on `Span`
-name will depend on the implementation.
+更新 `Span` 名称。在名称更新后的任何基于名称的取样操作，将取决于实现者。
 
-Note that [Samplers](sdk.md#sampler) can only consider information already
-present during span creation. Any changes done later, including updated span
-name, cannot change their decisions.
+注意：  [Samplers](sdk.md#sampler)  只考虑在创建 `span` 期间已经存在的信息。任何创建后的修改，包括更新名称，都不能修改原有的决定。
 
-Alternatives for the name update may be late `Span` creation, when Span is
-started with the explicit timestamp from the past at the moment where the final
-`Span` name is known, or reporting a `Span` with the desired name as a child
-`Span`.
+ `span` 创建后名称更新的替代方法是：如果确定了最终 `span` 名称， 可以使用已明确的时间戳（过去的时间）创建 `Span`，或者将带有所需名称的 `Span` 报告为子 `Span`。
 
-Required parameters:
+创建 `Span` 过程的后段，当 Span 已经使用明确的时间戳开始时
 
-- The new **span name**, which supersedes whatever was passed in when the
-  `Span` was started
+需要参数：
 
-#### End
+- 新的 span 名称，取代在 `span` 创建时创建的名称。
 
-Signals that the operation described by this span has
-now (or at the time optionally specified) ended.
+#### 结束
 
-Implementations SHOULD ignore all subsequent calls to `End` and any other Span methods,
-i.e. the Span becomes non-recording by being ended
-(there might be exceptions when Tracer is streaming events
-and has no mutable state associated with the `Span`).
+表示该 `Span` 所描述的操作到现在（或者可选的指定时间）已经结束。
 
-Language SIGs MAY provide methods other than `End` in the API that also end the
-span to support language-specific features like `with` statements in Python.
-However, all API implementations of such methods MUST internally call the `End`
-method and be documented to do so.
+实现者应当忽略任何在 `end` 调用发生后的所有操作。换言之，span 被结束后就变为不可记录状态。（存在例外，例如当 `Tracer` 是流式事件且没有可变的状态分配给 `Span`）。 
 
-`End` MUST NOT have any effects on child spans.
-Those may still be running and can be ended later.
+语言 SIGs 可能利用特定语言的语言特性，提供除 `End` 以外的方法用于结束 `span` 。例如 Python 提供了 `with` 形式结束 `span` 。然而，所有实现者的 API 必须在内部存在 `call` 方法并提供文档教导如何使用。
 
-`End` MUST NOT inactivate the `Span` in any `Context` it is active in.
-It MUST still be possible to use an ended span as parent via a Context it is
-contained in. Also, any mechanisms for putting the Span into a Context MUST
-still work after the Span was ended.
+`End` 必须不会影响子 `Span`s。这些 `Span` 可能在父 `span` 结束后仍然在运行。
 
-Parameters:
+`End` 必须不会使任何 `Context` 中的 `span` 进入非活跃状态。必须仍然可以通过 Context 使用已经结束的 `span` 作为父 `span`。此外，任何将 `Span` 放入 `Context` 的逻辑都必须保证在 `Span` 结束后依旧有效。
 
-- (Optional) Timestamp to explicitly set the end timestamp.
-  If omitted, this MUST be treated equivalent to passing the current time.
+参数:
 
-This API MUST be non-blocking.
+- (可选) 一个时间戳用于明确结束时间。如果省略，则必须等价于调用时的时间戳。
 
-#### Record Exception
+API 必须是非阻塞的。
 
-To facilitate recording an exception languages SHOULD provide a
-`RecordException` method if the language uses exceptions.
-This is a specialized variant of [`AddEvent`](#add-events),
-so for anything not specified here, the same requirements as for `AddEvent` apply.
+#### 记录异常
 
-The signature of the method is to be determined by each language
-and can be overloaded as appropriate.
-The method MUST record an exception as an `Event` with the conventions outlined in
-the [exception semantic conventions](semantic_conventions/exceptions.md) document.
-The minimum required argument SHOULD be no more than only an exception object.
+为了方便记录异常，实现者应该提供一个 `RecordException` 方法。该 API 可视为  [`AddEvent`](#add-events)的一个特殊变体，同时接口没有额外的参数要求，与 `AddEvent` 的要求是一样的。
 
-If `RecordException` is provided, the method MUST accept an optional parameter
-to provide any additional event attributes
-(this SHOULD be done in the same way as for the `AddEvent` method).
-If attributes with the same name would be generated by the method already,
-the additional attributes take precedence.
+该方法的签名由每种语言决定，并可酌情实现重载。该方法必须使用[异常语义约定](semantic_conventions/exceptions.md)文档中的规定，将异常记录为一个事件。所需的最小参数应该只是一个异常对象。
 
-Note: `RecordException` may be seen as a variant of `AddEvent` with
-additional exception-specific parameters and all other parameters being optional
-(because they have defaults from the exception semantic convention).
+如果提供 `RecordException`，该方法必须接受一个可选参数，以提供任何附加的事件属性（这应该以与 `AddEvent` 方法相同的方式进行）。如果该方法已经生成了同名的属性，那么附加的属性将优先。
+
+注意：`RecordException`  可以被看作是 `AddEvent` 的一个变体，它有额外的参数用于记录异常，而其他参数都是可选的（因为它们有异常语义约定的默认值）。
 
 ### Span lifetime
 
