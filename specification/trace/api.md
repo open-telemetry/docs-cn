@@ -41,7 +41,7 @@ Table of Contents
 
 </details>
 
- Tracing API 由以下三种类组成:
+Tracing API 由以下三种类组成:
 
 - [`TracerProvider`](#tracerprovider) 是 API 的入口点 (Entry Point) 。
   它提供对 Tracers 的访问。
@@ -50,13 +50,11 @@ Table of Contents
 
 ## 数据类型
 
-不同编程语言和平台有不同的数据表示方式。
-本节定义了 Tracing API 的一些通用规定。
+不同编程语言和平台有不同的数据表示方式，本节定义了 Tracing API 的一些通用规定。
 
 ### 时间 Time
 
-OpenTelemetry 可以处理精度为纳秒的时间值。
-The representation of those values is language specific.
+OpenTelemetry 可以处理精度为纳秒(ns)的时间值。这些值的表现方式是语言特定的。
 
 #### 时间戳 Timestamp
 
@@ -78,9 +76,9 @@ The representation of those values is language specific.
 
 在本 API 实现中， `TracerProvider` 应当是一个有状态的对象，且可以容纳任意配置。
 
-通常而言， `TracerProvider`  应当可以通过控制平面进行访问。因此，建议 API 提供一种可以设置/注册和访问全局默认 `TracerProvider` 的方法。
+通常而言， 应该从中心位置访问 `TracerProvider` 。因此，建议 API 提供一种可以设置/注册和访问全局默认 `TracerProvider` 的方法。
 
-然而在全局 `TracerProvider` 的情况下，一些软件可能还是希望使用多个 `TracerProvider` 实例，
+然而在全局 `TracerProvider` 的情况下，一些应用可能还是希望使用多个 `TracerProvider` 实例，
 例如：为每个实例加载不同配置（例如 `SpanProcessor`），或更好地与依赖注入框架进行协作
 
 to have different configuration (like `SpanProcessor`s) for each
@@ -90,30 +88,31 @@ or because its easier with dependency injection frameworks.
 
 ### TracerProvider 操作 TracerProvider operations
 
- `TracerProvider` 必须包含提供以下 API：
+`TracerProvider` 必须包含提供以下 API：
 
-- 获得一个 `Trace` 
+- 获得一个 `Trace`
 
 #### 获得一个 Trace
 
 本 API 必须接受以下参数：
 
-- `name` (required):  该输入必须是 [instrumentation library](../overview.md#instrumentation-libraries) 的名称 (identify) 
-  (e.g. `io.opentelemetry.contrib.mongodb`)，而不是 instrumented library.
+- `name` (required):  该值必须标识出 [instrumentation library](../overview.md#instrumentation-libraries)
+  (例如 `io.opentelemetry.contrib.mongodb`)，而不是 instrumented library.
   如果指定了一个无效的名称（空或者空字符串），将会返回一个可工作的默认 Trace ，而不是返回 null 或者抛出异常。
-  
-  当一个实现 OpenTelemetry API 的库不支持“命名”功能时，该库可以忽略该命名，并对所有调用返回一个默认实例。(例如，一个甚至于可观察性无关的实例)。
+
+  当一个实现 OpenTelemetry API 的库不支持“命名”功能时，该库可以忽略该命名，并对所有调用返回一个默认实例。(例如，一个甚至与可观察性无关的实例)。
   TracerProvider 也可以返回一个无操作 (no-op) Tracer，当应用程序所有者配置了 SDK 来抑制该库产生遥感数据。
-  
-- `version` (optional): Instrumentation library 的版本 (e.g. `1.0.0`).
+
+- `version` (optional): Instrumentation library 的版本 (例如 `1.0.0`).
 
 该接口不确保在相同/不同的情况下，返回相同/不同的 `Trace` 实例。
 
-该接口的实现禁止要求用户通过使用相同的名称+版本参数，重复获取 `Tracer`，接受 配置的变更。
+该接口的实现禁止要求用户通过使用相同的名称+版本参数重复获取 `Tracer`来接收配置的变更。
+这可以通过允许过时的配置继续工作或者确保新配置也适用于之前返回的 `Tracer`来实现。
 
-这意味着使用过时的配置或通过确保新的配置，都可以获得到之前返回的 `Tracer`s
-
-注: 这是可行的，例如，在 `TracerProvider` 中实现存储可变化的配置，同时实现 `Tracer`实现一个对 `TracerProvider` 引用的对象。如果配置必须按照每个 Tracer 存储（如禁止某个 Tracer），可以在 `TracerProvider` 中实现一个 name+version 的 map，或者实现一个注册表，用于存储所有返回的 `Tracer` 。当配置发生改变时进行主动更新。
+注: 这是可行的，例如，在 `TracerProvider` 中存储可变化的配置，同时从这个 `TracerProvider` 生成的 `Tracer` 对象持有该 `TracerProvider` 的引用。
+如果配置必须按照每个 Tracer 存储（如禁止某个 Tracer），则 `Tracer` 可以通过name+version在 `TracerProvider` 提供的map中查找，
+或者在 `TracerProvider` 中维护一个包含所有返回的 `Tracer`的注册表 ，并在配置发生改变时进行主动更新。
 
 ## Context Interaction
 
@@ -124,7 +123,7 @@ API 必须提供以下功能来与 `Context` 实例进行交互:
 - 提取 `Span` 从一个 `Context` 实例中
 - 插入 `Span` 从一个`Context` 实例中
 
-以上罗列的功能是必要的，因为 API 用户不应当使用 [Context Key](../context/context.md#create-a-key)  访问 Tracing API 的实现。
+以上罗列的功能是必要的，因为 API 用户不应当通过 Tracing API 的实现访问 [Context Key](../context/context.md#create-a-key)。
 
 如果编程语言支持隐性传递 `Context` (see [here](../context/context.md#optional-global-operations))，本 API 应当也提供以下功能。
 
@@ -155,10 +154,10 @@ OpenTelemetry `SpanContext` 符合 [W3C TraceContext 规范](https://www.w3.org/
 
 `SpanId` 一个有效的 SpanId 是一个 8 字节的数组，且至少有一个非零字节。
 
-`TraceFlags` 包含该 trace 的详情。不像 TraceState，TraceFlags 影响所有的 traces。当前版本和定义的 Flags 只有 sampled 。
+`TraceFlags` 包含该 trace 的详情。不像 TraceState，TraceFlags 影响所有的 traces。当前版本和定义的 Flags 只有 [sampled](https://www.w3.org/TR/trace-context/#sampled-flag) 。
 
 `TraceState` 携带特定 trace 标识数据，通过一个 KV 对数组进行标识。TraceState允许多个跟踪系统参与同一个 Trace。完整定义请参考 [W3C Trace Context
-specification](https://www.w3.org/TR/trace-context/#tracestate-header).
+specification](https://www.w3.org/TR/trace-context/#tracestate-header) 。
 
 本 API 必须实现创建 `SpanContext` 的方法。这些方法应当是唯一的方法用于创建 `SpanContext`。这个功能必须在 API 中完全实现，并且不应当可以被覆盖。
 
@@ -166,7 +165,7 @@ specification](https://www.w3.org/TR/trace-context/#tracestate-header).
 
 本 API 必须支持通过以下方式检索 `TraceId` 与 `SpanId`：
 
-* Hex - 返回十六进制格式 `TraceID` （结果必须是一个 32 个 十六进制字符的小写字母）或 `SpanID` 结果必须是一个 16 个十六进制字符的小写字母）
+* Hex - 返回十六进制格式 `TraceID` （结果必须是一个 32 个 十六进制字符的小写字母）或 `SpanID` （结果必须是一个 16 个十六进制字符的小写字母）
 * Binary - 返回二进制格式 `TraceId` （结果必须是 16 字节数组）或 SpanId（结果必须是8字节数组）。
 
 API 不应该暴露它们内部存储细节。
@@ -191,9 +190,15 @@ Tracing API 必须在 `TraceState` 上至少提供以下操作：
 * 添加新的 key/value pair
 * 删除 key/value pair
 
-这些操作必须遵循 [W3C Trace Context specification](https://www.w3.org/TR/trace-context/#mutating-the-tracestate-field) 中的定义规则。所有转变操作都必须返回新的修改生效的`TraceState`。`TraceState`  必须所有时候都按照  [W3C Trace Context specification](https://www.w3.org/TR/trace-context/#tracestate-header-field-values) 规范中指定的规则进行验证。每个转变操作必须验证输出的参数。如果操作被传入了无效值，必须不能返回带有无效数据的 `TraceState`。并且必须遵循 [一般错误处理准则](../error-handling.md) 。（例如，通常不得返回 null 或抛出异常）
+这些操作必须遵循 [W3C Trace Context specification](https://www.w3.org/TR/trace-context/#mutating-the-tracestate-field) 中的定义规则。
+所有转变操作都必须返回新的修改生效的`TraceState`。`TraceState`  必须所有时候都按照  
+[W3C Trace Context specification](https://www.w3.org/TR/trace-context/#tracestate-header-field-values) 
+规范中指定的规则进行验证。每个转变操作必须验证输出的参数。如果操作被传入了无效值，必须不能返回带有无效数据的 `TraceState`。
+并且必须遵循 [一般错误处理准则](../error-handling.md) 。（例如，通常不得返回 null 或抛出异常）
 
-注意: 由于 `SpanContext` 不可变，所以不可能用新的 `TraceState` 更新 `SpanContext`。 因此这种更改只有在 [`SpanContext` 传播 ](../context/api-propagators.md)或[遥感数据导出](sdk.md#span-exporter)发生前进行才有意义。在这两种情况下， `Propagators` 和 `SpanExporters`  可能在序列化到线上之前，创建更改后的 `TraceState` 副本。
+注意: 由于 `SpanContext` 不可变，所以不可能用新的 `TraceState` 更新 `SpanContext`。 
+因此这种更改只有在 [`SpanContext` 传播 ](../context/api-propagators.md)或[遥感数据导出](sdk.md#span-exporter)发生前进行才有意义。
+在这两种情况下， `Propagators` 和 `SpanExporters`  可能在序列化到线上之前，创建更改后的 `TraceState` 副本。
 
 ## Span
 
@@ -214,11 +219,9 @@ Tracing API 必须在 `TraceState` 上至少提供以下操作：
 - 一个 [`Status`](#set-status)
 
 span 名称应当简单扼要地表明该 Span 的工作内容。
-
 例如，一个 RPC 方法名，一个函数名，一个庞大计算任务中子任务或者阶段的名称。
-
-span 名称应当是一种具有通用性字符串，便于后续的统计学处理。而不是单个 span 实例同时人的可读性。
-也就是说，"get_user" 是一个合理的名词，而 "get_user/314159"，当中 "314159" 是一个用户 ID，这不是一个好的名字不具备高基数率 (high cardinality)。通用型应当优先于人的可读性。
+span 名称应当是一种具有通用性字符串，便于后续的统计学处理。而不是单个 Span 实例，同时仍然是人类可读的。
+也就是说，"get_user" 是一个合理的名称，而 "get_user/314159"，当中 "314159" 是一个用户 ID，这不是一个好的名称不具备高基数率 (high cardinality)。通用型应当优先于人的可读性。
 
 例如，以下是获得账户信息的端点 API 备选跨度名称列表。
 
@@ -226,7 +229,7 @@ span 名称应当是一种具有通用性字符串，便于后续的统计学处
 | ------------------------- | ------------------------------------------------------------ |
 | `get`                     | 过于普遍                                                     |
 | `get_account/42`          | 过于特殊                                                     |
-| `get_account`             | 不错, 同时 account_id=42 可以使一个很不错的a nice Span attribute |
+| `get_account`             | 不错, account_id=42 可以作为 Span 的 attribute |
 | `get_account/{accountId}` | 同样不错 (使用 "HTTP route")                                 |
 
 `Span` 的开始和结束时间戳反应了操作的实际时间。
@@ -241,13 +244,13 @@ span 名称应当是一种具有通用性字符串，便于后续的统计学处
 - 构建响应
 - 发送响应
 
-可以通过创建 Child spans（或者在一些情况下）来更详细观察描述子操作。Child spans 应当衡量各个子操作的时间，并可以添加相应的属性。
+可以通过创建 Child spans（或者在一些情况下用events）来更详细观察描述子操作。Child spans 应当衡量各个子操作的时间，并可以添加相应的属性。
 
 Span 的开始时间应当设置为创建 Span 时的当前时间。Span 创建后应当可以更改名称，设置属性，添加事件和设置状态。在 Span 的结束时间被设置后，这些都不允许被改变。
 
-`Span`s 没有在进程中传播的功能。为了防止被无用，实现中除了 `SpanContext` 外不应当提供对 Span 属性的访问。
+`Span`s 没有在进程中传播的功能。为了防止被误用，实现中除了 `Span` 自己的 `SpanContext` 外不能访问到 `Span` 的属性。
 
-广商可以通过实现 `Span` 接口来满足厂商自身特定的逻辑，然而其他实现严禁允许调用者直接创建 `Span`。所有的 `Span` 必须由 `Tracer` 创建
+厂商可以通过实现 `Span` 接口来满足厂商自身特定的逻辑，然而这些可供替代的实现不得允许调用者直接创建 `Span`。所有的 `Span` 必须由 `Tracer` 创建。
 
 ### 创建 Span
 
@@ -260,21 +263,24 @@ API 必须接受以下参数：
 - Span 名称。这是必须的参数。
 
 - 父 `Context` 或者表明该新的 `Span` 是 `root Span`。
-  
   API 需要提供一个选项，用于设置默认行为：将当前的 `Context` 作为父级。
-  
   API 禁止接收 `Span` 或 `SpanContext` 作为父级，只能是完整的 `Context`。
   
-  Span 的语义父级必须要个遵守  [Determining the Parent Span from a Context](#determining-the-parent-span-from-a-context) 中描述的规则。
+  Span 的语义父级必须根据  [Determining the Parent Span from a Context](#determining-the-parent-span-from-a-context) 中描述的规则确定。
   
 - [`SpanKind`](#spankind)，默认值为: `SpanKind.Internal`。
 
-- `[Attributes](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/common/common.md#attributes)`。此外，这些属性还可用于定义[取样详情](sdk.md#sampling)。如果没有指定，该字段将被假定是一个空的集合。只要有可能，使用者应该在创建跨度时设置相应属性，而不是在创建之后，调用SetAttribute。
+- [`Attributes`](../common/common.md#attributes)。此外，这些属性还可用于定义[取样详情](sdk.md#sampling)。如果没有指定，该字段将被假定是一个空的集合。
+  
+  只要有可能，使用者应该在创建跨度时设置相应属性，而不是在创建之后，调用 `SetAttribute` 。
+  
 - `Link`s - 一个有序的链接序列，详情见 [here](#specifying-links).
 - `Start timestamp`，默认为当前时间。应当只能在创建时间已经发生的 Span 时才可以使用本参数。如果 API 在 Span 逻辑发生时被调用，API 使用者必须能设置该参数。
 
 
-每个 span 都有零或一个父 span 和零或多个子 span，这用于记录操作的因果关系。Spans 的关联树构成了 Trace。如果一个 span 没有父 span，那它被定义成一个 *根 (root) span*。每个 Trace 有且只有一个的 root span，它是所有其他的 Trace 中的 span 的祖先。实现必须提供一个选项用于创建一个 `Span` 作为 root span，并且必须每次创建 root span 时生成一个新的 `TraceId`。对于有父 span 的 `Span`，`TraceId` 必须与父 span 相同。此外，子 span 必须默认继承其父 span 的所有 `TraceState` 值。
+每个 span 都有零或一个父 span 和零或多个子 span，这用于记录操作的因果关系。Spans 的关联树构成了 Trace。如果一个 span 没有父 span，那它被定义成一个 *根 (root) span*。
+每个 Trace 有且只有一个的 root span，它是所有其他的 Trace 中的 span 的祖先。实现必须提供一个选项用于创建一个 `Span` 作为 root span，并且必须每次创建 root span 时生成一个新的 `TraceId`。
+对于有父 span 的 `Span`，`TraceId` 必须与父 span 相同。此外，子 span 必须默认继承其父 span 的所有 `TraceState` 值。
 
 如果一个 `Span` 是被另一个进程中创建的 `Span` 的子代，那么它就被称为有一个 *remote parent*。每个传播者的反序列化时必须在父 `SpanContext` 上将 `IsRemote` 设置为 true，这样在 `Span` 的创建时就知道父 `Span` 是否是远程的。
 
