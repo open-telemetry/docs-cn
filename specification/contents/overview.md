@@ -56,13 +56,13 @@ For example, the following is an example **Trace** made up of 6 **Spans**:
 ### SpanContext(Span上下文)
 
 包含所有能够识别**Trace**中某个**Span**的信息，而且该信息必须要跨越进程边界传播到子Span中。
-一个**SpanContext**包含了跟踪ID和一些设置选项。
+一个**SpanContext**包含了将会由父**Span**传播到子**Span**的跟踪ID和一些设置选项。
 
 - **TraceId** 是一条Trace的全局唯一ID，由16个随机生成的字节组成,TraceID用来把该次请求链路的所有Spans组合到一起
 - **SpanId** 是Span的全局唯一ID，由8个随机生成的字节组成，当一个SpanID被传播到子Span时，该ID就是子Span的父SpanID
 - **TraceFlags** 代表了一条Trace的设置标志，由一个字节组成(里面8个bit都是设置位) 
   - 例如采样Bit位 -  设置了该Trace是否要被采样（掩码`0x1`).
-- **Tracestate** 携带了具体的跟踪内容，表现为[{key:value}]的形式,**Tracestate** 允许不同的APM提供商加入额外的自定义内容和对于旧ID的转换处理，更多内容请查看[this](https://w3c.github.io/trace-context/#tracestate-field).
+- **Tracestate** 携带了具体的跟踪内容，表现为[{key:value}]的键指对形式,**Tracestate** 允许不同的APM提供商加入额外的自定义内容和对于旧ID的转换处理，更多内容请查看[这里](https://w3c.github.io/trace-context/#tracestate-field).
 
 ### Span之间的Links(链接) 
 
@@ -70,28 +70,30 @@ For example, the following is an example **Trace** made up of 6 **Spans**:
 
 这些链接可以指向某一个**Trace**内部的**SpanContexts**，也可以指向其它的**Traces**。
 
-**Links**可以用来代表这种批量操作：一个**Span**需要多个**Span**进行初始化。另一个例子是：
-申明原始trace和后续trace之间的关系，例如**Trace**进入了一个受信边界，进入后需要重新生成一个新的Trace。
-或者一个长时间运行的异步数据处理操作被一个用户请求初始化时。
+**Links**可以用来代表这种批量操作：一个**Span**需要多个**Span**进行初始化。    
+另一个使用**Link**的例子是：申明原始trace和后续trace之间的关系，例如**Trace**进入了一个受信边界，进入后需要重新生成一个新的Trace。
+新的被链接的Trace也可以用来代表被许多快速进入的请求之一所初始化的一个长时间运行的异步数据处理操作。
 
-在上述分散/聚合模式下，当根操作开启多个下游处理时，这些都会最终聚合到一个**Span**中，这个最后的*Span**被链接到它所聚合
-的多个操作中。
+在上述分散/聚合模式下，当根操作开启多个下游处理时，这些都会最终聚合到一个**Span**中，这个最后的**Span**被链接到它所聚合
+的多个操作中。最后的Span将会被进行聚合其操作的Span所链接，这些Span都是来自同一个Trace，类似于Span的parent字段。
+但是建议在这个场景下，建议不要设置Span的parent字段，因为从语义上来说，parent字段表示单亲场景，父Span将
+完全包含子Span的所有范围，但是在分散/聚合模式和批处理场景下并不是如此。
 
 ## 指标(Metrics)
 
-OpenTelemetry允许用户使用预定义的聚合方法和标签记录应用指标数据。
+OpenTelemetry允许用户使用预定义的聚合方法和标签记录原始数据与指标。
 
-使用OpenTelemetry API记录指标数据时，我们可以把指标聚合的算法、标签分类等决定放在最后执行。用gRPC的客户端库，
-我们可以记录“服务器端延迟”或“接收字节数”等指标。因此终端用户就可以在大量的原始数据中，决定收集什么样的数据：可能是简单的
+当使用OpenTelemetry API记录原始数据时，我们可以在最后决定使用什么样的聚合算法或者标签来记录指标。当我们采用客户端库比如gRPC时，
+我们可以记录“服务器端延迟”或“接收字节数”等原始数据。因此终端用户就可以在大量的原始数据中，决定收集什么样的数据：可能是简单的
 求平均或详细的直方图(histogram)计算。
 
-这种指标收集实际上是非常重要的，例如我们可以用来收集CPU和内存使用信息，也可以收集简单的指标例如"队列长度"。
+这种预定义聚合的方式来进行指标收集实际上是非常重要的，例如我们可以用来收集CPU和内存使用信息，也可以收集简单的指标例如"队列长度"。
 
-### 记录原始指标
+### 记录原始数据
 
-用来记录原始指标主要的代码类是 `Measure` 和 `Measurement`。我们可以用OpenTelemetry API记录
+用来记录原始数据主要的代码类是 `Measure` 和 `Measurement`。我们可以用OpenTelemetry API记录
 `Measurement`列表，同时记录一些上下文信息。因此用户可以自定义如何聚合`Measurement`，同时可以使用上下文信息对
-最终结果进行额外的定义。
+最终指标结果进行额外的定义。
 
 
 #### Measure
@@ -115,7 +117,7 @@ Counter有两种类型：`double`和`long`
 - Gauge(实时值)指标，它也是一种瞬时测量值。与Counter不同的是，Gauges可以上下变动，也可以为负数。Gauges也有两种类型：
 `double`和`long`
 
-API允许使用选定的API来构造一个`Metric`，SDK则定义了一个`Metric`的当前值该怎么查询。
+API允许构造一个指定类型的`Metric`，SDK则定义了一个被导出的`Metric`的当前值该怎么查询。
 
 每个`Metric`类型都有自己的API来记录数据，而且支持读取或设置`Metric`的值。
 
@@ -126,9 +128,9 @@ API允许使用选定的API来构造一个`Metric`，SDK则定义了一个`Metri
 [metrics.proto](https://github.com/open-telemetry/opentelemetry-proto/blob/master/opentelemetry/proto/metrics/v1/metrics.proto)协议。
 
 该数据模型被所有OpenTelemetry导出器(exporters)作为数据输入来使用。不同的导出器有不同的能力(例如支持哪种数据类型)，
-还有不同的限制(例如在标签Key中哪些字符类型被允许)。所有的导出器都通过OpenTelemetry SDK中定义的指标生产者接口( Metric Producer interface)从数据指标模型中消费数据，
+还有不同的限制(例如在标签Key中哪些字符被允许)。所有的导出器都通过OpenTelemetry SDK中定义的指标生产者接口( Metric Producer interface)从数据指标模型中消费数据，
 
-因为上面的原因，指标对于数据本身是做了最小化限制的(例如支持哪种数据类型)，处理指标的代码应该避免对这些指标数据进行
+因为上面的原因，指标对于数据本身是做了最小限制的(例如在标签Key中支持哪些字符)，处理指标的代码应该避免对这些指标数据进行
 验证和净化。你应该做的是：把这些数据传到服务器端，让服务器端来做验证，然后从服务器端接收错误。
 
 OpenTelemetry根据国际常用惯例预定义了一些指标名称：[Semantic Conventions](data-semantic-conventions.md)
