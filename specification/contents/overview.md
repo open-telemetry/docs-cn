@@ -155,7 +155,7 @@ OpenTelemetry根据国际常用惯例预定义了一些指标名称：[Semantic 
 
 ## Resources
 
-`Resource`记录当前发生采集的实体的信息(虚拟机、容器等)，例如，Metrics如果是通过Kubernetes容器导出的，那么resouce可以记录
+`Resource`记录当前发生采集的实体的信息(虚拟机、容器等)，例如，Metrics如果是通过Kubernetes容器导出的，那么resource可以记录
 Kubernetes集群、命名空间、Pod和容器名称等信息。
 
 `Resource`也可以包含实体信息的层级结构，例如它可以描述云服务器/容器和跑在其中的应用。
@@ -163,21 +163,23 @@ Kubernetes集群、命名空间、Pod和容器名称等信息。
 注意，一些OpenTelemetry的SDK或者特定的导出器也会自动采集`Resource`信息，具体例子请查看：
 [proto](https://github.com/open-telemetry/opentelemetry-proto/blob/a46c815aa5e85a52deb6cb35b8bc182fb3ca86a0/src/opentelemetry/proto/agent/common/v1/common.proto#L28-L96)
 
-**TODO**: 更好的描述出`Resource`和`Node`的区别
-https://github.com/open-telemetry/opentelemetry-proto/issues/17
+## Context Propagation
+所有OpenTelemetry中的关注点（比如trace和metric指标）都共享一个底层上下文机制，用于在分布式事务的整个生命周期内存储状态和访问数据。    
+
+详情可以查看[这里](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/context/context.md)。
 
 ## Propagators(传播者)
 
-OpenTelemetry使用`Propagators`来序列化和反序列化`SpanContext`及`DistributedContext`，当前有两种
-传播者：
+OpenTelemetry使用`Propagators`来序列化和反序列化中的关注点，比如Span（通常仅限于SpanContext部分）和Baggage。
+不同的`Propagator`的类型定义了特定传输方式下的限制并将其绑定到一个数据类型上。     
+传播者Propagators API定义了一个`Propagator`类型：
 
-- `BinaryFormat` 把一个值序列化/反序列化成binary格式 
-- `HTTPTextFormat` 顾名思义是Text文本格式
+- `TextMapPropagator` 可以将值注入文本，也可以从文本当中提取值
 
-## Agent/Collector
+## Collector
 
-OpenTelemetry服务是由一系列组件组成的，可以使用Opentelemetry或三方SDK(Jaeger、Prometheus等)收集跟踪、指标和日志等数据，
-然后对这些数据进行聚合、智能采样，再导出到一个监控后端。
+OpenTelemetry collector是由一系列组件组成的，这些组件可以使用OpenTelemetry或三方SDK(Jaeger、Prometheus等)收集trace跟踪、metric指标和日志等数据，
+然后对这些数据进行聚合、智能采样，再导出到一个监控后端。Collector将允许加工转换收集到的数据（比如添加额外属性或者删除隐私数据）。
 
 OpenTelemetry服务由两个主要的模型：Agent(一个本地代理)和Collector(一个独立运行的服务)。
 
