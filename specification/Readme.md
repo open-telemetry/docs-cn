@@ -1,42 +1,86 @@
-# OpenTelemetry技术标准定义(Specification)
-![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/open-telemetry/specification.svg)
+# OpenTelemetry 标准规范
 
-该Specification描述了各个语言SDK在实现OpenTelemetry时需要遵照的标准要求。
+<p align="center">
+  <strong>
+    <a href="https://github.com/open-telemetry/opentelemetry-specification">English Version<a/>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://github.com/open-telemetry/docs-cn">中文文档使用指南<a/>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://gitter.im/open-telemetry/docs-cn">参与中文文档贡献<a/>
+  </strong>
+</p>
 
-## 索引目录
-- [ ] [标准概述](contents/overview.md)
-- [ ] [代码库(Library)指南](contents/library-guidelines.md)
-  - [ ] [代码库的组织布局](contents/library-layout.md)
-  - [ ] [并发和线程安全](contents/concurrency.md)
-- API规范
-  - [ ] [DistributedContext(分布式环境下上下文)](contents/api-distributedcontext.md)
-    - [ ] [Propagators(数据传播)](contents/api-propagators.md)
-  - [ ] [Resources](contents/api-resources.md)
-  - [ ] [Tracing(分布式追踪)](contents/api-tracing.md)
-    - [ ] [Sampling(采样频率控制)](contents/api-sampling.md)
-  - [ ] [Metrics(指标)](contents/api-metrics.md)
-- 数据规范
-  - [ ] [语义约定](contents/data-semantic-conventions.md)
-- 关于该项目
-  - [x] [进度时间表](#项目时间表)
-  - [x] [社区贡献](#贡献者) 
+![OpenTelemetry Logo](https://opentelemetry.io/img/logos/opentelemetry-horizontal-color.png)
+
+
+对 OpenTelemetry 充满好奇? 去 [官网](https://opentelemetry.io) 一探究竟吧！
+
+OpenTelemetry 规范描述了所有 OpenTelemetry 协议实现的跨语言要求和期望。对规范的实质性修改必须使用 [OpenTelemetry 增强提案(Enhancement Proposal)](https://github.com/open-telemetry/oteps) 流程。小的更改，如措辞优化、拼写/语法更正等，可以直接通过 Pull request 进行。
+
+需要额外讨论的问题可以在协议例会中提出。对欧盟和美国时区友好的会议在每周二太平洋时间上午 8 点举行。会议记录在 [Google doc](https://docs.google.com/document/d/1-bCYkN-DWJq4jw1ybaDZYYmx-WAe6HnwfWbkm8d57v8/edit?usp=sharing) 中。对亚太时区友好的会议在太平洋时间每周二下午 4 点举行。参见 [OpenTelemetry calendar](https://github.com/open-telemetry/community#calendar)。
+
+## 目录
+
+- [Overview](specification/overview.md)
+- [Glossary](specification/glossary.md)  ✅
+- [Library Guidelines](specification/library-guidelines.md)
+  - [Package/Library Layout](specification/library-layout.md)
+  - [General error handling guidelines](specification/error-handling.md)
+- API Specification
+  - [Baggage](specification/baggage/api.md)
+    - [Propagators](specification/context/api-propagators.md)
+  - [Tracing](specification/trace/api.md)  🚧
+  - [Metrics](specification/metrics/api.md)
+- SDK Specification
+  - [Tracing](specification/trace/sdk.md)
+  - [Metrics](specification/metrics/sdk.md)
+  - [Resource](specification/resource/sdk.md)
+  - [Configuration](specification/sdk-configuration.md)
+- Data Specification
+  - [Semantic Conventions](specification/overview.md#semantic-conventions)
+  - [Protocol](specification/protocol/README.md)
+- About the Project
+  - [Timeline](#project-timeline)
+  - [Notation Conventions and Compliance](#notation-conventions-and-compliance)
+  - [Versioning](#versioning)
+  - [Acronym](#acronym)
+  - [Contributions](#contributions)
   - [License](#license)
 
-注：索引条目前的☑代表已经翻译
+## 项目 Timeline
 
-## 项目时间表
+当前项目状态与过去各重要版本的信息可以从以下网址中获取。[The OpenTelemetry project page](https://opentelemetry.io/project-status/).
 
-OpenTelemetry当前仍在紧锣密鼓地开发中，可以查看我们的[Milestone](milestones.md)来大致了解开发的时间节点。
+当前项目工作和未来的发展计划信息可以在 [Specification development milestones](https://github.com/open-telemetry/opentelemetry-specification/milestones) 中查阅。
 
+## 符号约定和合规性
 
-## 贡献者
+规范中的关键词 "MUST"、"MUST NOT"、"REQUIRED"、"SHALL"、"SHALL NOT"、"SHOULD"、"SHOULD NOT"、"RECOMMENDED"、"NOT RECOMMENDED"、"MAY "和 "OPTIONAL"，当且仅当它们以全大写字母出现时，应按 [BCP 14](https://tools.ietf.org/html/bcp14) [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] 中所述进行解释。
 
-目前因为该Specification在快速变动中，因此我们暂定：
-1. 使用[issues](https://github.com/open-telemetry/specification/issues)来提交你的想法及建议
-2. 当完成第一步后, OpenTelemetry的开发会就该issue与你进行深入讨论，当issue确认后，你可以通过[pull requests](https://github.com/open-telemetry/specification/pulls) 来提交
+如果一个规范的实现未能满足规范中定义的 MUST", "MUST NOT", "REQUIRED", "SHALL", 或 "SHALL NOT" 中的一项或多项要求，则该实现是不合规。反之，如果一个规范的实现满足规范中定义的所有 MUST", "MUST NOT", "REQUIRED", "SHALL", 或 "SHALL NOT" 要求，则该规范的实现是合规的。
 
-当前具体的流程参见[CONTRIBUTING.md](CONTRIBUTING.md), 在未来，我们也会设置更加完整的RFC流程来跟踪讨论这些变化。
+> 中文文档额外提示: 对本章节中的用词翻译有具体说明。请参考 中文文档使用指南。
+
+## 版本控制
+
+版本号的变更将遵守 Semantic Versioning 2.0，并将会在 [CHANGELOG.md](CHANGELOG.md) 中描述。布局变更将不进行版本控制。本规范的具体实现应指定它们所实现的规范版本。
+
+变更过程本身的变更目前还没有版本化，但将来可能会独立版本化。
+
+## 缩略语
+
+OpenTelemetry 项目的正式官方缩写为 "OTel"。
+
+请不要使用 “OT”，以避免和现有已废弃的 “OpenTracing” 项目相混淆。
+
+## 参与贡献
+
+关于如何参与 OpenTelemetry 标准制定项目，参见 [CONTRIBUTING.md](CONTRIBUTING.md)
+
+> 中文文档额外提示：对中文文档的贡献，请参考 参与中文文档贡献
 
 ## License
 
-当你贡献自己的想法到OpenTelemetry Specification仓库时，就默认你遵守了我们的Licence: [Apache 2.0 License](https://github.com/open-telemetry/specification/blob/master/LICENSE)。
+您需要同意您对 OpenTelemetry Specification 项目的贡献，将在 [Apache 2.0 License ](https://github.com/open-telemetry/specification/blob/master/LICENSE)许可证下。
+
+> 您对 OpenTelemetry doc-cn 项目的贡献，也将在  [Apache 2.0 License ](https://github.com/open-telemetry/specification/blob/master/LICENSE)许可证下。
