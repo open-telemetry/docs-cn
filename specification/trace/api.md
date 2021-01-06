@@ -7,37 +7,38 @@
 Table of Contents
 </summary>
 
-* [Data types](#data-types)
-  * [Time](#time)
-    * [Timestamp](#timestamp)
-    * [Duration](#duration)
+* [数据类型](#数据类型)
+  * [时间](#time)
+    * [时间戳](#时间戳-timestamp)
+    * [时长](#时长-duration)
 * [TracerProvider](#tracerprovider)
-  * [TracerProvider operations](#tracerprovider-operations)
+  * [TracerProvider 操作](#tracerprovider-operations)
 * [Context Interaction](#context-interaction)
 * [Tracer](#tracer)
   * [Tracer operations](#tracer-operations)
 * [SpanContext](#spancontext)
-  * [Retrieving the TraceId and SpanId](#retrieving-the-traceid-and-spanid)
+  * [检索 TraceId 与 SpanId](#检索-traceid-与-spanid)
   * [IsValid](#isvalid)
   * [IsRemote](#isremote)
+  * [TraceState](#TraceState)
 * [Span](#span)
-  * [Span creation](#span-creation)
-    * [Determining the Parent Span from a Context](#determining-the-parent-span-from-a-context)
-    * [Specifying Links](#specifying-links)
-  * [Span operations](#span-operations)
-    * [Get Context](#get-context)
+  * [创建 Span](#创建-Span)
+    * [通过 Context 创建父 Span](#通过-Context-创建父-Span)
+    * [指定链接](#指定链接)
+  * [Span 操作](#span-operations)
+    * [获得 Context](#获得-context)
     * [IsRecording](#isrecording)
-    * [Set Attributes](#set-attributes)
-    * [Add Events](#add-events)
-    * [Set Status](#set-status)
-    * [UpdateName](#updatename)
-    * [End](#end)
-    * [Record Exception](#record-exception)
-  * [Span lifetime](#span-lifetime)
-  * [Wrapping a SpanContext in a Span](#wrapping-a-spancontext-in-a-span)
-* [SpanKind](#spankind)
-* [Concurrency](#concurrency)
-* [Included Propagators](#included-propagators)
+    * [设置属性](#设置属性-Set-Attributes)
+    * [新增事件](#新增事件-Add-Events)
+    * [设置状态](#设置状态)
+    * [更新名称](#更新名称)
+    * [结束](#结束)
+    * [记录异常](#记录异常)
+  * [Span 生命周期](#span-生命周期)
+  * [用 Span 包装 SpanContext](#用-Span-包装-SpanContext)
+* [跨度种类](#跨度种类-SpanKind)
+* [并发性](#并发性)
+* [包含传播者](#包含传播者-Included-Propagator)
 
 </details>
 
@@ -86,7 +87,7 @@ to have different configuration (like `SpanProcessor`s) for each
 or because its easier with dependency injection frameworks.
 因此，`TracerProvider` 应当允许创建任意数量的 `TracerProvider` 实例。
 
-### TracerProvider 操作 TracerProvider operations
+### TracerProvider 操作
 
 `TracerProvider` 必须包含提供以下 API：
 
@@ -161,7 +162,7 @@ specification](https://www.w3.org/TR/trace-context/#tracestate-header) 。
 
 本 API 必须实现创建 `SpanContext` 的方法。这些方法应当是唯一的方法用于创建 `SpanContext`。这个功能必须在 API 中完全实现，并且不应当可以被覆盖。
 
-### 检索 TraceId and SpanId
+### 检索 TraceId 与 SpanId
 
 本 API 必须支持通过以下方式检索 `TraceId` 与 `SpanId`：
 
@@ -345,9 +346,9 @@ Span 接口必须提供：
 
 注意： [Samplers](sdk.md#sampler) 只考虑在创建 `Span` 时已经存在的信息。创建后的任何改变，包括创建/修改属性，都不能改变原有的决定。
 
-#### 增加事件 Add Events
+#### 新增事件 Add Events
 
-`Span` 必须提供增加事件的功能。事件在添加进入 `span` 的时候需存在一个时间戳。
+`Span` 必须提供新增事件的功能。事件在添加进入 `span` 的时候需存在一个时间戳。
 
 `Event` 的结构定义遵循以下的属性：
 
@@ -440,136 +441,89 @@ API 必须是非阻塞的。
 
 该方法的签名由每种语言决定，并可酌情实现重载。该方法必须使用[异常语义约定](semantic_conventions/exceptions.md)文档中的规定，将异常记录为一个事件。所需的最小参数应该只是一个异常对象。
 
-如果提供 `RecordException`，该方法必须接受一个可选参数，以提供任何附加的事件属性（这应该以与 `AddEvent` 方法相同的方式进行）。如果该方法已经生成了同名的属性，那么附加的属性将优先。
+如果提供 `RecordException`，该方法必须接受一个可选参数，以提供任何附加的事件属性（这应该以与 `AddEvent` 方法相同的方式进行）。如果该方法已经生成了同名的属性，那么附加的属性将优先。
 
-注意：`RecordException`  可以被看作是 `AddEvent` 的一个变体，它有额外的参数用于记录异常，而其他参数都是可选的（因为它们有异常语义约定的默认值）。
+注意：`RecordException`  可以被看作是 `AddEvent` 的一个变体，它有额外的参数用于记录异常，而其他参数都是可选的（因为它们有异常语义约定的默认值）。
 
-### Span lifetime
+### Span 生命周期
 
-Span lifetime represents the process of recording the start and the end
-timestamps to the Span object:
+span 生命周期表示从 span 开始被记录时间戳到结束时间戳整个过程 。
 
-- The start time is recorded when the Span is created.
-- The end time needs to be recorded when the operation is ended.
+- Span 创建时需要记录开始时间。
+- Span 结束时需要记录结束时间。
 
-Start and end time as well as Event's timestamps MUST be recorded at a time of a
-calling of corresponding API.
+开始和结束时间以及事件的时间戳必须通过调用相应的 API 时记录。
 
-### Wrapping a SpanContext in a Span
+### 用 Span 包装 SpanContext
 
-The API MUST provide an operation for wrapping a `SpanContext` with an object
-implementing the `Span` interface. This is done in order to expose a `SpanContext`
-as a `Span` in operations such as in-process `Span` propagation.
+API 必须提供一个操作，用实现了 Span 接口的对象包装 SpanContext。这样做的目的是为了在进程内 Span 传播等操作中把 SpanContext 作为 Span 暴露。
 
-If a new type is required for supporting this operation, it SHOULD not be exposed
-publicly if possible (e.g. by only exposing a function that returns something
-with the Span interface type). If a new type is required to be publicly exposed,
-it SHOULD be named `NonRecordingSpan`.
+如果需要一个新的类型来支持本功能，应当尽力不公开暴露该操作（例如，只暴露一个返回 Span 接口类型对象的函数）。如果一个新类型要求被公开暴露，应当被命名成 `NonRecordingSpan`。
 
-The behavior is defined as follows:
+其行为应当准许以下定义:
 
-- `GetContext()` MUST return the wrapped `SpanContext`.
-- `IsRecording` MUST return `false` to signal that events, attributes and other elements
-  are not being recorded, i.e. they are being dropped.
+- `GetContext()` 必须返回被包装的 `SpanContext`.
+- `IsRecording` 必须返回 false。用于表示时间，属性和其他元素都未被记录（等价于他们被删除）。
 
-The remaining functionality of `Span` MUST be defined as no-op operations.
-Note: This includes `End`, so as an exception from the general rule,
-it is not required (or even helpful) to end such a Span.
+Span 的其余功能必须被定义为无操作行为。注意：这包括 End，因此作为常规的例外，不要求（甚至更加建议）结束这样的 Span。
 
-This functionality MUST be fully implemented in the API, and SHOULD NOT be overridable.
+本功能必须在 API 中完全实现，而且不能被覆盖。
 
-## SpanKind
+## 跨度种类 SpanKind
 
-`SpanKind` describes the relationship between the Span, its parents,
-and its children in a Trace.  `SpanKind` describes two independent
-properties that benefit tracing systems during analysis.
+`跨度种类` 描述 Span 与父母和子女 Span 之间在 Trace 中的关系。  `Span 种类` 描述了两个独立的属性，便于分析时发掘追踪系统的特性。
 
-The first property described by `SpanKind` reflects whether the Span
-is a remote child or parent.  Spans with a remote parent are
-interesting because they are sources of external load.  Spans with a
-remote child are interesting because they reflect a non-local system
-dependency.
+跨度种类`描述的第一个属性反映了 Span 是远程的子代或父代。 具有远程父级的 Span 很有趣，因为它们是外部负载的来源。 有远程子代的 Span 也很有趣的，因为它们反映了一个非本地系统的依赖性。
 
-The second property described by `SpanKind` reflects whether a child
-Span represents a synchronous call.  When a child span is synchronous,
-the parent is expected to wait for it to complete under ordinary
-circumstances.  It can be useful for tracing systems to know this
-property, since synchronous Spans may contribute to the overall trace
-latency. Asynchronous scenarios can be remote or local.
+`跨度种类`描述的第二个属性反映了一个子 Span 调用是表同步。 当一个子 Span 是同步时，一般而言，父 Span 应等待其完成。 理解这个属性对于跟踪系统来说是很有帮助的，因为同步的 Span 可能对整个跟踪延迟有所影响。异步方案可以是远程，也可以是本地。
 
-In order for `SpanKind` to be meaningful, callers should arrange that
-a single Span does not serve more than one purpose.  For example, a
-server-side span should not be used directly as the parent of another
-remote span.  As a simple guideline, instrumentation should create a
-new Span prior to extracting and serializing the SpanContext for a
-remote call.
+为了使 跨度种类有意义，调用者应当分配一个 Span 不超过一个目的。例如，一个服务器端的 Span 不应直接用作另一个远程 span 的父类。 作为一个简单的准则，在提取和序列化远程调用的 SpanContext 之前，instrumentation 应该创建一个新的 Span。
 
-These are the possible SpanKinds:
+以下是一些可选的 跨度种类:
 
-* `SERVER` Indicates that the span covers server-side handling of a
-  synchronous RPC or other remote request.  This span is the child of
-  a remote `CLIENT` span that was expected to wait for a response.
-* `CLIENT` Indicates that the span describes a synchronous request to
-  some remote service.  This span is the parent of a remote `SERVER`
-  span and waits for its response.
-* `PRODUCER` Indicates that the span describes the parent of an
-  asynchronous request.  This parent span is expected to end before
-  the corresponding child `CONSUMER` span, possibly even before the
-  child span starts. In messaging scenarios with batching, tracing
-  individual messages requires a new `PRODUCER` span per message to
-  be created.
-* `CONSUMER` Indicates that the span describes the child of an
-  asynchronous `PRODUCER` request.
-* `INTERNAL` Default value. Indicates that the span represents an
-  internal operation within an application, as opposed to an
-  operations with remote parents or children.
+* `SERVER` 表示该 span 包含服务端处理同步 RPC 或其他远程请求。该 span 是远程 `CLIENT` span 的子 span。`CLIENT` span 预期会等待响应。
+* `CLIENT` 表示该 span 对某些远程服务发送了同步请求。该 span 是远程 `SERVER` 的父 span，应当等待其响应。
+* `PRODUCER` 表明该 span 产生异步请求的父 span。其父 span 预计在相应的子 `CONSUMER` span 完成前结束，甚至有可能在子 span 开始前结束。在有批处理消息的场景中，跟踪不同的消息为每个消息创建相应的 `PRODUCER` span。
+* `CONSUMER` 表明该 span 是被异步 `PRODUCER` 创建的子 span。
+* `INTERNAL` 跨度种类默认值。表示该 span 代表应用程序内部的操作，而不是远程的父或子操作。
 
 To summarize the interpretation of these kinds:
 
-| `SpanKind` | Synchronous | Asynchronous | Remote Incoming | Remote Outgoing |
+| `跨度种类` | 同步 | 异步 | 远端接受 | 远端发送 |
 | ---------- | ----------- | ------------ | --------------- | --------------- |
-| `CLIENT`   | yes         |              |                 | yes             |
-| `SERVER`   | yes         |              | yes             |                 |
-| `PRODUCER` |             | yes          |                 | maybe           |
-| `CONSUMER` |             | yes          | maybe           |                 |
+| `CLIENT`   | 是        |              |                 | 是             |
+| `SERVER`   | 是        |              | 是            |                 |
+| `PRODUCER` |             | 是         |                 | 可能           |
+| `CONSUMER` |             | 是         | 可能         |                 |
 | `INTERNAL` |             |              |                 |                 |
 
-## Concurrency
+## 并发性
 
-For languages which support concurrent execution the Tracing APIs provide
-specific guarantees and safeties. Not all of API functions are safe to
-be called concurrently.
+对于支持并发执行的语言，Tracing APIs 提供了特定的保证和安全保障。并非所有的 API 函数都可以安全地被并发调用。
 
-**TracerProvider** - all methods are safe to be called concurrently.
+**TracerProvider** - 所有方法可以安全的并行调用。
 
-**Tracer** - all methods are safe to be called concurrently.
+**Tracer** - 所有方法可以安全的并行调用。
 
-**Span** - All methods of Span are safe to be called concurrently.
+**Span** - 所有方法可以安全的并行调用。
 
-**Event** - Events are immutable and safe to be used concurrently.
+**Event** - Events 为不可变，可安全的并行调用。
 
-**Link** - Links are immutable and safe to be used concurrently.
+**Link** - Links 为不可变，可安全的并行调用。
 
-## Included Propagators
+## 包含传播者 Included Propagator
 
-The API layer or an extension package MUST include the following `Propagator`s:
+API 层或扩展包必须包括以下 传播者。
 
-* A `TextMapPropagator` implementing the [W3C TraceContext Specification](https://www.w3.org/TR/trace-context/).
+* 一个 `TextMapPropagator` 基于 [W3C TraceContext Specification](https://www.w3.org/TR/trace-context/) 实现。
 
-See [Propagators Distribution](../context/api-propagators.md#propagators-distribution)
-for how propagators are to be distributed.
+查看 [Propagators Distribution](../context/api-propagators.md#propagators-distribution)
+了解 Propagators 如何被分发。
 
-## Behavior of the API in the absence of an installed SDK
+## 未安装 SDK 时，API 的行为
 
-In general, in the absence of an installed SDK, the Trace API is a "no-op" API.
-This means that operations on a Tracer, or on Spans, should have no side effects and do nothing. However, there
-is one important exception to this general rule, and that is related to propagation of a `SpanContext`:
-The API MUST create a [non-recording Span](#wrapping-a-spancontext-in-a-span) with the `SpanContext`
-that is in the `Span` in the parent `Context` (whether explicitly given or implicit current) or,
-if the parent is a non-recording Span (which it usually always is if no SDK is present),
-it MAY return the parent Span back from the creation method.
-If the parent `Context` contains no `Span`, an empty non-recording Span MUST be returned instead
-(i.e., having a `SpanContext` with all-zero Span and Trace IDs, empty Tracestate, and unsampled TraceFlags).
-This means that a `SpanContext` that has been provided by a configured `Propagator`
-will be propagated through to any child span and ultimately also `Inject`,
-but that no new `SpanContext`s will be created.
+通常而言，在没有安装 SDK 时，Trace API 为一个 无操作("no-op") 的 API 。这意味着对 Tracer 或 Spans 的任何操作都应当是无副作用且无用的。
+
+但是，该原则有个重要的例外，这与 `SpanContext` 的传播有关。API 必须使用 Span 的父 Context 的SpanContext 创建一个非记录 [Span](#wrapping-a-spancontext-in-a-span) （不管这是通过显示还是隐式设定的），或者如果父 Context 是一个非记录 Span（如果没有 SDK，通常会是这样），这可能会创建方法中返回父 Span。
+
+如果父 `Context` 不包含 `Span`，则必须返回一个空的非记录 Span（拥有一个 SpanContext，其 SpanID 和 TraceIDs 全设为零，空的Tracestate 与未采样的 TraceFlags）。这意味着由配置的传播者提供的 SpanContext 将被传播到任何子 span，并最终也会被 `Inject`，但并不会创建新的 `SpanContext`。
