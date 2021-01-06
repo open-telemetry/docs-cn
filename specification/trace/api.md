@@ -8,11 +8,11 @@ Table of Contents
 </summary>
 
 * [数据类型](#数据类型)
-  * [时间](#-time)
+  * [时间](#时间-Time)
     * [时间戳](#时间戳-timestamp)
     * [时长](#时长-duration)
 * [TracerProvider](#tracerprovider)
-  * [TracerProvider 操作](#tracerprovider-)
+  * [TracerProvider 操作](#TracerProvider-操作)
 * [Context Interaction](#context-interaction)
 * [Tracer](#tracer)
   * [Tracer operations](#tracer-operations)
