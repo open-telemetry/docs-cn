@@ -11,7 +11,7 @@
 <!-- toc -->
 
 - [Common](#common)
-  * [带内带外数据 In-band and Out-of-band Data](#带内带外数据-in-band-and-out-of-band-data)
+  * [带内带外数据 In-band and Out-of-band Data](#in-band-and-out-of-band-data)
   * [Telemetry SDK](#telemetry-sdk)
   * [Exporter Library](#exporter-library)
   * [Instrumented Library](#instrumented-library)
@@ -33,7 +33,7 @@
 <a name="in-band"></a>
 <a name="out-of-band"></a>
 
-### 带内带外数据 In-band and Out-of-band Data 
+### 带内带外数据In-band and Out-of-band Data 
 
 > 在通信领域，**带内信令 **[in-band signaling] 是指使用和数据（如语音或视频）相同的频段或信道内发送控制信息。这与**带外信令**[out-of-band signaling]相反，带外信令的发送使用不同的信道，甚至是通过单独的网络 ([Wikipedia](https://en.wikipedia.org/wiki/In-band_signaling))。
 
@@ -45,7 +45,7 @@
 
 基于 *OpenTelemetry API* 实现的库。
 
-详情请参考 [Library Guidelines](library-guidelines.md#sdk-implementation) 与 [Library resource semantic conventions](resource/semantic_conventions/README.md#telemetry-sdk)。
+详情请参考 [Library Guidelines](contents/library-guidelines.md#sdk-implementation) 与 [Library resource semantic conventions](resource/semantic_conventions/README.md#telemetry-sdk)。
 
 ### Exporter Library
 
@@ -61,7 +61,7 @@
 
 ### Instrumentation Library
 
-为指定的 Instrumented Libray 提供性能测量。
+为指定的 Instrumented Library 提供性能测量。
 
 如果内置OpenTelemetry instrumentation，则 *Instrumented Library* 与 *Instrumentation Library* 可能是同一个库。
 
@@ -95,7 +95,7 @@
 
 ### 嵌入日志 Embedded Log
 
-一条嵌入在 Span 对象中，[Events](trace/api.md#add-events) 列表中的 Log Record。
+一条嵌入在 Span 对象中，[Events](trace/api.md#-add-events) 列表中的 Log Record。
 
 ### 独立日志 Standalone Log
 
