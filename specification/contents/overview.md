@@ -135,23 +135,24 @@ API允许构造一个指定类型的`Metric`，SDK则定义了一个被导出的
 
 OpenTelemetry根据国际常用惯例预定义了一些指标名称：[Semantic Conventions](data-semantic-conventions.md)
 
-## DistributedContext（分布式上下文）
+## Logs
+### 数据模型
+[Log数据模型](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/logs/data-model.md)
+定义了OpenTelemetry如何理解日志和事件。
 
-**DistributedContext**存储一些全局的指标。
+## Baggage
+除了Trace传播之外，OpenTelemetry还提供了一个简单的机制来传播键指对，这一机制被称为**Baggage**。**Baggage**可以为一个服务查看可观测事件提供索引，
+其属性则是由同一个事务的前一个服务提供。这有助于在各个事件之间建立因果关系。    
 
-例如，一个Web应用可能想知道是谁发起了这次请求，或者一个SaaS提供商可能该次请求的访问用户或Token是什么。因此这些数据可以从**DistributedContext**中获取，然后用来给Metric打上额外的标签，或者作为额外的内容添加到日志、跟踪中。
+虽然**Baggage**也为其他横切关注点的实现提供了原型，但是这一机制主要还是为了在OpenTelemetry所观测的系统之间进行值传递。     
 
-**DistributedContext**是推荐的名称，但是编程语言SDK可以使用更加语言特定的名称，例如 **dctx**。
+下面这些值可以在**Baggage**中进行使用，并提供额外维度的metric指标或者为trace追踪和log日志提供额外的上下文内容。下面是一些例子：
+- 一个web服务提供方可以在上下文中得到服务的调用方的信息
+- Saas提供者可以在上下文中记录API的使用者及其持有令牌的信息
+- 可以确定特定的浏览器版本与图像处理服务的故障的关联关系
 
-### Entry
-
-**Entry**代表了存储在`DistributedContext`中的标签，记录例如请求的来源服务、特定运营商的数据等。它由 **EntryKey**,  **EntryValue** 和 **EntryMetadata**组成.
-
-- **EntryKey**是**Entry**的名称。它伴随着**EntryValue**一起出现，可以用来进行聚合和分组统计数据，注释日志和跟踪等等。
-**EntryKey**是一个字符串，只允许ASCII字符[32-126],长度要求小于256.
-- **EntryValue**是一个字符串，只允许ASCII字符[32-126]
-- **EntryMetadata** 包含了一些属性元数据,目前只有**EntryTTL**被定义了
-    - **EntryTTL** 表示该entry可以传播多少跳，每一跳代表了：数据序列化后通过网络发送给远端，然后远端收到数据，最后反序列化获得entry
+为了让OpenTracing向后兼容，当使用OpenTracing bridge的时候Baggage将以**Baggage**进行传播。具有不同标准的新的关注点应该去新建一个横切关注点来覆盖其用例。
+这些新的关注点可能受益于W3C编码格式，但是需要使用新的HTTP头来在分布式追踪中传播数据。
 
 ## Resources
 
@@ -160,7 +161,7 @@ Kubernetes集群、命名空间、Pod和容器名称等信息。
 
 `Resource`也可以包含实体信息的层级结构，例如它可以描述云服务器/容器和跑在其中的应用。
 
-注意，一些OpenTelemetry的SDK或者特定的导出器也会自动采集`Resource`信息，具体例子请查看：
+注意，一些OpenTelemetry的SDK或者特定的导出器也会自动采集`Resource`信息，具体例子请查看:
 [proto](https://github.com/open-telemetry/opentelemetry-proto/blob/a46c815aa5e85a52deb6cb35b8bc182fb3ca86a0/src/opentelemetry/proto/agent/common/v1/common.proto#L28-L96)
 
 ## Context Propagation
@@ -187,6 +188,24 @@ OpenTelemetry服务由两个主要的模型：Agent(一个本地代理)和Collec
 Vision](https://github.com/open-telemetry/opentelemetry-service/blob/master/docs/vision.md).
 
 
-## Code injecting adapters
+## Instrumentation Libraries
+详情可以查看[Instrumentation Libraries](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/glossary.md#instrumentation-library)。    
 
-TODO: fill out as a result of SIG discussion.
+这个项目的灵感在于通过让各个库和应用程序通过直接调用OpenTelemetry的API来达到开箱即用的目标。但是，大部分库不会做这样的集成，因此需要一个单独的库来注入
+这样这样的调用，通过诸如包装接口，订阅特定库的回调或者将当前的监测模型改为OpenTelemetry模型等机制来实现。
+     
+一个被让另一个库实现OpenTelemetry观测能力的库叫做[Instrumentation Library](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/glossary.md#instrumentation-library)。    
+一个Instrumentation Library的命名应该遵循任意关于对于这个库的命名规范(比如web框架的'中间件')。      
+如果没有已经确定的名称，建议在包前面加上“opentelemetry instrumentation”前缀，然后加上被集成的库名称本身。示例包括：     
+
+- opentelemetry-instrumentation-flask (Python)
+- @opentelemetry/instrumentation-grpc (Javascript)
+
+## Semantic Conventions
+OpenTelemetry约定了Resource属性与Span属性的标准值与名称。 
+- [Resource约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/resource/semantic_conventions/README.md)
+- [Span约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/README.md)
+- [Metrics约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/semantic_conventions/README.md)
+
+ 属性的类型应该在语义约定中指定。可以查阅[Attributes](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/common/common.md#attributes)
+ 部分了解更多。
