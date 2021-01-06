@@ -206,7 +206,7 @@ OpenTelemetry使用`Propagators`来序列化和反序列化中的关注点，比
 不同的`Propagator`的类型定义了特定传输方式下的限制并将其绑定到一个数据类型上。     
 传播者Propagators API定义了一个`Propagator`类型：
 
-- `TextMapPropagator`可以将值注入文本，也可以从文本当中提取值
+- `TextMapPropagator` 可以将值注入文本，也可以从文本当中提取值
 
 ## Collector
 
