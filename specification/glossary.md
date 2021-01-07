@@ -95,7 +95,7 @@
 
 ### 嵌入日志 Embedded Log
 
-一条嵌入在 Span 对象中，[Events](trace/api.md#-add-events) 列表中的 Log Record。
+一条嵌入在 Span 对象中，[Events](trace/api.md#新增事件-Add-Events) 列表中的 Log Record。
 
 ### 独立日志 Standalone Log
 
