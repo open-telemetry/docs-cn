@@ -8,24 +8,24 @@ Table of Contents
 </summary>
 
 * [数据类型](#数据类型)
-  * [时间](#时间-Time)
+  * [时间](#time)
     * [时间戳](#时间戳-timestamp)
     * [时长](#时长-duration)
 * [TracerProvider](#tracerprovider)
-  * [TracerProvider 操作](#TracerProvider-操作)
+  * [TracerProvider 操作](#tracerprovider-operations)
 * [Context Interaction](#context-interaction)
 * [Tracer](#tracer)
   * [Tracer operations](#tracer-operations)
 * [SpanContext](#spancontext)
-  * [检索 TraceId 与 SpanId](#检索-TraceId-与-SpanId)
+  * [检索 TraceId 与 SpanId](#检索-traceid-与-spanid)
   * [IsValid](#isvalid)
   * [IsRemote](#isremote)
   * [TraceState](#TraceState)
 * [Span](#span)
   * [创建 Span](#创建-Span)
-    * [通过 Context 创建父 Span](#通过-Context-创建-Parent-Span)
+    * [通过 Context 创建父 Span](#通过-Context-创建父-Span)
     * [指定链接](#指定链接)
-  * [Span 操作](#Span-操作)
+  * [Span 操作](#span-operations)
     * [获得 Context](#获得-context)
     * [IsRecording](#isrecording)
     * [设置属性](#设置属性-Set-Attributes)
@@ -216,7 +216,7 @@ Tracing API 必须在 `TraceState` 上至少提供以下操作：
 - 结束时间 end timestamp
 - [`Attributes`](../common/common.md#attributes)
 - [`Link`s](#specifying-links)  列表，用于链接其他 `Span`s
-- 带有时间戳的 [`Event`s](#-add-events) 列表
+- 带有时间戳的 [`Event`s](#add-events) 列表
 - 一个 [`Status`](#set-status)
 
 span 名称应当简单扼要地表明该 Span 的工作内容。
@@ -271,7 +271,7 @@ API 必须接受以下参数：
   
 - [`SpanKind`](#spankind)，默认值为: `SpanKind.Internal`。
 
-- [`Attributes`](../common/common.md#属性)。此外，这些属性还可用于定义[取样详情](sdk.md#sampling)。如果没有指定，该字段将被假定是一个空的集合。
+- [`Attributes`](../common/common.md#attributes)。此外，这些属性还可用于定义[取样详情](sdk.md#sampling)。如果没有指定，该字段将被假定是一个空的集合。
   
   只要有可能，使用者应该在创建跨度时设置相应属性，而不是在创建之后，调用 `SetAttribute` 。
   
@@ -302,7 +302,7 @@ API 必须接受以下参数：
 一个 `Link` 由一下属性组成。
 
 - `SpanContext` ，要链接的 `Span` 所属的 `SpanContext`。
-- 零或多个 [`属性`](../common/common.md#属性) 用于描述链接。
+- 零或多个 [`属性`](../common/common.md#attributes) 用于描述链接。
 
 Span 创建 API 必须提供：
 
