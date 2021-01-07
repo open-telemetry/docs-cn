@@ -7,3 +7,4 @@
 - [技术标准](./specification/Readme.md) 
 - [社区入口](community/Readme.md)
 - [快速入门](QUICKSTART.md)
+    - [上手指南之Java相关](https://github.com/chenmudu/open-telemetry-java-guides)
