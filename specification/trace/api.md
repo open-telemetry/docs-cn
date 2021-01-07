@@ -8,14 +8,14 @@ Table of Contents
 </summary>
 
 * [数据类型](#数据类型)
-  * [时间](#time)
+  * [时间](#时间-Time)
     * [时间戳](#时间戳-timestamp)
     * [时长](#时长-duration)
 * [TracerProvider](#tracerprovider)
-  * [TracerProvider 操作](#tracerprovider-operations)
+  * [TracerProvider 操作](#tracerprovider-操作)
 * [Context Interaction](#context-interaction)
 * [Tracer](#tracer)
-  * [Tracer operations](#tracer-operations)
+  * [Tracer 操作](#Tracer-操作)
 * [SpanContext](#spancontext)
   * [检索 TraceId 与 SpanId](#检索-traceid-与-spanid)
   * [IsValid](#isvalid)
@@ -25,7 +25,7 @@ Table of Contents
   * [创建 Span](#创建-Span)
     * [通过 Context 创建父 Span](#通过-Context-创建父-Span)
     * [指定链接](#指定链接)
-  * [Span 操作](#span-operations)
+  * [Span 操作](#span-操作)
     * [获得 Context](#获得-context)
     * [IsRecording](#isrecording)
     * [设置属性](#设置属性-Set-Attributes)
@@ -139,11 +139,11 @@ API 必须提供以下功能来与 `Context` 实例进行交互:
 
 注意: `Tracers` 通常不负责进行配置，这是`TracerProvider` 的职责。
 
-Tracer 操作
+### Tracer 操作
 
  `Tracer` 必须包含以下功能：
 
-- [创建新的 `Span`](#span-creation) (请看 `Span` 章节)
+- [创建新的 `Span`](#创建-Span) (请看 `Span` 章节)
 
 ## SpanContext
 
@@ -211,13 +211,13 @@ Tracing API 必须在 `TraceState` 上至少提供以下操作：
 - Span 名称
 - 一个不可变的 [`SpanContext`](#spancontext) ，作为 `Span ` 的唯一标识。
 - 一个父 span，以 [`Span`](#span), [`SpanContext`](#spancontext) 形式。也可能是 null。
--  [`SpanKind`](#spankind)
+-  [`SpanKind`](#跨度种类-SpanKind)
 - 开始时间 start timestamp
 - 结束时间 end timestamp
 - [`Attributes`](../common/common.md#attributes)
-- [`Link`s](#specifying-links)  列表，用于链接其他 `Span`s
-- 带有时间戳的 [`Event`s](#add-events) 列表
-- 一个 [`Status`](#set-status)
+- [`Link`s](#指定链接)  列表，用于链接其他 `Span`s
+- 带有时间戳的 [`Event`s](#新增事件-Add-Events) 列表
+- 一个 [`Status`](#设置状态)
 
 span 名称应当简单扼要地表明该 Span 的工作内容。
 例如，一个 RPC 方法名，一个函数名，一个庞大计算任务中子任务或者阶段的名称。
@@ -267,15 +267,15 @@ API 必须接受以下参数：
   API 需要提供一个选项，用于设置默认行为：将当前的 `Context` 作为父级。
   API 禁止接收 `Span` 或 `SpanContext` 作为父级，只能是完整的 `Context`。
   
-  Span 的语义父级必须根据  [Determining the Parent Span from a Context](#determining-the-parent-span-from-a-context) 中描述的规则确定。
+  Span 的语义父级必须根据  [通过-Context-创建父-Spant](#通过-Context-创建父-Span) 中描述的规则确定。
   
-- [`SpanKind`](#spankind)，默认值为: `SpanKind.Internal`。
+- [`SpanKind`](#跨度种类-SpanKind)，默认值为: `SpanKind.Internal`。
 
 - [`Attributes`](../common/common.md#attributes)。此外，这些属性还可用于定义[取样详情](sdk.md#sampling)。如果没有指定，该字段将被假定是一个空的集合。
   
   只要有可能，使用者应该在创建跨度时设置相应属性，而不是在创建之后，调用 `SetAttribute` 。
   
-- `Link`s - 一个有序的链接序列，详情见 [here](#specifying-links).
+- `Link`s - 一个有序的链接序列，详情见 [here](#指定链接).
 - `Start timestamp`，默认为当前时间。应当只能在创建时间已经发生的 Span 时才可以使用本参数。如果 API 在 Span 逻辑发生时被调用，API 使用者必须能设置该参数。
 
 
@@ -287,11 +287,11 @@ API 必须接受以下参数：
 
 任何被创建的 `Span` 也必须被结束。这是使用者的责任。如果使用者忘记结束 `Span`，API 实现可能会泄漏内存或其他资源（例如，适用于所有 `Span` 的周期性工作的 CPU 时间）。
 
-#### 通过 Context 创建 Parent Span
+#### 通过 Context 创建父 Span
 
 当新的 Span 通过 Context 创建时，Context 可能已经包含一个代表当前活跃实例的 Span，并将其设置为新的 Span 的父 Span。如果 Context 中没有 Span，那么新创建的 Span 将是一个 Root Span。
 
-`SpanContext` 不能被直接设置成活跃状态，而是通过 [包装成 Span](#wrapping-a-spancontext-in-a-span)。
+`SpanContext` 不能被直接设置成活跃状态，而是通过 [包装成 Span](#用-Span-包装-SpanContext)。
 
 例如：提取 context 的 `Propagator` 可能需要这个。
 
@@ -366,7 +366,7 @@ Span 接口必须提供：
 
 注意：OpenTelemetry 项目文档中定义了一些具有语义的  ["标准时间名称和键"](semantic_conventions/README.md) 。
 
-注意： [`RecordException`](#record-exception) 是一种特殊的变体，用于记录 `AddEvent` 发生的异常时间。
+注意： [`RecordException`](#记录异常) 是一种特殊的变体，用于记录 `AddEvent` 发生的异常时间。
 
 
 #### 设置状态
@@ -437,7 +437,7 @@ API 必须是非阻塞的。
 
 #### 记录异常
 
-为了方便记录异常，实现者应该提供一个 `RecordException` 方法。该 API 可视为  [`AddEvent`](#add-events)的一个特殊变体，同时接口没有额外的参数要求，与 `AddEvent` 的要求是一样的。
+为了方便记录异常，实现者应该提供一个 `RecordException` 方法。该 API 可视为  [`AddEvent`](#新增事件-Add-Events)的一个特殊变体，同时接口没有额外的参数要求，与 `AddEvent` 的要求是一样的。
 
 该方法的签名由每种语言决定，并可酌情实现重载。该方法必须使用[异常语义约定](semantic_conventions/exceptions.md)文档中的规定，将异常记录为一个事件。所需的最小参数应该只是一个异常对象。
 
@@ -524,6 +524,6 @@ API 层或扩展包必须包括以下 传播者。
 
 通常而言，在没有安装 SDK 时，Trace API 为一个 无操作("no-op") 的 API 。这意味着对 Tracer 或 Spans 的任何操作都应当是无副作用且无用的。
 
-但是，该原则有个重要的例外，这与 `SpanContext` 的传播有关。API 必须使用 Span 的父 Context 的SpanContext 创建一个非记录 [Span](#wrapping-a-spancontext-in-a-span) （不管这是通过显示还是隐式设定的），或者如果父 Context 是一个非记录 Span（如果没有 SDK，通常会是这样），这可能会创建方法中返回父 Span。
+但是，该原则有个重要的例外，这与 `SpanContext` 的传播有关。API 必须使用 Span 的父 Context 的SpanContext 创建一个非记录 [Span](#用-Span-包装-SpanContext) （不管这是通过显示还是隐式设定的），或者如果父 Context 是一个非记录 Span（如果没有 SDK，通常会是这样），这可能会创建方法中返回父 Span。
 
 如果父 `Context` 不包含 `Span`，则必须返回一个空的非记录 Span（拥有一个 SpanContext，其 SpanID 和 TraceIDs 全设为零，空的Tracestate 与未采样的 TraceFlags）。这意味着由配置的传播者提供的 SpanContext 将被传播到任何子 span，并最终也会被 `Inject`，但并不会创建新的 `SpanContext`。
