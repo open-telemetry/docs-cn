@@ -98,7 +98,7 @@ or because its easier with dependency injection frameworks.
 本 API 必须接受以下参数：
 
 - `name` (required):  该值必须是 [instrumentation library](../overview.md#instrumentation-libraries) 的标识
-  (例如 `io.opentelemetry.contrib.mongodb`)，而不是 instrumented library 的.
+  (例如 `io.opentelemetry.contrib.mongodb`)，而不是 instrumented library 的标识.
   如果指定了一个无效的名称（空或者空字符串），将会返回一个可工作的默认 Trace ，而不是返回 null 或者抛出异常。
 
   当一个实现 OpenTelemetry API 的库不支持“命名”功能时，该库可以忽略该命名，并对所有调用返回一个默认实例。(例如，一个甚至与可观察性无关的实例)。
