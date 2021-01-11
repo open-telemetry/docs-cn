@@ -21,15 +21,15 @@ OpenTelemetry 规范描述了所有 OpenTelemetry 协议实现的跨语言要求
 
 ## 目录
 
-- [Overview](specification/overview.md)
-- [Glossary](specification/glossary.md)  ✅
+- [Overview](overview.md)  ✅
+- [Glossary](glossary.md)  ✅
 - [Library Guidelines](specification/library-guidelines.md)
   - [Package/Library Layout](specification/library-layout.md)
   - [General error handling guidelines](specification/error-handling.md)
 - API Specification
-  - [Baggage](specification/baggage/api.md)
+  - [Baggage](baggage/api.md)
     - [Propagators](specification/context/api-propagators.md)
-  - [Tracing](specification/trace/api.md)  🚧
+  - [Tracing](trace/api.md)  🚧
   - [Metrics](specification/metrics/api.md)
 - SDK Specification
   - [Tracing](specification/trace/sdk.md)
@@ -37,14 +37,14 @@ OpenTelemetry 规范描述了所有 OpenTelemetry 协议实现的跨语言要求
   - [Resource](specification/resource/sdk.md)
   - [Configuration](specification/sdk-configuration.md)
 - Data Specification
-  - [Semantic Conventions](specification/overview.md#semantic-conventions)
+  - [Semantic Conventions](overview.md#semantic-conventions)
   - [Protocol](specification/protocol/README.md)
 - About the Project
-  - [Timeline](#project-timeline)
-  - [Notation Conventions and Compliance](#notation-conventions-and-compliance)
-  - [Versioning](#versioning)
-  - [Acronym](#acronym)
-  - [Contributions](#contributions)
+  - [项目 Timeline](#项目-Timeline)
+  - [符号约定和合规性](#符号约定和合规性)
+  - [版本控制](#版本控制)
+  - [缩略语](#缩略语)
+  - [参与贡献](#参与贡献)
   - [License](#license)
 
 ## 项目 Timeline
