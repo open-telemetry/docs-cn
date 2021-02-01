@@ -6,3 +6,4 @@
 - 社区贡献者
     - [x] [贡献者准则](./CONTRIBUTING.md)
     - [x] [角色与职能](./membership.md)
+    - [ ] [Java Instrumentation代码贡献指南](./opentelemetryJavaInstrumentation/Readme.md)
