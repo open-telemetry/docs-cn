@@ -6,9 +6,9 @@
 
 OpenTelemetry Collector 是一个可以接受观测数据并对其有选择地进行转换并进一步转发的可执行程序。
 
-这个 Collector 支持接受发送基于多种流行的开源协议的数据，并且提供了一个可插拔的体系结构以便添加更多的协议类型。
+这个 Collector 支持接收并发送基于多种流行的开源协议的数据，并且提供了一个可插拔的体系结构以便添加更多的协议类型。
 
-数据的接收转换与发送都是通过 Pipelines 来实现。 Collector 可以配置一个或多个 Pipelines 。 每个 Pipelines 都包括一组 Receivers 来负责数据的
+数据的接收，转换与发送都是通过都是通过 Pipelines 来实现。 Collector 可以配置一个或多个 Pipelines 。 每个 Pipelines 都包括一组 Receivers 来负责数据的
 接收，一组可选的从 Receivers 那里获取数据并进行转换的 Processors ，和一组从 Processors 当中获取数据并将数据发送到收集器外的 Exporters。 一个
 receiver 可以把数据发送给多个 Pipelines ，而多个 Pipelines 可以把数据发送给同一个 Exporter 。
 
@@ -22,7 +22,7 @@ Pipelines 可以操作两种类型的观测数据：traces 和 metrics 。Pipeli
 
 ![Pipelines](images/design-pipelines.png)
 
-一个 Pipeline 中可以存在多个 Receivers 。每个 Receivers 中接收的数据将会被推给 Pipeline 中的第一个 Processor 进行处理并推送给下一个 Processor
+一个 Pipeline 中可以存在多个 Receivers 。每个 Receivers 中接收的数据将会被推给 Pipeline 中的第一个 Processor 进行处理并将处理后的结果推送给下一个 Processor
 进行处理（在这个过程中，可能会有数据被抛弃，比如在一个"采样"的 Processor 的处理过程中）并以此类推到最后一个 Processor 处理完毕后将会把数据推送给
 Exporters 。每个 Exporters 都会有一个数据的拷贝。最后一个 Processor 通过 `FanOutConnector` 将数据扇出到每一个 exporter 上面。
 
