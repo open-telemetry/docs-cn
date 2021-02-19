@@ -235,7 +235,7 @@ Vision](https://github.com/open-telemetry/opentelemetry-service/blob/master/docs
 ## Semantic Conventions
 OpenTelemetry约定了Resource属性与Span属性的标准值与名称。 
 - [Resource约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/resource/semantic_conventions/README.md)
-- [Span约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/README.md)
+- [Span约定](trace/semantic_conventions/README.md)
 - [Metrics约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/semantic_conventions/README.md)
 
  属性的类型应该在语义约定中指定。可以查阅[Attributes](common/common.md#属性)
