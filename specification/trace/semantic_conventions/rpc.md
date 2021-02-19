@@ -124,8 +124,6 @@ Span名称的一些示例:
 
 ### gRPC状态
 
-The [Span Status](../api.md#设置状态) MUST be left unset for an `OK` gRPC status code, and set to `Error` for all others.
-
 [Span 状态](../api.md#设置状态) 必须使用unset作为gRPC `OK` 状态码，其他的都是设置为`Error`。
 
 ### 事件
