@@ -8,7 +8,7 @@ Table of Contents
 
 <!-- toc -->
 
-- [分布式跟踪(distributed trace)](#分布式跟踪(distributed trace))
+- [分布式跟踪(distributed trace)](#分布式跟踪distributed-trace)
   * [Trace](#Trace(一种数据结构，代表了分布式跟踪链路))
   * [Span](#Span(一种数据结构，代表了Trace中的某一个片段))
   * [SpanContext](#SpanContext(Span上下文))
