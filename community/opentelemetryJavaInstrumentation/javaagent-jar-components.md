@@ -68,7 +68,7 @@ JVM 的 bootstrap classloader。由于对于实际应用来说，这带来了意
 
 处于 agent class loader:
 
-- `inst/` - 包括 `javaagent-tooling` 模块和 `instrumentation` 子模块，被 `AgentClassLoader` 并被隔离。这里也包括 OpenTelemetry
+- `inst/` - 包括 `javaagent-tooling` 模块和 `instrumentation` 子模块，并被 `AgentClassLoader` 隔离。这里也包括 OpenTelemetry
   的 SDK，当使用 `-all` 构建的时候会包括 exporter
 
 ![Agent initialization sequence](initialization-sequence.svg)
