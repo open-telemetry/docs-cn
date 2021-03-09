@@ -8,23 +8,23 @@ Table of Contents
 
 <!-- toc -->
 
-- [分布式跟踪(distributed trace)](#分布式跟踪(distributed trace))
-  * [Trace](#Trace(一种数据结构，代表了分布式跟踪链路))
-  * [Span](#Span(一种数据结构，代表了Trace中的某一个片段))
-  * [SpanContext](#SpanContext(Span上下文))
-  * [Span之间的Links](#Span之间的Links(链接) )
-- [Metrics](#指标(Metrics))
+- [分布式跟踪(distributed trace)](#分布式跟踪distributed-trace)
+  * [Trace](#trace一种数据结构代表了分布式跟踪链路)
+  * [Span](#span一种数据结构代表了trace中的某一个片段)
+  * [SpanContext](#spancontextspan上下文)
+  * [Span之间的Links](#span之间的links链接)
+- [Metrics](#指标metrics)
   * [记录原始数据](#记录原始数据)
     + [Measure](#measure)
     + [Measurement](#measurement)
   * [使用预定义的聚合方式记录指标](#使用预定义的聚合方式记录指标)
-  * [指标数据模型（Metrics Data Model）和SDK](#指标数据模型（Metrics Data Model）和SDK)
+  * [指标数据模型（Metrics Data Model）和SDK](#指标数据模型metrics-data-model和sdk)
 - [Logs](#logs)
   * [数据模型](#数据模型)
 - [Baggage](#baggage)
 - [Resources](#resources)
 - [Context Propagation](#context-propagation)
-- [Propagators](#Propagators(传播者))
+- [Propagators](#propagators传播者)
 - [Collector](#collector)
 - [Instrumentation Libraries](#instrumentation-libraries)
 - [Semantic Conventions](#semantic-conventions)
@@ -235,7 +235,7 @@ Vision](https://github.com/open-telemetry/opentelemetry-service/blob/master/docs
 ## Semantic Conventions
 OpenTelemetry约定了Resource属性与Span属性的标准值与名称。 
 - [Resource约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/resource/semantic_conventions/README.md)
-- [Span约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/README.md)
+- [Span约定](trace/semantic_conventions/README.md)
 - [Metrics约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/semantic_conventions/README.md)
 
  属性的类型应该在语义约定中指定。可以查阅[Attributes](common/common.md#属性)
