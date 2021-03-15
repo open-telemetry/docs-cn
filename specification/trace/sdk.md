@@ -23,7 +23,7 @@
 新的`Tracer`实例都是通过`TracerProver`来创建的（查看[API](api.md#tracerprovider)）。需要提供`name(名称)`和`version(版本)`两个参数 给`TracerProvider`
 来创建一个存储在`Tracer`实例中的[`InstrumentationLibrary`][otep-83]实例
 
-所有的配置（比如： [Span处理器](#span-processor), [Id生成器](#id-generators),[Span的限制](#span-limits) 和 [`采样器`](#sampling)）
+所有的配置（比如： [Span处理器](#span-processor)，[Id生成器](#id-generators)，[Span的限制](#span-limits)和[`采样器`](#sampling)）
 都是被`TracerProvider`所管理的，`TracerProvider`也提供了一些途径去配置这些实现自SDK的元素，至少在创建或初始化的时候是可以配置的
 
 TracerProvider可以提供更新配置的方法。如果配置已更新（例如，添加“ SpanProcessor”），则更新后的配置还必须应用于所有已返回的`Tracer`（也就 是说，在配置更改之前或之后，从`TracerProvider`
@@ -33,7 +33,7 @@ TracerProvider可以提供更新配置的方法。如果配置已更新（例如
 
 此方法可以让provider做任何有必要的清理工作
 
-对于每个`TracerProvider`实例，`Shutdown`只能被调用一次。 在`Shutdown`被调用之后, 就不再允许获取`Tracer`。如果可以的话，在被调用时，SDK 可以返回一个无操作的Tracer
+对于每个`TracerProvider`实例，`Shutdown`只能被调用一次。在`Shutdown`被调用之后, 就不再允许获取`Tracer`。如果可以的话，在被调用时，SDK 可以返回一个无操作的Tracer
 
 `Shutdown` 应该让调用者知道调用是否成功，还是失败或超时。
 
@@ -64,9 +64,9 @@ TracerProvider可以提供更新配置的方法。如果配置已更新（例如
   可能包含一个不可变的快照，而`ReadableSpan`可能直接读取来自`Span`接口操作的底层数据结构）
 
 * **Read/write span接口**: 以此作为参数的方法，必须有权限访问[API-level definition for span's interface ](api.md#span-operations)
-  中定义的完整的span API， 以及能够检索到所有添加到span中的信息（像*readable span*那样）
+  中定义的完整的span API，以及能够检索到所有添加到span中的信息（像*readable span*那样）
 
-  调用此接口的方法能够获得与[span creation API](api.md#span-creation)相同的已返回给用户的`Span`实例和类型（例如：`Span`可以作为方法的一个参数， 或者也可以提供getter方法）
+  调用此接口的方法能够获得与[span creation API](api.md#span-creation)相同的已返回给用户的`Span`实例和类型（例如：`Span`可以作为方法的一个参数，或者也可以提供getter方法）
 
 ## Sampling（采样）
 
@@ -76,12 +76,12 @@ TracerProvider可以提供更新配置的方法。如果配置已更新（例如
 
 OpenTelemetry API有两个负责数据收集的属性：
 
-* `Span`的`IsRecording`属性。如果是`false`， 当前的`Span`会丢弃所欲的tracing数据（属性、事件、状态等）。用户可以通过该属性来决定是否收集高成本的trace数据。
+* `Span`的`IsRecording`属性。如果是`false`，当前的`Span`会丢弃所欲的tracing数据（属性、事件、状态等）。用户可以通过该属性来决定是否收集高成本的trace数据。
   [Span Processor（Span处理器）](#span-processor)只会接收`IsRecording`是`true`的span。但是，如果`Sampled`
   没有设置的话，[Span Exporter（Span 导出器）](#span-exporter)同样不会接收。
 
 * `SpanContext`中的`TraceFlags`标识：`Sampled`。这个标识会通过`SpanContext`
-  传播给子span。了解更多请查看[W3C Trace Context specification](https://www.w3.org/TR/trace-context/#sampled-flag) 。 这个标识表明这个`Span`
+  传播给子span。了解更多请查看[W3C Trace Context specification](https://www.w3.org/TR/trace-context/#sampled-flag) 。这个标识表明这个`Span`
   已经被采样且将会被导出。
   [Span Exporters（Span 导出器）](#span-exporter) 将接收那些`Sampled`为true的span，而不会接收`Sampled`是false的span
 
@@ -141,10 +141,10 @@ SDK定义了[`Sampler`]（＃sampler）接口以及一组[内置采样器]（＃
 
 * 采样决策Decision。枚举值如下：
     * `DROP` - `IsRecording() == false`，span不会被记录，而且所有的事件和属性也会被丢弃
-    * `RECORD_ONLY` - `IsRecording == true`， 同时`Sampled`标记不能设置
+    * `RECORD_ONLY` - `IsRecording == true`，同时`Sampled`标记不能设置
     * `RECORD_AND_SAMPLE` - `IsRecording == true`，且设置`Sampled`标记
 * span属性的集合，这些属性同样被添加到`Span`中。返回的对象必须是不可变的（多次调用将返回不同的不可变对象）
-* Trace状态`Tracestate`，在new `SpanContext`的时候被关联到`Span`。采样器在这如果返回一个空的`Tracestate`， 那么`Tracestate`将会被清除；
+* Trace状态`Tracestate`，在new `SpanContext`的时候被关联到`Span`。采样器在这如果返回一个空的`Tracestate`，那么`Tracestate`将会被清除；
   所以如果采样器不打算修改它，那通常会直接返回传入的`Tracestate`。
 
 #### GetDescription（获取描述）
@@ -179,13 +179,13 @@ TODO（待办）：添加关于`TraceIdRatioBased`是如何通过`TraceID`
 
 ##### Requirements for `TraceIdRatioBased` sampler algorithm（`TraceIdRatioBased`采样算法的必需条件）
 
-* 采样算法是确定性的。通过traceId来表明是否要采样的trace是独立于语言、时间等条件的。为此，当计算采样决策的时候，实现上就需要一个确定的关于`TraceId`的hash算法。 因此，在子`Span`
+* 采样算法是确定性的。通过traceId来表明是否要采样的trace是独立于语言、时间等条件的。为此，当计算采样决策的时候，实现上就需要一个确定的关于`TraceId`的hash算法。因此，在子`Span`
   上运行任何采样器都会产生同样的采样决策
 
 * 一个指定采样率rate的`TraceIdRatioBased`采样器必需采集那些采样率更低的`TraceIdRatioBased`的trace。这在一个后端系统希望比前端系统采用更高的采样率的时候很重要，这样前端系统还是正常采样，
   但是一些额外的trace就只会被后端系统采样。
 
-* **警告：** 由于确切的算法还没有指定（查看上面的TODO），很有可能在某个语言的SDK中会做改动，这就会打破依赖于该算法结果的代码。当前只有配置和创建的API是可以认为是稳定的。 建议只在根span上采用这种算法(in
+* **警告：** 由于确切的算法还没有指定（查看上面的TODO），很有可能在某个语言的SDK中会做改动，这就会打破依赖于该算法结果的代码。当前只有配置和创建的API是可以认为是稳定的。建议只在根span上采用这种算法(in
   combination with [`ParentBased`](#parentbased))，因为不同语言的SDK，或者是同种语言的不同版本对于同样的输入都有可能产生不一致的结果。
 
 #### ParentBased（基于父级）
@@ -256,7 +256,7 @@ SDK默认情况下，随机生成`TraceId`和`SpanId`。
 SDK提供自定义`TradeId`和`SpanId`的方式
 
 SDK可以像下方Java代码一样提供一个接口供自定义实现（接口名称可以是`IdGenerator`，方法名必须和[SpanContext](./api.md#retrieving-the-traceid-and-spanid)
-保持一致），提供两个方法的扩展点， 一个方式是生成`SpanId`，一个方式是生成`TraceId`。
+保持一致），提供两个方法的扩展点，一个方式是生成`SpanId`，一个方式是生成`TraceId`。
 
 ```java
 public interface IdGenerator {
@@ -366,7 +366,7 @@ SDK必须允许用户实现和配置自定义处理器，以及在一些高级�
 * `exporter` - span数据推给导出器exporter
 * `maxQueueSize` - 最大队列长度。达到该值后span将会被丢弃。默认值是`2048`。
 * `scheduledDelayMillis` - 两次连续导出之间的延迟间隔（以毫秒为单位）。默认值为5000。
-* `exportTimeoutMillis` - 超时时间：在被超时取消之前，export能运行多久。 默认值是`30000`.
+* `exportTimeoutMillis` - 超时时间：在被超时取消之前，export能运行多久。默认值是`30000`.
 * `maxExportBatchSize` - 每次批量export的最大数量。它必须小于等于`maxQueueSize`。默认值是`512`.
 
 ## Span Exporter（Span导出器）
@@ -377,7 +377,7 @@ SDK必须允许用户实现和配置自定义处理器，以及在一些高级�
 
 ### Interface Definition（接口定义）
 
-导出器必须支持两个功能：**导出**和**关闭**。 在强类型语言中，通常会有2个单独的导出器`Exporter`接口，一个接收span（SpanExporter），另一个接收metrics（MetricsExporter）
+导出器必须支持两个功能：**导出**和**关闭**。在强类型语言中，通常会有2个单独的导出器`Exporter`接口，一个接收span（SpanExporter），另一个接收metrics（MetricsExporter）
 
 #### `Export(batch)（批量导出）`
 
@@ -415,7 +415,7 @@ ExportResult是下面的一种：
 基于上述通用的接口定义，library作者必须为特定的语言定义确切的接口
 
 鼓励作者在接口上使用高效的数据结构，适合快速序列化为protocol exporter的线路传输格式以及较低内存管理器的压力。后者通常需要理解特定语言的内存管理器
-如何优化出快速生成、短暂存活的数据结构，让生命周期更简单。通常的建议是减少分配数量和使用allocation arenas进行分配， 从而避免在telemetry数据生成率很高时爆炸式的进行【分配/接触分配/回收】
+如何优化出快速生成、短暂存活的数据结构，让生命周期更简单。通常的建议是减少分配数量和使用allocation arenas进行分配，从而避免在telemetry数据生成率很高时爆炸式的进行【分配/接触分配/回收】
 
 #### Examples（示例）
 
