@@ -208,27 +208,24 @@ TODO（待办）：添加关于`TraceIdRatioBased`是如何通过`TraceID`
 * `localParentSampled(Sampler)` (默认值: AlwaysOn)
 * `localParentNotSampled(Sampler)` (默认值: AlwaysOff)
 
-[以下待翻译](todo)
+|父级     | 父级isRemote？ | 父级IsSampled？| 触发的采样器          |
+|--------|-----------------|-----------------|--------------------------| 
+|无  | n/a             | n/a             |`root()`                  |
+|有 |true             |true             |`remoteParentSampled()`   |
+|有 |true             |false            |`remoteParentNotSampled()`|
+|有 |false            |true             |`localParentSampled()`    | 
+|有 |false            |false            |`localParentNotSampled()` |
 
-|Parent| parent.isRemote() | parent.IsSampled()| Invoke sampler| |--|--|--|--| |absent| n/a | n/a |`root()`|
-|present|true|true|`remoteParentSampled()`| |present|true|false|`remoteParentNotSampled()`|
-|present|false|true|`localParentSampled()`| |present|false|false|`localParentNotSampled()`|
+## Span Limits（Span的限制）
 
-## Span Limits
+错误的代码会添加预期之外的属性、事件、链接到span中。如果这些收集不被解绑，它们会迅速耗尽可用内存，从而导致奔溃，而且这些奔溃很难安全的恢复。
 
-Erroneous code can add unintended attributes, events, and links to a span. If these collections are unbounded, they can
-quickly exhaust available memory, resulting in crashes that are difficult to recover from safely.
+为了防止此类错误，SDK可能丢弃那些导致收集器的元素数量超过配置上限的属性、链接或事件。
 
-To protect against such errors, SDK Spans MAY discard attributes, links, and events that would increase the number of
-elements of each collection beyond the configured limit.
+如果SDK实现了上述限制，则必须提供更改这些限制的途径。通过TraceProvider的配置，可以像下面的Java示例一样让用户配置单独的限制。
 
-It the SDK implements the limits above it MUST provide a way to change these limits, via a configuration to the
-TracerProvider, by allowing users to configure individual limits like in the Java example bellow.
-
-The name of the configuration options SHOULD be `AttributeCountLimit`,
-`EventCountLimit` and `LinkCountLimit`. The options MAY be bundled in a class, which then SHOULD be called `SpanLimits`.
-Implementations MAY provide additional configuration such as `AttributePerEventCountLimit`
-and `AttributePerLinkCountLimit`.
+配置的名称可以是：`AttributeCountLimit`,`EventCountLimit` 和 `LinkCountLimit`。这些选项捆绑在一个类中，称为`SpanLimits`。
+实现上可以提供附加的配置，例如`AttributePerEventCountLimit`和`AttributePerLinkCountLimit`。
 
 ```java
 public final class SpanLimits {
@@ -242,29 +239,24 @@ public final class SpanLimits {
 }
 ```
 
-**Configurable parameters:**
+**可配置参数：**
 
-* `AttributeCountLimit` (Default=128) - Maximum allowed span attribute count;
-* `EventCountLimit` (Default=128) - Maximum allowed span event count;
-* `LinkCountLimit` (Default=128) - Maximum allowed span link count;
-* `AttributePerEventCountLimit` (Default=128) - Maximum allowed attribute per span event count;
-* `AttributePerLinkCountLimit` (Default=128) - Maximum allowed attribute per span link count;
+* `AttributeCountLimit` (默认值：128) - 允许的最大属性数量；
+* `EventCountLimit` (默认值：128) - 允许的最大事件数量；
+* `LinkCountLimit` (默认值：128) - 允许的最大链接数量；
+* `AttributePerEventCountLimit` (默认值：128) - 一个span允许的最大属性个数；
+* `AttributePerLinkCountLimit` (默认值：128) - 一个span允许的最大链接个数；
 
-There SHOULD be a log emitted to indicate to the user that an attribute, event, or link was discarded due to such a
-limit. To prevent excessive logging, the log should not be emitted once per span, or per discarded attribute, event, or
-links.
+应该发出一条日志告知用户由于上限限制，属性、事件、链接已被丢弃。为防止过多的日志记录，不应为每个跨度或每个废弃的属性，事件或链接发送一次日志。
 
-## Id Generators
+## Id Generators（Id生成器）
 
-The SDK MUST by default randomly generate both the `TraceId` and the `SpanId`.
+SDK默认情况下，随机生成`TraceId`和`SpanId`。
 
-The SDK MUST provide a mechanism for customizing the way IDs are generated for both the `TraceId` and the `SpanId`.
+SDK提供自定义`TradeId`和`SpanId`的方式
 
-The SDK MAY provide this functionality by allowing custom implementations of an interface like the java example below (
-name of the interface MAY be
-`IdGenerator`, name of the methods MUST be consistent with
-[SpanContext](./api.md#retrieving-the-traceid-and-spanid)), which provides extension points for two methods, one to
-generate a `SpanId` and one for `TraceId`.
+SDK可以像下方Java代码一样提供一个接口供自定义实现（接口名称可以是`IdGenerator`，方法名必须和[SpanContext](./api.md#retrieving-the-traceid-and-spanid)
+保持一致），提供两个方法的扩展点， 一个方式是生成`SpanId`，一个方式是生成`TraceId`。
 
 ```java
 public interface IdGenerator {
@@ -274,28 +266,21 @@ public interface IdGenerator {
 }
 ```
 
-Additional `IdGenerator` implementing vendor-specific protocols such as AWS X-Ray trace id generator MUST NOT be
-maintained or distributed as part of the Core OpenTelemetry repositories.
+不得将实现自特定供应商协议（例如AWS X-Ray跟踪ID生成器）的`IdGenerator`作为OpenTelemetry核心来维护、分发
 
-## Span processor
+## Span processor（Span 处理器）
 
-Span processor is an interface which allows hooks for span start and end method invocations. The span processors are
-invoked only when
-[`IsRecording`](api.md#isrecording) is true.
+Span处理器是一个接口，它允许在start和end方法的调用上添加钩子函数。只有在[`IsRecording`](api.md#isrecording)为true的时候，span处理器才会被调用
 
-Built-in span processors are responsible for batching and conversion of spans to exportable representation and passing
-batches to exporters.
+内置的span处理器负责批处理操作和转换span为可导出的样式，以及最终批量将传递给exporter
 
-Span processors can be registered directly on SDK `TracerProvider` and they are invoked in the same order as they were
-registered.
+Span处理器可以直接在SDK `TracerProvider`上注册，并以与注册时相同的顺序进行调用。
 
-Each processor registered on `TracerProvider` is a start of pipeline that consist of span processor and optional
-exporter. SDK MUST allow to end each pipeline with individual exporter.
+每一个注册到`TraceProvider`上的处理器都存在管道的开始端，而管道是由span处理器和可选的导出器exporter组成的。SDK必须允许以单独的导出器exporter来结束每一个管道
 
-SDK MUST allow users to implement and configure custom processors and decorate built-in processors for advanced
-scenarios such as tagging or filtering.
+SDK必须允许用户实现和配置自定义处理器，以及在一些高级场景下装饰内置处理器（例如：打标操作tagging或过滤操作filtering）
 
-The following diagram shows `SpanProcessor`'s relationship to other components in the SDK:
+下图显示了`SpanProcessor`与SDK中其他组件的关系：
 
 ```
   +-----+--------------+   +-------------------------+   +-------------------+
@@ -312,173 +297,131 @@ The following diagram shows `SpanProcessor`'s relationship to other components i
   +-----+--------------+
 ```
 
-### Interface definition
+### Interface definition（接口定义）
 
-#### OnStart
+#### OnStart（启动时）
 
-`OnStart` is called when a span is started. This method is called synchronously on the thread that started the span,
-therefore it should not block or throw exceptions.
+`OnStart`在span start后调用。此方法在start span的线程上同步调用，因此它不应阻塞或引发异常。
 
-**Parameters:**
+**入参:**
 
-* `span` - a [read/write span object](#additional-span-interfaces) for the started span. It SHOULD be possible to keep a
-  reference to this span object and updates to the span SHOULD be reflected in it. For example, this is useful for
-  creating a SpanProcessor that periodically evaluates/prints information about all active span from a background
-  thread.
-* `parentContext` - the parent `Context` of the span that the SDK determined
-  (the explicitly passed `Context`, the current `Context` or an empty `Context`
-  if that was explicitly requested).
+* `span` - 一个[read/write span object](#additional-span-interfaces)。它应该保存一个对此span对象的引用，并且应该在其中能反映此span的更新。
+  例如，这对于创建那些定期计算/打印来自后台线程所有活跃span信息的Span处理器很有用。
 
-**Returns:** `Void`
+* `parentContext` - 由SDK确定的span父级`Context`
+  （显示传递的`Context`，当前`Context`，明确要求一个空`Context`）
 
-#### OnEnd(Span)
+**返回值:** `Void（空）`
 
-`OnEnd` is called after a span is ended (i.e., the end timestamp is already set). This method MUST be called
-synchronously within the [`Span.End()` API](api.md#end), therefore it should not block or throw an exception.
+#### OnEnd(Span)（结束时(Span)）
 
-**Parameters:**
+`OnEnd`在span结束时被调用（即设置了结束时间戳）。必须在[`Span.End（）`API]（api.md＃end）中同步调用此方法，这样不会阻塞或引发异常。
 
-* `Span` - a [readable span object](#additional-span-interfaces) for the ended span. Note: Even if the passed Span may
-  be technically writable, since it's already ended at this point, modifying it is not allowed.
+**入参：**
 
-**Returns:** `Void`
+* `Span` - a [readable span object](#additional-span-interfaces)。注意：即使过去的Span在技术上是可写的，但由于它已经在此处结束，因此不允许对其进行修改。
 
-#### Shutdown()
+**返回值:** `Void`（空）
 
-Shuts down the processor. Called when SDK is shut down. This is an opportunity for processor to do any cleanup required.
+#### Shutdown()（关闭）
 
-`Shutdown` SHOULD be called only once for each `SpanProcessor` instance. After the call to `Shutdown`, subsequent calls
-to `OnStart`, `OnEnd`, or `ForceFlush`
-are not allowed. SDKs SHOULD ignore these calls gracefully, if possible.
+关闭处理器。在SDK关闭时调用。这是处理器做清理工作的时机。
 
-`Shutdown` SHOULD provide a way to let the caller know whether it succeeded, failed or timed out.
+每一个`SpanProcessor`实例只能调用一次`Shutdown`。调用`Shutdown`后，随后调用`OnStart`，`OnEnd`，或`ForceFlush`都是不允许的。SDK应该优雅地忽略这些调用。
 
-`Shutdown` MUST include the effects of `ForceFlush`.
+`Shutdown` 应该让调用者知道调用是成功、失败或是超时。
 
-`Shutdown` SHOULD complete or abort within some timeout. `Shutdown` can be implemented as a blocking API or an
-asynchronous API which notifies the caller via a callback or an event. OpenTelemetry client authors can decide if they
-want to make the shutdown timeout configurable.
+`Shutdown` 包含了`ForceFlush`同样的效果。
 
-#### ForceFlush()
+`Shutdown` 应该在一段时间内完成或者中止。`Shutdown`可以实现成同步阻塞或者异步回调的方式。OpenTelemetry客户端作者可以决定是否将shutdown超时配置做成可配置的。
 
-Exports all spans that have not yet been exported to the configured `Exporter`.
+#### ForceFlush()（强制冲刷）
 
-`ForceFlush` SHOULD provide a way to let the caller know whether it succeeded, failed or timed out.
+导出所有未被导出的span到配置的导出器`Exporter`
 
-`ForceFlush` SHOULD only be called in cases where it is absolutely necessary, such as when using some FaaS providers
-that may suspend the process after an invocation, but before the `Processor` exports the completed spans.
+`ForceFlush` 应该让调用者知道调用是成功、失败或是超时。
 
-`ForceFlush` SHOULD complete or abort within some timeout. `ForceFlush` can be implemented as a blocking API or an
-asynchronous API which notifies the caller via a callback or an event. OpenTelemetry client authors can decide if they
-want to make the flush timeout configurable.
+`ForceFlush` 仅在绝对必要的情况下才调用“ ForceFlush”，例如在使用某些FaaS提供程序时，这些提供程序可能在调用之后、`处理器`导出完整的跨度之前挂起该进程。
 
-### Built-in span processors
+`ForceFlush` 应该在一段时间内完成或者中止。`ForceFlush`可以实现成同步阻塞或者异步回调的方式。OpenTelemetry客户端作者可以决定是否将flush超时配置做成可配置的。
 
-The standard OpenTelemetry SDK MUST implement both simple and batch processors, as described below. Other common
-processing scenarios should be first considered for implementation out-of-process
-in [OpenTelemetry Collector](../overview.md#collector)
+### Built-in span processors（内置span处理器）
 
-#### Simple processor
+标准的OpenTelemetry SDK应该实现如下所述的简单处理器和批量的处理器。其他常见的处理场景应首先考虑下[OpenTelemetry Collector](../overview.md#collector)中的【进程外实现】
 
-This is an implementation of `SpanProcessor` which passes finished spans and passes the export-friendly span data
-representation to the configured
-`SpanExporter`, as soon as they are finished.
+#### Simple processor（简单处理器）
 
-**Configurable parameters:**
+这是`SpanProcessor`的一个实现，该处理器传递finished spans，并在完成后传递export-friendly的span的数据给配置的`SpanExporter`
 
-* `exporter` - the exporter where the spans are pushed.
+**可配置参数：**
 
-#### Batching processor
+* `exporter（导出器）` - span数据推给导出器exporter
 
-This is an implementation of the `SpanProcessor` which create batches of finished spans and passes the export-friendly
-span data representations to the configured `SpanExporter`.
+#### Batching processor（分批处理器）
 
-**Configurable parameters:**
+这是`SpanProcessor`的一个实现，该处理器批量传递finished spans，并在完成后传递export-friendly的span的数据给配置的`SpanExporter`
 
-* `exporter` - the exporter where the spans are pushed.
-* `maxQueueSize` - the maximum queue size. After the size is reached spans are dropped. The default value is `2048`.
-* `scheduledDelayMillis` - the delay interval in milliseconds between two consecutive exports. The default value
-  is `5000`.
-* `exportTimeoutMillis` - how long the export can run before it is cancelled. The default value is `30000`.
-* `maxExportBatchSize` - the maximum batch size of every export. It must be smaller or equal to `maxQueueSize`. The
-  default value is `512`.
+**可配置参数：**
 
-## Span Exporter
+* `exporter` - span数据推给导出器exporter
+* `maxQueueSize` - 最大队列长度。达到该值后span将会被丢弃。默认值是`2048`。
+* `scheduledDelayMillis` - 两次连续导出之间的延迟间隔（以毫秒为单位）。默认值为5000。
+* `exportTimeoutMillis` - 超时时间：在被超时取消之前，export能运行多久。 默认值是`30000`.
+* `maxExportBatchSize` - 每次批量export的最大数量。它必须小于等于`maxQueueSize`。默认值是`512`.
 
-`Span Exporter` defines the interface that protocol-specific exporters must implement so that they can be plugged into
-OpenTelemetry SDK and support sending of telemetry data.
+## Span Exporter（Span导出器）
 
-The goal of the interface is to minimize burden of implementation for protocol-dependent telemetry exporters. The
-protocol exporter is expected to be primarily a simple telemetry data encoder and transmitter.
+`Span Exporter` 定义了一个特定协议exporter必须实现的接口，以便可以将其插入到OpenTelemetry SDK中并支持发送telemetry数据。
 
-### Interface Definition
+该接口的目的是最大程度地减少依赖协议的telemetry导出器的实现负担。协议导出器主要是一个简单的telemetry数据编码器和发送器。
 
-The exporter must support two functions: **Export** and **Shutdown**. In strongly typed languages typically there will
-be 2 separate `Exporter`
-interfaces, one that accepts spans (SpanExporter) and one that accepts metrics
-(MetricsExporter).
+### Interface Definition（接口定义）
 
-#### `Export(batch)`
+导出器必须支持两个功能：**导出**和**关闭**。 在强类型语言中，通常会有2个单独的导出器`Exporter`接口，一个接收span（SpanExporter），另一个接收metrics（MetricsExporter）
 
-Exports a batch of [readable spans](#additional-span-interfaces). Protocol exporters that will implement this function
-are typically expected to serialize and transmit the data to the destination.
+#### `Export(batch)（批量导出）`
 
-Export() will never be called concurrently for the same exporter instance. Export() can be called again only after the
-current call returns.
+导出一批[readable spans](#additional-span-interfaces)。实现此方法的协议导出器通常会序列化数据，并将数据发送到目的地
 
-Export() MUST NOT block indefinitely, there MUST be a reasonable upper limit after which the call must time out with an
-error result (`Failure`).
+Export()方法不会被同一个exporter并发的调用。Export()方法只能在当前调用返回才会进行下一次调用。
 
-Any retry logic that is required by the exporter is the responsibility of the exporter. The default SDK SHOULD NOT
-implement retry logic, as the required logic is likely to depend heavily on the specific protocol and backend the spans
-are being sent to.
+Export()不能无限期地阻塞，必须有一个合理的上限，在此上限之后必须超时并返回错误结果（`Failure`）。
 
-**Parameters:**
+exporter需要有重试逻辑，这是exporter的责任。默认的SDK不应实现重试逻辑，因为所需的逻辑很大程度上取决于具体的协议和span要发送去的后端
 
-batch - a batch of [readable spans](#additional-span-interfaces). The exact data type of the batch is language specific,
-typically it is some kind of list, e.g. for spans in Java it will be typically `Collection<SpanData>`.
+**入参:**
 
-**Returns:** ExportResult:
+batch - 一批[readable spans](#additional-span-interfaces)。批量数据的类型是特定于语言的，通常是某种列表。例如对于Java中的span通常为`Collection<SpanData>`
 
-ExportResult is one of:
+**返回值:** ExportResult（导出结果）:
 
-* `Success` - The batch has been successfully exported. For protocol exporters this typically means that the data is
-  sent over the wire and delivered to the destination server.
-* `Failure` - exporting failed. The batch must be dropped. For example, this can happen when the batch contains bad data
-  and cannot be serialized.
+ExportResult是下面的一种：
 
-Note: this result may be returned via an async mechanism or a callback, if that is idiomatic for the language
-implementation.
+*`Success` - 该批次全部成功导出。对于协议导出器这通常意味着数据已经通过线路发送且已传递给目标服务器
+*`Failure` - 导出失败。改批次必须被丢弃。例如当数据包含错误的数据不能被序列化
 
-#### `Shutdown()`
+注意： 如果异步回调是当前语言的常用手段的话，那么结果可能就通过这种异步回调方式返回
 
-Shuts down the exporter. Called when SDK is shut down. This is an opportunity for exporter to do any cleanup required.
+#### `Shutdown()`（关闭）
 
-`Shutdown` should be called only once for each `Exporter` instance. After the call to `Shutdown` subsequent calls
-to `Export` are not allowed and should return a `Failure` result.
+关闭导出器exporter。在SDK关闭的时候被调用。这是exporter做相关清理工作的一个时机。
 
-`Shutdown` should not block indefinitely (e.g. if it attempts to flush the data and the destination is unavailable).
-OpenTelemetry client authors can decide if they want to make the shutdown timeout configurable.
+`Shutdown` 只会被`Exporter`实例调用一次。在`Shutdown`被调用之后，随后的`Export`调用不会被允许并返回一个`Failure`结果
+
+`Shutdown` 不应无限期地阻塞（例如，如果它尝试冲刷数据但目标地址不可用）。OpenTelemetry客户端作者可以决定是否将shutdown超时配置做成可配置的。
 
 ### Further Language Specialization
 
-Based on the generic interface definition laid out above library authors must define the exact interface for the
-particular language.
+基于上述通用的接口定义，library作者必须为特定的语言定义确切的接口
 
-Authors are encouraged to use efficient data structures on the interface boundary that are well suited for fast
-serialization to wire formats by protocol exporters and minimize the pressure on memory managers. The latter typically
-requires understanding of how to optimize the rapidly-generated, short-lived telemetry data structures to make life
-easier for the memory manager of the specific language. General recommendation is to minimize the number of allocations
-and use allocation arenas where possible, thus avoiding explosion of allocation/deallocation/collection operations in
-the presence of high rate of telemetry data generation.
+鼓励作者在接口上使用高效的数据结构，适合快速序列化为protocol exporter的线路传输格式以及较低内存管理器的压力。后者通常需要理解特定语言的内存管理器
+如何优化出快速生成、短暂存活的数据结构，让生命周期更简单。通常的建议是减少分配数量和使用allocation arenas进行分配， 从而避免在telemetry数据生成率很高时爆炸式的进行【分配/接触分配/回收】
 
-#### Examples
+#### Examples（示例）
 
-These are examples on what the `Exporter` interface can look like in specific languages. Examples are for illustration
-purposes only. OpenTelemetry client authors are free to deviate from these provided that their design remain true to the
-spirit of `Exporter` concept.
+这些是`Exporter`接口在一些特定语言上的例子展示。例子仅仅是说明性的。OpenTelemetry客户端作者可以自由的偏离这些遵循`Exporter`概念精神的例子
 
-##### Go SpanExporter Interface
+##### Go SpanExporter Interface（Golang的SpanExporter接口）
 
 ```go
 type SpanExporter interface {
@@ -499,7 +442,7 @@ Failure
 )
 ```
 
-##### Java SpanExporter Interface
+##### Java SpanExporter Interface（Java的SpanExporter接口）
 
 ```java
 public interface SpanExporter {
