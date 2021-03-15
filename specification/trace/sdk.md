@@ -208,7 +208,7 @@ TODO（待办）：添加关于`TraceIdRatioBased`是如何通过`TraceID`
 * `localParentSampled(Sampler)` (默认值: AlwaysOn)
 * `localParentNotSampled(Sampler)` (默认值: AlwaysOff)
 
-[以下待翻译]()
+[以下待翻译](todo)
 
 |Parent| parent.isRemote() | parent.IsSampled()| Invoke sampler| |--|--|--|--| |absent| n/a | n/a |`root()`|
 |present|true|true|`remoteParentSampled()`| |present|true|false|`remoteParentNotSampled()`|
