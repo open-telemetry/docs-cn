@@ -58,7 +58,7 @@ TracerProvider可以提供更新配置的方法。如果配置已更新（例如
 
 * **Readable span接口**：以此作为参数的方法，能够访问span中所有在[in the API spec](api.md#span-data-memebers)列出的这些信息。特别是，
   它还必须能够（隐式地）访问与span相关联的`InstrumentationLibrary`和`Resource`信息。它还必须能够可靠地确定Span是否已结束 （某些语言可能通过将结束时间戳记为`null`
-  来表示，而其他语言可能具有显式的布尔类型的`hasEnded`标志）。
+  来表示，而其他语言可能具有显式的布尔类型的`hasEnded`标志）
 
   以此作为参数的方法不能修改Span 注意：通常这将使用新的接口或（不可变的）值类型来实现。在某些语言中，SpanProcessor可能具有与exporter不同的可读span类型（例如：`SpanData`
   可能包含一个不可变的快照，而`ReadableSpan`可能直接读取来自`Span`接口操作的底层数据结构）
