@@ -33,18 +33,18 @@ api
 
 ### [/baggage](baggage/api.md)
 
-本目录包含可以用于管理context propagation和与metrics相关的标签的 Baggage API.
+本目录包含可以用于管理context propagation和与metrics相关的标签的 Baggage API。
 
 ### [/trace](trace/api.md)
 
 跟踪 API 包含一些主要的类:
 
-- `Tracer` 用于所有的操作. 详见 [Tracer](trace/api.md#tracer) 章节.
-- `Span` 是一个保存了当前执行的操作的可变对象. 详见 [Span](trace/api.md#span) 章节.
+- `Tracer` 用于所有的操作. 详见 [Tracer](trace/api.md#tracer) 章节。
+- `Span` 是一个保存了当前执行的操作的可变对象. 详见 [Span](trace/api.md#span) 章节。
 
 ### `/internal` (_Optional_)
 
-私有的库和应用代码.
+私有的库和应用代码。
 
 ### `/logs` (_In the future_)
 

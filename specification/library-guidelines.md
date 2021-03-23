@@ -20,7 +20,7 @@ _OpenTelemetry 客户端作者请注意:_ OpenTelemetry 的规范、 API 和 SDK
 ## 要求
 
 <!-- 1. The OpenTelemetry API must be well-defined and clearly decoupled from the implementation. This allows end users to consume API only without also consuming the implementation (see points 2 and 3 for why it is important). -->
-1. OpenTelemetry API 必须是清晰明确的并且和实现解耦。这样最终用户可以仅仅理解API而不需要关系实现。(第2和第3点解释了原因).
+1. OpenTelemetry API 必须是清晰明确的并且和实现解耦。这样最终用户可以仅仅理解API而不需要关系实现。(第2和第3点解释了原因)。
 
 <!-- 2. Third party libraries and frameworks that add instrumentation to their code will have a dependency only on the API of OpenTelemetry client. The developers of third party libraries and frameworks do not care (and cannot know) what specific implementation of OpenTelemetry is used in the final application. -->
 2. 第三方库和框架的仅仅需要集成和依赖OpenTelemetry客户端 API。第三方库和框架的作者通常不关心（也无法知晓）OpenTelemetry的最终使用场景和规范。
@@ -48,7 +48,7 @@ _OpenTelemetry 客户端作者请注意:_ OpenTelemetry 的规范、 API 和 SDK
     - Zipkin.
     - Prometheus.
     - 标准输出 (或日志) 以用于调试和测试，也可以用于集成日志代理工具。
-    - 内存 (mock) exporter，可以用于在本地内存中收集和检查遥测数据。(比如用于单元测试).
+    - 内存 (mock) exporter，可以用于在本地内存中收集和检查遥测数据。(比如用于单元测试)。
 
     注: 上面有一些 exporter 包含多种协议 (比如 gRPC, Thrift, 等等)。具体 exporter 需要实现哪些协议还处于待定状态。
 
@@ -67,7 +67,7 @@ _OpenTelemetry 客户端作者请注意:_ OpenTelemetry 的规范、 API 和 SDK
 
 <!-- The OpenTelemetry client is composed of 4 types of [packages](glossary.md#packages): API packages, SDK packages, a Semantic Conventions package, and plugin packages.
 The API and the SDK are split into multiple packages, based on signal type (e.g. one for api-trace, one for api-metric, one for sdk-trace, one for sdk-metric) is considered an implementation detail as long as the API artifact(s) stay separate from the SDK artifact(s). -->
-OpenTelemetry 客户端有4种 [包](glossary.md#packages) 组成: API 包, SDK 包, 语义转换包, 以及插件包.
+OpenTelemetry 客户端有4种 [包](glossary.md#packages) 组成: API 包, SDK 包, 语义转换包, 以及插件包。
 API 和 SDK 被拆分成了多个包, 每个包都基于单个类型 (比如: 一个用于 api-trace, 一个用于 api-metric, 一个用于 sdk-trace, 一个用于 sdk-metric) ，并且把 API 包和 the SDK 分开实现。
 
 <!-- Libraries, frameworks, and applications that want to be instrumented with OpenTelemetry take a dependency only on the API packages. The developers of these third-party libraries will make calls to the API to produce telemetry data. -->
