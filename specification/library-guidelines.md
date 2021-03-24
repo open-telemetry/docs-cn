@@ -5,7 +5,7 @@
 本文档定义了 OpenTelemetry 客户端设计的通用规范。目的是所有支持的语言的客户端保持统一，更容易使用，并且能允许保留对特定语言的特性支持的弹性。
 
 <!-- OpenTelemetry clients are expected to provide full features out of the box and allow for innovation and experimentation through extensibility. -->
-OpenTelemetry客户端的目标是让所有的功能都一个开箱即用，并且在创新型的功能和实验性功能上保持的扩展性。
+OpenTelemetry 客户端的目标是让所有的功能都一个开箱即用，并且在创新型的功能和实验性功能上保持的扩展性。
 
 <!-- Please read the [overview](overview.md) first, to understand the fundamental architecture of OpenTelemetry. -->
 请先阅读 [overview](overview.md) 以了解 OpenTelemetry 架构的基本原理。
@@ -20,16 +20,16 @@ _OpenTelemetry 客户端作者请注意:_ OpenTelemetry 的规范、 API 和 SDK
 ## 要求
 
 <!-- 1. The OpenTelemetry API must be well-defined and clearly decoupled from the implementation. This allows end users to consume API only without also consuming the implementation (see points 2 and 3 for why it is important). -->
-1. OpenTelemetry API 必须是清晰明确的并且和实现解耦。这样最终用户可以仅仅理解API而不需要关系实现。(第2和第3点解释了原因)。
+1. OpenTelemetry API 必须是清晰明确的并且和实现解耦。这样最终用户可以仅仅理解 API 而不需要关系实现。(第2和第3点解释了原因)。
 
 <!-- 2. Third party libraries and frameworks that add instrumentation to their code will have a dependency only on the API of OpenTelemetry client. The developers of third party libraries and frameworks do not care (and cannot know) what specific implementation of OpenTelemetry is used in the final application. -->
-2. 第三方库和框架的仅仅需要集成和依赖OpenTelemetry客户端 API。第三方库和框架的作者通常不关心（也无法知晓）OpenTelemetry的最终使用场景和规范。
+2. 第三方库和框架的仅仅需要集成和依赖 OpenTelemetry 客户端 API。第三方库和框架的作者通常不关心（也无法知晓）OpenTelemetry 的最终使用场景和规范。
 
 <!-- 3. The developers of the final application normally decide how to configure OpenTelemetry SDK and what extensions to use. They should be also free to choose to not use any OpenTelemetry implementation at all, even though the application and/or its libraries are already instrumented.  The rationale is that third-party libraries and frameworks which are instrumented with OpenTelemetry must still be fully usable in the applications which do not want to use OpenTelemetry (so this removes the need for framework developers to have "instrumented" and "non-instrumented" versions of their framework). -->
 3. 通常由最终的软件开发者来决定如何配置 OpenTelemetry SDK 和使用哪些插件。允许他们接入的程序或者库时可以选择不开启任何 OpenTelemetry 的功能。其最终目的是为了让使用者在即便不想使用 OpenTelemetry 的时候也能直接使用其内部集成了 OpenTelemetry 的第三方库和框架(所以，这就不需要框架开发者分开提供集成和未集成 OpenTelemetry 的版本)。
 
 <!-- 4. The SDK must be clearly separated into wire protocol-independent parts that implement common logic (e.g. batching, tag enrichment by process information, etc.) and protocol-dependent telemetry exporters. Telemetry exporters must contain minimal functionality, thus enabling vendors to easily add support for their specific protocol. -->
-4. SDK 必须把与协议无关的公共逻辑（比如：批处理、按进程信息打标签）和与协议相关的遥测 exporter 隔离开。遥测 exporter 必须仅包含最小功能块，以便厂商可以更容易地增加私有协议的支持。
+4. SDK 必须把与协议无关的公共逻辑（比如：批处理、按进程信息打标签）和与协议相关的遥测 Exporter 隔离开。遥测 Exporter 必须仅包含最小功能块，以便厂商可以更容易地增加私有协议的支持。
 
 <!-- 5. The SDK implementation should include the following exporters:
     - OTLP.
@@ -42,17 +42,17 @@ _OpenTelemetry 客户端作者请注意:_ OpenTelemetry 的规范、 API 和 SDK
     Note: some of these support multiple protocols (e.g. gRPC, Thrift, etc). The exact list of protocols to implement in the exporters is TBD.
 
     Other vendor-specific exporters (exporters that implement vendor protocols) should not be included in OpenTelemetry clients and should be placed elsewhere (the exact approach for storing and maintaining vendor-specific exporters will be defined in the future). -->
-5. SDK 实现应该包含以下的 exporter:
+5. SDK 实现应该包含以下的 Exporter:
     - OTLP.
     - Jaeger.
     - Zipkin.
     - Prometheus.
     - 标准输出 (或日志) 以用于调试和测试，也可以用于集成日志代理工具。
-    - 内存 (mock) exporter，可以用于在本地内存中收集和检查遥测数据。(比如用于单元测试)。
+    - 内存 (Mock) Exporter ，可以用于在本地内存中收集和检查遥测数据。(比如用于单元测试)。
 
-    注: 上面有一些 exporter 包含多种协议 (比如 gRPC, Thrift, 等等)。具体 exporter 需要实现哪些协议还处于待定状态。
+    注: 上面有一些 Exporter 包含多种协议 (比如 gRPC , Thrift , 等等)。具体 Exporter 需要实现哪些协议还处于待定状态。
 
-    其他厂商定制化的 exporter (实现了厂商私有协议) 不被包含在 OpenTelemetry 客户端列表中，其文档位于其他位置 (未来会确定保存和维护厂商定制化 exporter 位置)。
+    其他厂商定制化的 Exporter (实现了厂商私有协议) 不被包含在 OpenTelemetry 客户端列表中，其文档位于其他位置 (未来会确定保存和维护厂商定制化 Exporter 位置)。
 
 <!-- ## OpenTelemetry Client Generic Design -->
 ## OpenTelemetry 客户端通用设计模型
@@ -77,7 +77,7 @@ API 和 SDK 被拆分成了多个包, 每个包都基于单个类型 (比如: �
 如果应用使用的第三方库集成了 OpenTelemetry API，它也能控制是否安装 SDK 来生成遥测数据。如果 SDK 为安转，API 调用应该不做任何事情且保持最小化开销。
 
 <!-- In order to enable telemetry the application must take a dependency on the OpenTelemetry SDK. The application must also configure exporters and other plugins so that telemetry can be correctly generated and delivered to their analysis tool(s) of choice. The details of how plugins are enabled and configured are language specific. -->
-为了保证在应用开启遥测时必须依赖 OpenTelemetry SDK 。应用必须配置 exporter 和其他的插件以确保遥测模块可以生成正确的数据并且传递给其选择的分析工具。如果开启和配置插件的细节由语言规范约束。
+为了保证在应用开启遥测时必须依赖 OpenTelemetry SDK 。应用必须配置 Exporter 和其他的插件以确保遥测模块可以生成正确的数据并且传递给其选择的分析工具。如果开启和配置插件的细节由语言规范约束。
 
 <!-- ### API and Minimal Implementation -->
 ### API 和最小实现
@@ -111,10 +111,10 @@ SDK 实现是生成用于导出的遥测数据的 API 调用的核心功能。�
 ![Full Operation Diagram](internal/img/library-full.png)
 
 <!-- SDK defines an [Exporter interface](trace/sdk.md#span-exporter). Protocol-specific exporters that are responsible for sending telemetry data to backends must implement this interface. -->
-SDK 定义了[导出接口](#span-exporter)。协议专用的 exporter 负责吧遥测数据发送到实现了改接口的后端。
+SDK 定义了[导出接口](#span-exporter)。协议专用的 Exporter 负责吧遥测数据发送到实现了改接口的后端。
 
 <!-- SDK also includes optional helper exporters that can be composed for additional functionality if needed. -->
-如果需要的话，SDK 也可以包含一些辅助的 exporter 用于组装一些附加的功能。
+如果需要的话，SDK 也可以包含一些辅助的 Exporter 用于组装一些附加的功能。
 
 <!-- Library designers need to define the language-specific `Exporter` interface based on [this generic specification](trace/sdk.md#span-exporter). -->
 库的设计者需要基于 [这个通用规范](trace/sdk.md#span-exporter) 定义语言专用的 `Exporter` 接口。
@@ -126,7 +126,7 @@ SDK 定义了[导出接口](#span-exporter)。协议专用的 exporter 负责吧
 我们期望遥测服务后端的供应商来实现 [导出接口](trace/sdk.md#span-exporter)。接收到的数据可以通过 ```Export()``` 函数来通过供应商专有的方式序列化并发送到后端。
 
 <!-- Vendors are encouraged to keep protocol-specific exporters as simple as possible and achieve desirable additional functionality such as queuing and retrying using helpers provided by SDK. -->
-我们鼓励供应商保持 exporter 的协议规范尽可能简单，并且实现适当的扩展功能，比如排队机制和使用 SDK 提供的工具来做失败重试。
+我们鼓励供应商保持 Exporter 的协议规范尽可能简单，并且实现适当的扩展功能，比如排队机制和使用 SDK 提供的工具来做失败重试。
 
 <!-- End users should be given the flexibility of making many of the decisions regarding the queuing, retrying, tagging, batching functionality that make the most sense for their application. For example, if an application's telemetry data must be delivered to a remote backend that has no guaranteed availability the end user may choose to use a persistent local queue and an `Exporter` to retry sending on failures. As opposed to that for an application that sends telemetry to a locally running Agent daemon, the end user may prefer to have a simpler exporting configuration without retrying or queueing. -->
 最合理的情况是让应用程序的最终用户可以在排队、重试、标签、批处理等功能中做出选择。比如，如果一个应用的遥测数据必须被发送到不保证可用性的远程的后端。用户可以选择使用一个本地持久化队列和一个可以在失败后重新发送数据的 `Exporter` 。或者另一种方案是应用可以把数据发送到一个本地的代理服务，这样最终用户就可以使用一个更简单的不包含重试和排队的导出配置。
@@ -157,7 +157,7 @@ SDK 应当被拆分成多个不同的库，除此以外，库的名字应当按�
 SDK 提供了一定的弹性和扩展功能并且被很多的实现使用了。在开发一个新的替代实现前，请再检视一下 OpenTelemetry 提供的扩展点。
 
 <!-- An example use-case for alternate implementations is automated testing. A mock implementation can be plugged in during automated tests. For example, it can store all generated telemetry data in memory and provide a capability to inspect this stored data. This will allow the tests to verify that the telemetry is generated correctly. OpenTelemetry client authors are encouraged to provide such a mock implementation. -->
-一个替代实现的例子是自动化测试。可以使用一个 Mock 的实现加到自动化测试中去。比如，在内存里保存所有的遥测数据并提供来复杂这些保存的数据的能力。这样可以让测试用例来检查遥测数据是否正确。我们鼓励 OpenTelemetry 客户端的作者来提供类似这样的 mock 实现。
+一个替代实现的例子是自动化测试。可以使用一个 Mock 的实现加到自动化测试中去。比如，在内存里保存所有的遥测数据并提供来复杂这些保存的数据的能力。这样可以让测试用例来检查遥测数据是否正确。我们鼓励 OpenTelemetry 客户端的作者来提供类似这样的 Mock 实现。
 
 <!-- Note that mocking is also possible by using SDK and a Mock `Exporter` without needing to swap out the entire SDK. -->
 注意: 需要 Mock 功能也可以通过使用 SDK 中的 Mock `Exporter` 而不需要换掉整个 SDK。
@@ -178,7 +178,7 @@ API 和 SDK 包必须采用语义化版本控制规范。API 包的版本号和 
 因为 API 和 SDK 包的版本号并不耦合，所以每个 API 和 SDK 发布包必须显式声明他们实现的规范版本。并且如果特定版本的 SDK 包仅兼容某个特定版本的 API 包，这些兼容性信息也必须由 OpenTelemetry 客户端的作者公布出来。OpenTelemetry 客户端的作者必须把这些兼容性信息公布在发行说明里。比如，SDK 包的发行说明里可以说“SDK 0.3.4 匹配 API 0.1.0，实现了 OpenTelemetry 规范 0.1.0”。
 
 <!-- _TODO: How should third-party library authors who use OpenTelemetry for instrumentation guide their end users to find the correct SDK package?_ -->
-_TODO: 使用 OpenTelemetry 的第三方库的作者如何指引最终用户找到正确的SDK包？
+_TODO: 使用 OpenTelemetry 的第三方库的作者如何指引最终用户找到正确的 SDK 包？
 
 <!-- ### Performance and Blocking -->
 ### 性能和阻塞

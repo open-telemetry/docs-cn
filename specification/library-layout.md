@@ -1,6 +1,6 @@
-# OpenTelemetry工程结构
+# OpenTelemetry 工程结构
 
-本文档展示了OpenTelemetry项目的基本的工程结构布局。对于包结构仅展示通用的部分，对某个特定语言的包结构不做强制要求。
+本文档展示了 OpenTelemetry 项目的基本的工程结构布局。对于包结构仅展示通用的部分，对某个特定语言的包结构不做强制要求。
 
 ## API 包结构
 
@@ -25,15 +25,15 @@ api
 
 ### `/context`
 
-本目录包含正在执行的context propagation的API。
+本目录包含正在执行的 context propagation 的 API 。
 
 ### [/metrics](./metrics/api.md)
 
-本目录包含用于记录应用Metrics数据的Metrics API。
+本目录包含用于记录应用 Metrics 数据的 Metrics API 。
 
 ### [/baggage](baggage/api.md)
 
-本目录包含可以用于管理context propagation和与metrics相关的标签的 Baggage API。
+本目录包含可以用于管理 context propagation 和与 Metrics 相关的标签的 Baggage API。
 
 ### [/trace](trace/api.md)
 
@@ -71,16 +71,16 @@ sdk
 
 ### `/sdk/context`
 
-本目录包含api/context的SDK实现。
+本目录包含 api/context 的 SDK 实现。
 
 ### `/sdk/metrics`
 
-本目录包含api/metrics的SDK实现。
+本目录包含 api/metrics 的 SDK 实现。
 
 ### [/sdk/resource](resource/sdk.md)
 
-resource目录主要定义了[Resource](overview.md#resources)类型。该类型包含了统计和跟踪实体的信息。比如，
-Kubernetes可以导出指向Kubernetes集群、命名空间、pod和容器名称的metrics。
+resource 目录主要定义了 [Resource](overview.md#resources) 类型。该类型包含了统计和跟踪实体的信息。比如，
+Kubernetes 可以导出指向 Kubernetes 集群、命名空间、 Pod 和容器名称的 Metrics 。
 
 ### `/sdk/baggage`
 
