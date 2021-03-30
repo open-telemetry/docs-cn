@@ -221,7 +221,7 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 
 ### Metric Event格式
 
-`Metric events`具有相同的数据表现形式，无论`instrument`是那种类型。
+无论`instrument`是那种类型，`Metric events`都具有相同的逻辑形式。
 通过任何工具捕获的`Metric events`都具有以下属性：
 
 - timestamp (隐式的时间戳)
@@ -230,102 +230,102 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 - value (有符号整数或浮点数)
 - [资源](../resource/sdk.md) （启动时与SDK相关的资源）.
 
-同步的`events`还有一个附加属性，即当时处于活动状态的分布式
+同步的`events`还有一个附加属性，即当时所处于的有效的分布式
 [上下文](../context/context.md) (包括 `Span`，`Baggage`等等)。
 
 ## Meter provider
 
-`MeterProvider`通过初始化和配置`OpenTelemetry Metrics SDK`，可以获得具体的实现。
+`MeterProvider` 通过初始化和配置 `OpenTelemetry Metrics SDK` 来获得具体实例。
 本文档未指定如何构建SDK，仅说明它们必须实现 `MeterProvider`。
-配置完成后，应用程序或库将选择是使用`MeterProvider` 接口的全局实例，还是选择使用依赖项注入来更好地控制配置提供程序。
+配置完成后，应用程序或库可以选择使用 `MeterProvider` 接口的全局实例的方式获取，也可以选择使用依赖项注入的方式来更好地根据配置进行控制。
 
-### 获取一个Meter
+### 获取一个 Meter
 
-`Meter`可以通过`MeterProvider`和 `GetMeter(name, version)`方法创建新实例。 `MeterProvider`通常被期望作为单例来使用。
-实现应提供单个全局默认值`MeterProvider`。该`GetMeter`方法需要两个字符串参数：
+`Meter` 可以通过 `MeterProvider` 的 `GetMeter(name, version)`方法来创建一个新实例。 `MeterProvider` 通常被期望作为单例来使用。
+其实现应作为`MeterProvider`全局的唯一实现。该 `GetMeter` 方法需要两个字符串类型的参数：
 
-- name（必填）：此名称必须标识`instrumentation library`（例如`io.opentelemetry.contrib.mongodb`），而不标识`instrumented library`。
-  如果指定了无效的名称（`null`或空字符串`""`），Meter则将可用的默认实现作为后备返回，而不是返回null或引发异常。
-  如果应用程序所有者配置SDK来废弃这个库的`telemetry produced`，一个“MeterProvider”也可以返回一个无操作的“Meter”，
+- name（必填）：这个名称应该作为集成库的名称（例如`io.opentelemetry.contrib.mongodb`），而不是被集成库的名称。
+  如果指定了非法的名称（ `null` 或空字符串`""`），一个默认的 Meter 应该被返回，而不是返回 null 或引发异常。
+  如果应用程序所有者配置SDK认为这个库已经过期而不应该产生任何观测数据，那么返回的 `MeterProvider` 应该不做任何操作。
 
-- version（选填）：指定检测库的版本（例如1.0.0）。
+- version（选填）：指定集成库的版本（例如 1.0.0）。
 
-每个单独命名的“Meter”都为其`metric instruments`建立了一个单独的命名空间，
-这使得多个`instrument`库可以用其他库使用的相同`instrument`名称报告`metrics`。
-
-`Meter`的名称明显并不是`instrument`名称的一部分，因为这将阻止`instrumentation`库捕获同名的`metrics`。
+每个单独命名的 `Meter` 都为其 metric instrument 建立了一个单独的命名空间，
+这使得某个 instrument 可以在不同的集成库使用的相同名名称上报 `metrics` 。
+但是 `Meter` 的名称明显不会作为 instruments 的名称的一部分，因为这会导致集成库去捕获同名的 `metrics` 。
 
 ### 全局 Meter provider
 
-在许多情况下，全局实例的使用可能被视为一种反模式（anti-pattern），但是在大多数情况下，它是`telemetry`数据的正确形式，
-以便将相互依赖的库中的`telemetry`数据组合在一起而不使用依赖注入，因此，`penTelemetry`语言API应该提供一个全局实例。
-一种语言在提供全局实例时，必须保证通过这些`Meter`实例分配的全局的`MeterProvider`和`instruments`，
-并且通过这些`Meter`实例分配的`instruments`的初始化过程延迟到全局SDK的第一次初始化。
+在许多情况下，全局实例的使用可能被视为一种反面模式，但是在大多数情况下，它却是观测数据的合理方案，
+这种实现以便从一批相互依赖的库当中的获取观测数据从而避免依赖注入，因此，`openTelemetry` 所提供针对编程语言的 API 应该提供一个全局实例。
+当在一种语言中提供全局实例时，必须保证通过这些 `Meter` 实例是全局的 `MeterProvider` 所分配的并且集成库所获取到的 `Meter` 实例的初始化将会
+延迟到全局 SDK 的第一次初始化之后。
 
-#### 获取全局的MeterProvider
+#### 获取全局的 MeterProvider
 
-由于全局`MeterProvider`变量是单例并且支持单个方法，因此调用者可以`Meter`使用全局`GetMeter` 调用获取全局变量。
-例如， 在全局`global.GetMeter(name, version)`调用全局`MeterProvider`上的`GetMeter`方法，并返回一个命名的`Meter`的实例。
+由于全局 `MeterProvider` 变量是单例并且支持通过单个方法获取，因此调用者可以通过全局的 `GetMeter` 方法调用来获取一个全局 
+`Meter` 的变量。
+例如， `global.GetMeter(name, version)` 通过调用全局 `MeterProvider` 的 `GetMeter` 方法并返回一个被命名的 `Meter` 的实例。
 
-#### 设置全局的MeterProvider
+#### 设置全局的 MeterProvider
 
-全局函数将MeterProvider安装为全局SDK。
-例如，用`global.SetMeterProvider(MeterProvider)`在初始化SDK后安装它。
+可以通过 SDK 的一个全局函数来设置 MeterProvider 。
+例如，用 `global.SetMeterProvider(MeterProvider)` 可以在 SDK 初始化的过程中进行配置 MeterProvider 。
 
-## Instrument属性
+## Instrument 属性
 
-因为API与SDK是分开的，所以实现的逻辑最终决定了如何处理`metric events`的事件。
-因此`instrument`的选择应该以语义和预设实现（原文：the individual instruments）作为指导。
-各个`instrument`的语义是由几个属性定义的，此处有详细的介绍，以帮助选择`instrument`。
+因为 API 与 SDK 是分开的，所以其实现的逻辑最终决定了如何处理 `metric events` 的事件。
+因此在选择 instrument 的过程中的选择应该以语义与需求作为指导。
+各个 instrument 的语义是由几个属性定义的，此处有详细的介绍，以帮助选择合适的 instrument 。
 
-### Instrument命名要求
+### Instrument 命名要求
 
-`Metric instruments`主要由其名称定义，这是我们在外部系统中对它们的称呼方式。`Metric instruments`的命名应符合以下语法：
+Metric instruments 主要由其名称定义，这是我们在外部系统中对它们的称呼方式。 Metric instruments 的命名应符合以下语法：
 1. 它们不是空字符串
 2. 它们不区分大小写
 3. 第一个字符必须是非数字，非空格，非标点符号
-4. 后续字符必须属于字母数字字符`_`, `.`和`-`。
+4. 后续字符必须属于字母数字字符和`_`，`.`和`-`。
 
-`Metric instruments`的名称属于一个命名空间`namespace`，由关联的“Meter”实例建立。
-当多个`instruments`以相同的名称注册时，`Meter`的实现必须要返回一个错误。
+Metric instruments 的名称属于一个命名空间，这个命名空间由这关联的 `Meter` 实例建立。
+当多个 instruments 以相同的名称注册时， `Meter` 的实现必须要返回一个错误。
 
-TODO: [关于`metric`命名的更规范的指导](https://github.com/open-telemetry/opentelemetry-specification/issues/600)
+TODO: [以下段落是为了后续更详细文档的占位符。](https://github.com/open-telemetry/opentelemetry-specification/issues/600)
 
-`Metric instrument`的名称在语义上应该是有意义的，独立于最初的`Meter`的名称。
-例如，在检测http服务器库时，"latency"就不是一个合适的`instrument`名称，因为这个名称太笼统了。
-作为示例，我们应该喜欢使用"http_request_latency"之类的名称，因为它会告知查看者延迟测量的语义。
+Metric instrument 的名称在语义上应该是有意义的，独立于最初的 Meter 的名称。
+例如，在检测 http 服务器库时，"latency" 就不是一个合适的 instrument 名称，因为这个名称太笼统了。
+作为示例，我们应该喜欢使用 "http_request_latency" 之类的名称，因为它会直接展示给查看者其延迟数据的语义。
 可以编写多个工具库来生成此`metric`。
 
-### 同步和异步instruments比较
+### 同步和异步 instruments 比较
 
-同步`instruments`在请求内被调用，这意味着它们具有关联的分布式
+同步 `instruments` 在请求内被调用，这意味着它们处于在分布式
 [上下文](../context/context.md)
-（包括`Span`，`Bagage`等）。
-在给定的收集间隔内，同步`instruments`可能会发生多个`metric events`。
+（包括`Span`，`Bagage`等）之下。
+在给定的间隔内，同步 `instruments` 可能会产生多个 `metric events` 。
 
-异步`instruments`由回调来进行上报收集，每个收集间隔上报一次，并且缺少上下文信息。每个时期每个标签组只能报告一个值。
-如果应用程序在同一回调中观察到同一标签集的多个值，则最后一个值是唯一保留的值。
+异步 `instruments` 由回调来进行上报收集，每个收集间隔上报一次，并且缺少上下文信息。在每个时间间隔内每个标签组只能报告一个值。
+如果应用程序在一次回调中观察到同一标签集的多个值，则最后一个值是唯一保留的值。
 
-为确保最后一个值的定义在异步工具中保持一致，与异步事件关联的时间戳，是固定到计算时间间隔结束时的时间戳。
-所有的异步事件都在时间间隔的结束上打上时间戳，也就是它们成为仪器和标签集合对应的最后一个值的那一刻。
-（由于这个原因，SDK应该在收集间隔的末尾运行异步工具回调。）
+为确保最后一个值的定义在异步工具中保持一致，计算时间间隔结束时的时间戳将会固定作为异步事件关联的时间戳。
+所有的异步事件都在时间间隔的结束上打上时间戳，同时这些 event 也成为了 instrument 下标签集合的最后一个值。
+（由于这个原因， SDK 应该在收集间隔的末尾运行异步工具回调。）
 
-### Adding instruments与grouping instruments比较
+### Adding instruments 与 grouping instruments 比较
 
-`Adding instruments`用于获取有关总和的数据，根据其定义，只有总和才具有意义。
-单个的事件，对于这些`instruments`是没有意义的，也没有对于事件的计数。
-这也就意味着，两个`Counter`事件 `Add(N)`和`Add(M)`等效于一个`Counter`事件`Add(N + M)`。
+Adding instruments 用于获取有关总和的数据，根据其定义只有数据总和才是值得感兴趣的结果。
+个别的事件对于这些 instruments 是没有意义的，具体 event 数量的计算没有意义。
+这也就意味着，两个 `Counter` 事件 `Add(N)` 和 `Add(M)` 等效于一个 `Counter` 事件 `Add(N + M)` 。
 之所以会出现这种情况，是因为`Counter`是同步的，而`Adding instruments`是用来捕获变化到一个总和。
 
-异步的`adding instruments`（例如`SumObserver`）用于直接捕获总和。
-例如，这意味着在`SumObserver`给定`instrument`和标签集的任何观察序列中，最后一个值定义了`instrument`的总和。
+异步的 adding instruments（例如 `SumObserver` ）用于直接捕获总和。
+这意味着在 `SumObserver` 给定 instrument 和标签集的任何观察序列中，最后一个值定义了`instrument`的总和。
 
-在同步和异步的情况下，在不丢失信息的情况下，`adding instruments`以低廉的成本在每个收集间隔内收集的数据聚合成一个单独的数字。
-这个特性使添加工具的性能比分组工具的性能更高
+在同步和异步的情况下，在不丢失信息的情况下，adding instruments 以低廉的成本在每个收集间隔内收集的数据聚合成一个单独的数字。
+这个特性使 adding instrument 的性能比 grouping instruments 的性能更高。
 
-`Grouping instruments`在默认情况下，使用了与记录完成数据相比更简单的聚合工具，
-但是仍然比`adding instruments`的默认的默认值消耗更多的性能（Sum）。
-与添加工具不同，在`adding instruments`中，只需要定义定义的总和即可，而`Grouping instruments`可以配置甚至更昂贵的聚合器。
+Grouping instruments 在默认情况下，使用了与记录完整数据相比更简单的聚合工具，
+但是仍然比 adding instruments 的默认的默认值消耗更多的性能（求和）。
+在 adding instruments 中，只有总和是感兴趣的，而 grouping instruments 可以配置更消耗性能的聚合器。
 
 ### 单调和非单调instruments的比较
 
