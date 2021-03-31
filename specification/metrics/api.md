@@ -55,13 +55,13 @@
 <!-- tocstop -->
 
 ## 总览
-`OpenTelemetry Metrics API`支持在运行时获取有关计算机程序执行情况的参数，
+`OpenTelemetry Metrics API`支持获取计算机程序在运行时有关执行情况的原始测量数据，
 `Metrics API`是专门为处理原始测量数据而设计的，通常是为了高效且并行的对这些测量结果进行连续的统计分析。
 以下，`API`是指`OpenTelemetry Metrics API`。
 
-`API`通过提供不同级别性能的几个调用约定，用于捕获原始度量的函数。
-无论什么级别的调用约定, 我们都将`metric event`定义为捕获新的测量时发生的逻辑事件。
-捕获的这一时间（在“运行时”）定义了一个隐式时间戳，这是SDK在该时刻从系统时钟读取的时间。
+`API`通过提供基于不同性能级别的调用约束的函数来抓取原始测量数据。
+无论什么样的调用约束, 我们都将`metric event`定义为新的测量数据被捕获时发生的逻辑事件。
+捕获的这一时刻（在运行期中）也定义了一个隐式时间戳，该时间戳是SDK在该时刻从系统时钟读取到的。
 
 这里使用的`semantic`或者`semantics`一词是指我们如何为`metric events`赋予含义，
 该术语在本文档中得到广泛使用，以定义和解释这些API函数以及我们应如何解释它们。
@@ -69,7 +69,7 @@
 标准实现对每种`metric event`执行与默认解释对应的聚合。
 
 监控和报警系统一般使用`metric events`所提供的数据, 这些数据经过[聚合](#聚合)并转换为各种展示格式的数据。
-然而，我们还发现`metric events`的数据还有许多其他用途，例如在Tracing和日志系统中记录聚合的或原始的度量。
+然而，我们还发现`metric events`的数据还有许多其他用途，例如在Tracing和日志系统中记录聚合的或原始测量数据。
 因此，
 [OpenTelemetry需要将API与SDK分开](../library-guidelines.md#requirements)
 以便可以在运行时配置不同的SDK。
@@ -82,20 +82,21 @@
 API不得在对其进行的任何调用上引发异常。
 
 ### 测量
-本文档中使用术语`捕获`（capture）来描述将用户测量出的数据传递给API时所执行的操作。
+本文档中使用术语`捕获`（capture）来描述用户将一份测量数据传递给API时所执行的操作。
 `捕获`（capture）的结果取决于所配置的SDK，如果SDK没有被安装，则默认操作是不会执行捕获的事件。
-这种用法的目的是，根据不同的SDK来传达任何可能会发生的测量结果，但是这也意味着用户正在进行着某些测量。
+这种用法的目的是，根据不同的SDK来传达任何可能会发生的测量结果，但是这也意味着用户已经为了获取这一部分测量数据付出了成本。
 出于性能和语义（semantic）方面的考虑，API允许用户在这两种测量方式之间进行选择。
 
-术语`添加`（adding）用于指定某些测量的特征，在该种测量下，仅将总和的量视为有用信息。
-这些是可以使用算术加法（通常是某些事物的实际数量，例如字节数）进行组合的度量。
+术语`求和`（adding）用于指定某些测量的特征，在该种测量下，只有总和才会被认为是有意义的信息。
+这些是可以使用算术加法（通常是某些事物的实际数量，例如字节数）进行组合的测量数据。
 
-分组度量在值集时使用，如果一个值的集合自身具有一定的意义，则使用分组度量。
-分组度量是一种您不会使用算术加法自然组合的度量（例如请求延迟），或者，当您的目的是监视值的分布时，也会添加这种度量（例如队列的大小）。
+分组度量在一组值的集合自身具有一定的意义的时候适合被使用。
+分组度量是一种你不会使用算术加法进行组合的测量数据（例如请求延迟），或者当你对于关心的值的分布更感兴趣的时候（例如队列的大小）所采取的方案。
 在分组度量中，中位数也是有用的信息。
 
-分组工具在功能上比添加工具捕获更多的信息。根据此定义，分组测量会消耗比添加测量更高的系统性能。
-用户应该优先选择添加工具，除非他们希望从有关单个数据的额外信息中获取到其他价值。
+分组工具在功能上比求和工具能够捕获更多的信息。根据其定义，分组测量数据比求和测量数据会消耗更高的性能。
+用户应该优先选择求和工具，除非他们希望从有关单个数据的额外信息中获取到其他价值。当然这些都不能阻止SDK根据
+配置重新组织解释原始数据。原始数据可以被随意加工处理。
 
 ### Metric Instruments
 
@@ -107,11 +108,11 @@ API捕获的所有度量数据都与用于进行度量的`instrument`相关联�
 因此赋予了度量其语义属性。`instrument`是通过调用`Meter`API来创建和定义的，API是SDK面向用户的入口点。
 
 `instrument`通过以下的几种方式进行区分：
-1.同步性：同步`instrument`由用户在分布式
+1.同步性：同步`instrument`由用户在处于分布式
   [上下文](../context/context.md)
-  中调用（即，具有关联的`Span`，`Baggage`等）。在没有上下文的情况下，SDK会在每个收集间隔调用一次异步工具。
-2.`添加`与`分组`：添加工具是一种记录添加测量值的工具，与上述的分组工具相反。
-3.单调性：`monotonic instrument`是一种`adding instrument`，其总和的进度不减。`monotonic instrument`对于监视速率信息很有用。
+  下的情况调用（即，具有关联的`Span`，`Baggage`等）。在没有上下文的情况下，SDK会在每个收集间隔调用一次异步工具。
+2.`求和`与`分组`：求和工具是一种记录添加测量值的工具，与上述的分组工具相反。
+3.单调性：`monotonic instrument`是一种`adding instrument`，但是其值永远不会下降。`monotonic instrument`对于监视速率信息很有用。
 
 度量工具名称以及它们是否`synchronous`，`adding`或`monotonic`显示在下面表格中。
 
@@ -124,45 +125,44 @@ API捕获的所有度量数据都与用于进行度量的`instrument`相关联�
 | UpDownSumObserver | 否 | 是 | 否 |
 | ValueObserver     | 否 | 否 | 否 |
 
-`synchronous instruments`对于在分布式
+`synchronous instruments`对于在处于分布式
 [上下文](../context/context.md)
-中（即，具有关联的`span`，`Baggage`等）收集的测量很有用。
+下（即，具有关联的`span`，`Baggage`等）收集的测量很有用。
 当测量成本很高时，`asynchronous instruments`很有用，因此应定期收集。在下面阅读更多
 [同步和异步instruments的特性](#同步和异步instruments比较)
 
 同步和异步`adding instruments`有很大的区别：同步`instruments`用于捕获总和的变化，而异步工具用于直接捕获总和。在下面阅读
 [`adding instruments`的特征](#Adding-instruments与grouping-instruments比较)。
 
-`monotonic adding instrument`是重要的工具，因为他们支持比例计算。阅读
+`monotonic adding instrument`是重要的工具，因为他们支持速率计算。阅读
 [选择`metric instruments`](#单调和非单调instruments的比较)
 以获取更多的信息。
 
-一个`instrument`的定义，描述了这个`instrument`的一些特性，包括他的名称和种类。
-`metric instrument`的一些其他属性是可配置的，包括其说明和度量单位。
-一个`instrument`的定义与其产生的数据之间相关联。
+一个`instrument`的定义，描述了这个`instrument`的一些特性，包括他的名称和类型。
+`metric instrument`的一些其他属性是可配置的，包括其介绍说明和度量单位。
+一个`instrument`的定义取决于其产生的数据特性。
 
 ### 标签
 
 标签是用于指代与`metric event`关联的Key-Value属性的术语，类似于`Tracing API`中的
 [Span attribute](../trace/api.md#span)。
-每个标签对于进行`metric event`分类，从而可以对事件进行过滤和分组以进行分析。
+每个标签可以对`metric event`进行分类，从而可以对其进行过滤和分组以进行分析。
 
 每一个`instrument`的调用约定（在下面详细说明）都接受一组标签作为参数。
 标签的集合定义为从Key到Value的唯一映射。
-通常，标签以key：values列表的形式传递给API，在这种情况下，规范规定通过在列表中显示最后一个值来解析键的重复项。
-（此处翻译存疑，原文：in which case the specification dictates that duplicate entries for a key are resolved by taking the last value to appear in the list.）
+通常，标签以键值对列表的形式传递给API，在这种情况下，当key发生重复的时候以列表中的最后一个同名key为准。
 
-如果将同步`instrument`的测量与具有完全相同标记集的其他测量相结合，那么它将得到显著的优化。
+同步`instrument`的测量数据通常可以与其他具有完全相同 label 集合数据进行组合来达到一定的性能优化的目的。
 相关的内容可以阅读[通过聚合来组合度量](#聚合)
 
 ### Meter Interface
 
 API定义了一个Meter接口。该接口由一组`instrument`构造器，和一个使用原子方式批量获取测量值的工具组成。
 
-有一个全局Meter实例可供使用，它有助于自动检测第三方代码。
-使用此实例可以使代码静态初始化`metric instruments`，而无需显式依赖注入。
-全局`Meter`实例充当无操作实现，直到应用程序`Meter`通过服务提供商接口或其他特定于语言的支持显式，安装SDK来初始化全局实例。
-请注意，没有必要直接使用全局实例：OpenTelemetry SDK的多个实例可以同时运行。
+有一个全局Meter实例可供使用，以便在与第三方代码的自动适配中使用。
+使用此实例可以使代码静态初始化`metric instruments`实例，而无需显式依赖注入。
+全局`Meter`实例在应用程序中服务提供者或者特定语言所支持的SDK被成功初始化之前将会不执行任何逻辑。
+请注意，不要直接去使用全局实例：OpenTelemetry SDK的多个实例可能同时运行。
 
 作为强制性的步骤，API要求调用者在获得`Meter`实现时提供`instrumenting`库的名称（可选，版本）。
 库名称旨在用于标识从该库产生的检测，例如禁用检测，配置聚合和应用采样策略。有关更多详细信息，请参见
@@ -177,7 +177,7 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 
 `adding instruments` (`Counter`, `UpDownCounter`, `SumObserver`,`UpDownSumObserver`)在默认的情况下使用的是求和聚合
 用于计算聚合数据的详细信息有所不同，但是从用户的角度来说，这意味着他们将能够监测捕获的值的总和。
-同步于异步的`instruments`之间的区别，对于指定到处工具的工作方式至关重要。
+同步与异步的`instruments`之间的区别，对于指定 exporter 的工作方式至关重要。
 这是
 [SDK 规范 (WIP)](https://github.com/open-telemetry/opentelemetry-specification/pull/347)
 涵盖的主题。
@@ -188,7 +188,7 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 
 `ValueObserver``instrument`默认使用LastValue聚集。此聚合跟踪所观察到的最后一个值和它的时间戳。
 
-还可以使用其他标准聚合，尤其是对于`grouping instruments`，
+对于`grouping instruments`来说，其他聚合方式也是可行的，
 我们普遍关心的各种不同的报表，例如直方图，分位数报表，基数估计和其他种类的数据结构。
 
 默认的OpenTelemetry SDK实现了[Views API (WIP)](https://github.com/open-telemetry/oteps/pull/89)，
@@ -200,15 +200,16 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 时间是`Metric Event`的基本属性，但不是必须的属性。用户不为`Metric Event`提供显式的时间戳。
 不建议SDK捕获每个事件的当前时间戳（通过读取时钟），除非明确需要每个`Event`都需要计算高精度的时间戳。
 
-源于针对`metric`报告的常见优化，该优化是将`metric`数据收集配置为具有相对较小的时间段（例如1秒），并使用单个时间戳来描述一批导出的数据，
-因为所需要的精度是在跨数分钟或数小时的时间段内的数据汇总，所以无需在数据精度上进行担忧。
+这是在上报`metric`的时候的常见优化，该优化是将`metric`数据收集间隔配置为相对较小的时间间隔（例如1秒），并使用单个时间戳来描述一批导出的数据，
+因此在对所需要的精度是在跨数分钟或数小时的时间段内的数据进行汇总的时候，精度上的损失很小。
 
-聚合通常通过一系列事件进行计算，这些事件落入连续的时间区间内，称为收集间隔。
-由于SDK控制着开始收集的决定，因此可以收集汇总的指标数据，而每个收集间隔仅读取一次时钟。
+聚合通常通过一系列事件进行计算，这些事件属于一个连续的时间区域，而这一时间区域称为收集间隔。
+由于SDK控制着是否开始收集，因此可以收集聚合的指标数据的同时在每个收集间隔仅读取一次时钟。
 默认的SDK就是使用这种方法。
 
-同步仪器产生的`Metric events`会在瞬间发生，因此，它们属于同一个收集间隔，其中它们与来自同一`instrument`和标签集的其他事件聚合在一起。
-因为`events`可能彼此同时发生，最近的事件没有在技术上有着很好的定义。
+`synchronous instruments`产生的`Metric events`会在瞬间发生，因此，它会和属于同一个收集间隔中来自同一`instrument`和标签集的其他事件
+组合在一起。
+因为`events`可能同时发生复数个，所以最近的事件并没有在技术上有着很好的定义。
 
 异步`instruments`允许SDK通过每个收集间隔进行一次观察来评估`metric instruments`。
 由于这种与集合的耦合(与同步`instruments`不同)，这些`instruments`明确地定义了最近的事件。
