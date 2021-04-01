@@ -327,30 +327,30 @@ Grouping instruments 在默认情况下，使用了与记录完整数据相比�
 但是仍然比 adding instruments 的默认的默认值消耗更多的性能（求和）。
 在 adding instruments 中，只有总和是感兴趣的，而 grouping instruments 可以配置更消耗性能的聚合器。
 
-### 单调和非单调instruments的比较
+### 单调和非单调 instruments 的比较
 
-单调性仅适用于`adding instruments`。 `Counter`和 `SumObserver`工具被定义为单调的，因为任一工具捕获的总和都不会减少。
-`UpDown-` 这两种工具的变化是非单调的，这意味着总和可以增加，减少或保持恒定。
+单调性仅适用于 `adding instruments` 。 `Counter` 和 `SumObserver` 工具被定义为单调的，因为任一工具捕获的总和都不会减少。
+`UpDown-` 系列的两种工具的变化是非单调的，这意味着总和可以增加，减少或保持恒定。
 
-单调性的`instruments`用于捕获有关要作为速率监视的总和的信息。
-此API将`Monotonic`（单调）属性定义为表示不减总和。不增加总和不被视为`Metric API`中的功能。
+单调性的 `instruments` 用于捕获有关要作为速率监视的总和的信息。
+此API将 `Monotonic` （单调）属性定义为表示不减总和。不会增加的总和计数不被考虑为 `Metric API` 中的功能。
 
-### 方法名称
+### 函数名称
 
-每个`instrument`都支持一个方法，命名该功能有助于传达该`instrument`的语义。
+每个 instrument 都支持一个函数，命名该功能有助于传达该 `instrument` 的语义。
 
-同步`adding instruments`支持一项`Add()`方法，表示它们加到总和上而不直接捕获总和。
+同步 adding instruments 提供 `Add()` 方法来将目标数字加到总和上而不是直接捕获总和。
 
-同步`Synchronous grouping`支持一项`Record()`方法，表示它们捕获单个事件，而不仅仅是一个和。
+同步 grouping instruments 提供 `Record()` 方法，表示它们捕获单个独立事件，而不仅仅是一个数字和。
 
-异步`instruments`均支持一项`Observe()`方法，这表明它们在每个测量间隔内仅捕获一个值。
+异步 instruments 提供 `Observe()` 函数，这表明它们在每个测量间隔内仅捕获一个值。
 
-## Instrument说明
+## Instrument 说明
 
 ### Counter
 
-`Counter` 是最常见的同步`instrument`。该`instrument`支持`Add(increment)`报告总和的功能，并且仅限于非负增量。
-对于任何的`adding instrument`，默认聚合为`Sum`。
+`Counter` 是最常见的同步 instrument 。该 instrument 支持通过 Add(increment) 函数报告总和的功能，并且仅限于非负增量。
+对于任何的 adding instrument ，默认聚合为`Sum`。
 
 `Counter`使用示例:
 
@@ -360,120 +360,113 @@ Grouping instruments 在默认情况下，使用了与记录完整数据相比�
 - 统计运行的检查点数量
 - 统计5xx错误的数量
 
-上述的这些示例的`instruments`对于监测这些数量的速率是非常有用的。
-在这些情况下，通常会比较方便地报告和发生的变化量，而不是计算和报告每次测量的和。
+上述的这些示例的 instruments 对于监测这些数量的速率是非常有用的。
+在这些情况下，报告一个和的变化量通常比计算并报告每个测量数据的和更方便。
 
 ### UpDownCounter
 
-`UpDownCounter`与`Counter`相似，`Counter`除了`Add(increment)`支持负增量。
-这`UpDownCounter`对于计算速率聚合没有用。它汇总一个Sum，只有总和数据，是非单调的。
-通常，对于捕获所用资源量或请求期间上升和下降的任何量的变化很有用。
+`UpDownCounter` 与 `Counter` 相似， 但是相比 `Counter` 其的 `Add(increment)` 函数支持负增量。
+这 `UpDownCounter` 对于计算速率聚合没有用。它汇总一个 `Sum` ，只有总和数据，是非单调的。
+通常，这对于捕获所占用的资源量或请求期间上升和下降的数据的变化来说很有用。
 
-示例用于`UpDownCounter`：
+示例用于 `UpDownCounter` ：
 
-- 计算活动请求的数量
-- 通过仪器计数使用中的内存，new并delete
-- 通过检测enqueue和计算队列大小dequeue
-- 计算信号量up和down操作。
+- 计算活跃请求的数量
+- 通过对 `new` 和 `delete` 操作进行集成计算占用内存的数量
+- 通过对 `enqueue` 和 `dequeue` 操作进行集成计算队列的长度
+- 通过 `up` `down` 操作记录信号量
 
-上述的这些示例的`instruments`对于监视一组进程中的资源级别将很有用。
+上述的这些示例的 instruments 对于监视一组进程中的资源级别的数据将很有用。
 
 ### ValueRecorder
 
-`ValueRecorder`是一个同步的`grouping instrument`，用于记录一些正数或者负数的分组编号。
-`Record(value)`方法捕获的值，被视为属于正在汇总的分布的单个事件。
-如果数据的总和没有意义，或者数据的分布是具有意义的，则应该使用`ValueRecorder`。
+`ValueRecorder` 是一个同步的 grouping instrument ，用于记录分组数据，不管是正数还是负数。
+`Record(value)` 函数所捕获的值，被视为正在汇总的分布的单个事件。
+如果数据的总和没有意义，或者数据的分布情况是具有意义的，则应该使用` ValueRecorder` 。
 
-`ValueRecorder`的常见用法之一是用于捕获延迟数据，因为延迟的测量数据不需要了解延迟的总和数据。
-我们通常使用`ValueRecorder`来捕获延迟的测量值，单个事件的平均值，中位数和其他摘要信息是具有意义的。
+`ValueRecorder` 的常见用法之一是用于捕获延迟数据，因为对于每个正在执行的请求来说，它们的延迟之和是没有意义的。
+我们通常使用 `ValueRecorder` 来捕获延迟的测量值的时候，我们可能会对单个事件的平均值，中位数和其他统计信息更感兴趣。
 
-`ValueRecorder`的默认聚合计算最小值和最大值、事件值和事件总数，
+`ValueRecorder` 的默认聚合计算最小值和最大值、事件值和事件总数，
 从而可以监视输入值的速率，平均值和范围。
 
-用于`ValueRecorder`分组的示例用法：
+用于 `ValueRecorder` 分组的示例用法：
 
-- 捕获任何类型的时间信息
+- 捕获任何类型的时序信息
 - 记录飞行员的加速度
 - 捕获喷油器的喷嘴压力
 - 捕获MIDI按键的速度
 
-例如在`adding`使用`ValueRecorder`的捕获度量数据的示例，这些数据正在相加，
+例如在 `adding` 工具使用 `ValueRecorder` 的捕获度量数据的示例，这些数据正在相加，
 但是我们不仅对值的总和感兴趣，可能对值的分布也比较感兴趣：
 
-- 捕获请求大小
+- 捕获一个请求的大小
 - 取得帐户余额
 - 捕获队列长度
 - 捕获一些木材板的大小
 
-上述这些例子表明，尽管它们本质上是相加的，但选择`ValueRecorder`而不是使用`Counter`或`UpDownCounter`，
-暗示着我们不仅对于总和的统计存在兴趣。如果你对收集这些属性不感兴趣，则可以选择一种`adding instruments`，
+上述这些例子表明，尽管它们本质上是相加的，但选择 `ValueRecorder` 而不是使用 `Counter` 或 `UpDownCounter` 
+表明着我们不仅对于总和的统计存在兴趣。如果你对收集数据的分布不感兴趣，则可以选择其中一种 adding instruments ，
 使用`ValueRecorder`的意义在于对数据的分布进行分析。
 
-请谨慎的使用`ValueRecorder`，因为它会消耗比`adding instruments`更多的性能。
+请谨慎的使用 `ValueRecorder` ，因为它会消耗比 adding instruments 更多的性能。
 
 ### SumObserver
 
-`SumObserver`是对应的异步的`instrument``Counter`，用于捕获`Observe(sum)`单调求和数据。
+`SumObserver` 对应 `Counter` 的异步形式，用于捕获 `Observe(sum)` 单调求和数据。
 名称中会出现“总和”，以提醒用户直接用于捕获总和。
-使用`SumObserver`捕获任何从零开始并在整个过程生命周期中上升并且永不下降的值。
+使用` SumObserver` 捕获任何从零开始并在整个过程生命周期中上升并且永不下降的值。
 
 `SumObserver`的示例用法.
 
-- 捕获进程用户/系统CPU秒
-- 捕获高速缓存未命中的数量
+- 捕获进程用户/系统 CPU 秒数
+- 捕获缓存未命中的数量
 
-`SumObserver`度量的计算成本很高，因此对每个请求都进行计算是一种浪费。
-例如，需要一个系统调用来捕获进程的CPU占用率，因此，它应该定期执行，而不是针对每个请求。
-在不实用或浪费的`instrument`的个别变化，构成一个总和时`SumObserver`也时一个不错的选择。
+`SumObserver` 用来计算计算成本很高以致于多次计算将会导致性能浪费的数据。
+例如，需要一个系统调用来捕获进程的 CPU 占用率，它应该定期执行，而不是针对每个请求进行一次计算。
+在不实用或浪费的 `instrument` 的个别变化，构成一个总和时`SumObserver`也时一个不错的选择。
 例如，即使缓存未命中的数量是单个缓存未命中事件的总和，使用`Counter`同步捕获每个事件的代价太大了。
 
 ### UpDownSumObserver
 
-`UpDownSumObserver`是对应的异步工具`UpDownCounter`，
-用于捕获的非单调计数 `Observe(sum)`。名称中会出现`sum`，以提醒用户直接用于捕获总和。
-使用`UpDownSumObserver`捕获在整个过程生命周期中从零开始并且上升或下降的任何值。
+`UpDownSumObserver` 是 `UpDownCounter` 所对应的异步形式，
+通过 `Observe(sum)` 函数进行非单调的计数。名称中会出现 "sum" ，以提醒用户这是用来直接用于捕获总和。
+使用 `UpDownSumObserver` 捕获在整个过程生命周期中从零开始并且上升或下降的任何值。
 
-的示例用法UpDownSumObserver：
+`UpDownSumObserver` 的示例用法：
 
 - 捕获进程堆大小
 - 捕获活动碎片的数量
 - 捕获已启动/已完成的请求数
 - 捕获当前队列大小。
 
-关于选择`SumObserver`还是`Counter`的考虑，也同样适用于在选择`UpDownSumObserver`还是`UpDownCounter`的场景。
-如果度量值的计算成本很高，或者相应的更改发生得太频繁以至于无法进行测量，请使用`UpDownSumObserver`。
+关于选择 `SumObserver` 还是`Counter`的考虑，也同样适用于在选择 `UpDownSumObserver` 还是 `UpDownCounter` 的场景。
+如果测量数据的计算成本很高，或者相应的更改发生得太频繁以至于无法进行测量，请使用 `UpDownSumObserver` 。
 
 ### ValueObserver
-ValueObserver是ValueRecorder与之对应的异步工具，使用`Observe(value)`来捕获分组测量值。
-这些`instruments`对于捕获计算成本很高的测量数据特别有用，因为使用SDK可以控制它们数据采集的频率。
 
-`ValueObserver`的示例用法:
+`ValueObserver` 是 `ValueRecorder` 与之对应的异步工具，使用 `Observe(value)` 来捕获分组测量值。
+这些 instruments 对于捕获计算成本很高的测量数据特别有用，因为使用SDK可以控制它们数据采集的频率。
 
-- 捕获CPU风扇速度
-- 捕获CPU温度。
+`ValueObserver` 的示例用法:
 
-注意，这些例子使用了分组度量。在上面的ValueRecorder案例中，给出了在请求期间捕获同步`adding instrument`的示例用法（获取当前的队列大小）。
-但是，在异步情况下，用户应如何决定是否使用`ValueObserver`而不是`UpDownSumObserver`？
-（此处翻译可能存在问题，下方为原文）
-_Note that these examples use grouping measurements.  In the
-`ValueRecorder` case above, example uses were given for capturing
-synchronous adding measurements during a request (e.g.,
-current queue size seen by a request).  In the asynchronous case,
-however, how should users decide whether to use `ValueObserver` as
-opposed to `UpDownSumObserver`?_
+- 捕获 CPU 风扇速度
+- 捕获 CPU 温度。
 
-考虑如何异步报告队列的大小。无论`ValueObserver`和`UpDownSumObserver`的逻辑都适用于这种情况。
-异步仪器每个时间间隔仅捕获一次测量，因此在此示例中，UpDownSumObserver报告一个当前统计值，
-`ValueObserver`报告一个当前的统计值（等于最大或最小值）和一个count = 1。
+注意，这些例子使用了分组度量。在上面的 `ValueRecorder` 案例中，给出了在请求期间捕获同步 adding instrument 的示例用法（获取当前的队列大小）。
+但是，在异步情况下，用户应如何决定是否使用 `ValueObserver` 而不是 `UpDownSumObserver` ？
+
+思考一下如何异步报告队列的大小。无论 `ValueObserver` 和 `UpDownSumObserver` 的使用都适用于这种情况的逻辑。
+异步 instruments 每个时间间隔仅捕获一次测量，因此在此示例中，`UpDownSumObserver` 报告一个当前统计值，
+ `ValueObserver` 报告一个当前的统计值（等于最大和最小值）和一个count = 1。
 当没有聚合时，这些结果是相等的。
 
-当只有一个数据点时，定义默认聚合似乎没有意义。在执行空间聚合时指定应用默认聚合，这意味着可以组合跨标签集或分布式设置的测量值。
-尽管在`ValueObserver`每个收集间隔中仅观察一个值，但是默认聚合指定了如何在没有其他任何配置的情况下将其与其他值聚合。
+当只有一个数据点时，定义默认聚合似乎没有意义。在执行聚集性分析时将会使用应用默认聚合，这是为了跨标签集或在分布式配置下聚合数据。
+尽管在 `ValueObserver` 每个收集间隔中仅观察一个值，但是默认聚合指定了其如何在没有其他任何配置的情况下将其与其他值聚合的方式。
 
-因此，考虑到`ValueObserver`和`UpDownSumObserver`之间的选择，建议选择具有更合适的默认汇总的工具。
-如果您正在观察一组机器的队列大小，而您唯一想知道的就是聚合队列大小，使用`SumObserver`是因为它产生的是总和数据，而不是分布数据。
-
-如果您正在观察一组机器上的队列大小，并且您想知道这些机器上队列大小的分布情况，使用`ValueObserver`。
+因此，考虑到 `ValueObserver` 和 `UpDownSumObserver` 之间的选择，建议选择其中更适合当前聚合场景的工具。
+如果你正在观察一组机器的队列大小，而你唯一想知道的就是聚合队列大小，使用 `SumObserver` 是因为它产生的是总和数据，而不包括数据的分布。
+如果你正在观察一组机器上的队列大小，并且想知道这些机器上队列大小的分布情况，使用 `ValueObserver` 。
 
 ### 解释
 
