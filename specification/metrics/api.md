@@ -470,17 +470,17 @@ Grouping instruments 在默认情况下，使用了与记录完整数据相比�
 
 ### 解释
 
-这些工具有根本的不同，为什么只有三个？为什么不是一个`instrument`？为什么不十个？
+这些工具有什么区别，为什么只有三个？为什么不是一个 instrument ？那么又为什么不是十个呢？
 
-正如我们所看到的，这些工具根据它们是否同步，相加和/或单调而分类。
-该方法为提高`metric events`的性能和解释方式，为每种工具提供了独特的语义。
+正如我们所看到的，这些工具根据它们是否同步，支持相加以及与或关系和单调性而分类。
+这种方式通过为每个工具赋予其语义，能够提高 metric events 的性能并使其更容易被理解。
 
-建立不同种类的`instrument`很重要，因为在大多数情况下，它允许SDK“开箱即用”提供良好的默认功能，而无需配置其他行为。
-`instrument`的选择不仅决定事件的含义，还决定用户调用的功能的名称。
-函数名称`Add()`用于添加工具，`Record()`用于`grouping instruments`和`Observe()`用于异步工具，
+建立不同种类的 instrument 很重要，因为在大多数情况下，它允许SDK“开箱即用”，在无需其他配置的前提下提供良好的默认功能。
+instrument 的选择不仅决定事件的含义，还决定用户调用的函数的名称。
+函数名称 `Add()` 用于 add instruments ，`Record()`用于 grouping instruments ，`Observe()`用于 asynchronous instruments ，
 不同名称帮助传达这些动作的含义。
 
-下表概述了每种仪器的特性和标准实施。
+下表概述了每种 instruments 的特性和标准实施。
 
 | **名称** | Instrument种类 | 方法(参数) | 默认聚合 | 备注 |
 | --------------------- | ----- | --------- | ------------- | --- |
@@ -493,29 +493,27 @@ Grouping instruments 在默认情况下，使用了与记录完整数据相比�
 
 ### 构造函数
 
-该`Meter`接口支持创建新的注册`metric instruments`的功能。
-`instruments`构造函数的命名方式是在它构造的类型、构造器模式或语言中的其他惯用方法上添加`New`前缀
+`Meter` 接口支持创建并注册新的 metric instruments 的功能。
+instruments 的构造函数的命名方式是在它构造的类型、构造器模式或语言中的其他惯用方法上添加 `New-` 前缀
 
-在本规范中每种`instrument`都会有至少一种对应的构造器， (查看 [上文Metric Instruments](#metric-instruments))
+在本规范中每种 instrument 都会有至少一种对应的构造器， (查看 [详细](#metric-instruments))
 并且可能由于语言的种类而规定更多的构造器。例如，如果提供了整型和浮点型指针数的专用处理，
-OpenTelemetry API将支持每种`instrument`类型的2个构造函数。
+OpenTelemetry API将会为每种 instrument 支持2个不同类型的构造函数。
 
-将`instrument`绑定到单个`Meter`实例有两个好处::
+将 instrument 绑定到单个 `Meter` 实例有两个好处:
 
-1. `instrument`可以从零状态导出，在第一次使用之前，没有明确的注册调用
-2. 库的名称和版本与`metric event`隐式关联
+1. instrument 在第一次使用之可以在零状态的情况下导出，不需要显式注册调用
+2. 库的名称和版本与 metric event 隐式关联
 
-一些现有的`metric`系统支持支持静态分配`metric instruments`，并在使用时提供等效的`Meter`接口。
-在一个示例中，典型的statsd客户端，现有的代码可能没有一个方便的地方来存储新的度量工具。
-如果这成为一种负担，建议使用全局`MeterProvider`来构建静态`Meter`，并构建和使用全局范围的度量工具。
+一些现有的 metric 系统支持支持静态分配 metric instruments ，并在使用时提供等效的 `Meter` 接口。
+在一个示例中，典型的statsD客户端，现有的代码可能没有一个方便的地方来存储新的度量工具。
+如果这成为一种负担，建议使用全局 `MeterProvider` 来构建静态 `Meter` ，并构建和使用全局范围的度量工具。
 
-`Prometheus`现有客户端的用户也面临着类似的情况，他们可以将`instruments`分配给全局注册器。
-这样的代码可能无法访问定义`instruments`时使用的那个适当的`MeterProvider`或`Meter`实例。
-如果这成为一种负担，建议使用全局`MeterProvider`来构建静态`Meter`，并构建和使用全局范围的度量工具。
+Prometheus 客户端的一些用户目前面临着类似的情况，他们可以将 instruments 分配给全局 `Register`。
+这样的代码可能无法在定义 instruments 时访问适当的 `MeterProvider` 或 `Meter` 实例。
+如果这成为一种负担，建议使用全局 `MeterProvider` 来构建静态 `Meter` 来构建静态 instruments 。
 
-预期中，应用程序将会构造一个长生命周期的`instruments`。
-
-`Instruments`在SDK的生命周期内被认为是永久的，没有办法删除它们。
+应用程序应当构造长生命周期的 instruments 。Instruments 在 SDK 的生命周期内被认为是永久的，不会提供删除它们的方法。
 
 ## 标签集合
 
