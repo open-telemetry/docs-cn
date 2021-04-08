@@ -517,27 +517,27 @@ Prometheus 客户端的一些用户目前面临着类似的情况，他们可以
 
 ## 标签集合
 
-从语义上讲，一组标签是从字符串键到值的唯一映射。在整个API中，必须以相同的数据格式传递一组标签。
-常见的表示形式包括键: 包含key与values属性的对象列表，或Map结构的key与value的映射。
+从语义上讲，一组标签是一组字符串键值对的唯一映射。在整个API中，必须以相同的数据格式传递一组标签。
+常见的表示形式包含 key values 键值对的对象列表，或 Map 结构的 key value 键值对。
 
-如果将标签作为key：values的有序列表传递，并且存在重复的键，则将获取给定键的列表中的最后一个值，以形成唯一的映射。
+如果将标签作为 key：values 的有序列表传递，如果存在重复的键，则将获取给定键的列表中的最后一个值，以形成唯一的映射。
 
-标签值的类型通常被导出工具假定为字符串，尽管作为编程语言级别的决定，
+标签值的类型通常被导出工具假定为字符串，但编程语言级别的考虑，
 标签值类型可以是该语言中用于表示字符串的任何常用类型。
 
-用户不需要预先声明将与API中的`metric instruments`一起使用的一组标签键。
-调用API时，用户可以针对任何`metric event`自由使用任何标签集。
+用户不需要预先声明将与 API 中的 metric instruments 一起使用的一组标签键。
+调用 API 时，用户可以针对任何 metric event 自由使用任何标签集。
 
 ### 标签性能
 
-在整个`metric`数据的生产中，标签处理可能会产生巨大的成本。
+在整个 metric 数据的生产中，标签处理可能会产生巨大的成本。
 
-SDK对进程内聚合的支持取决于找到仪器、标签集组合活动记录的能力。这样可以将测量组合在一起。
-通过使用绑定的同步`instruments`和批处理方法(`RecordBatch`, `BatchObserver`)，可以降低标签处理成本。
+SDK 支持对进程进行聚合来找到源于一个 instrument 并具有相同标签集组合活跃记录的能力。这允许将测量数据组合在一起。
+通过使用绑定的同步 instruments 和批处理方法( `RecordBatch` ， `BatchObserver` )可以降低标签处理成本。
 
-### Option: Ordered labels
+### 可以选择的能力： 经过排序的标签
 
-作为编程语言级别的决定，API可以支持标签键排序。
+考虑到编程语言的能力，API 可以支持对标签键进行排序。
 在这种情况下，用户可以指定标签键的有序序列，该序列是用来从一个类似有序的标签值序列中创建一个无序的标签集的。
 
 ```golang
@@ -554,36 +554,36 @@ for _, input := range stream {
 之所以将其指定为语言可选功能，是由于其安全性和因此作为监视输入的值会受到源语言中类型的可用性检查。
 传递无序标签（即，从键到值的映射）被认为是更安全的选择。
 
-## 同步instrument详情
+## 同步 instrument 详情
 
-为同步`instruments`指定了以下详细信息。
+为同步 instruments 指定了以下详细信息。
 
 ### 同步调用约定
 
-`metrics`API提供了三种语义上等效的方式来使用同步`instruments`捕获测量值：
+metrics API提供了三种语义上等效的方式来使用同步`instruments`捕获测量值：
 
-- 绑定调用`instruments`，它们具有一组预先关联的标签
-- 直接调用`instruments`，传递相关的标签集
-- 使用一组标签对多个`instruments`进行批量记录测量。
+- 调用绑定 instruments ，它们具有一组预先关联的标签
+- 直接调用 instruments ，传递相关的标签集
+- 使用一组标签对多个 instruments 进行批量记录测量。
 
-这三种方法均会生成等效的`metric events`，但会提供不同程度的性能和便利性。
+这三种方法均会生成等效的 metric events ，但会提供不同程度的性能和便利性。
 
-`metric`的API性能取决于输入新度量标准所完成的工作，通常由处理标签的成本决定。
-调用绑定的`instruments`是性能最高的调用约定，因为它们可以分摊在许多用途中处理标签的成本。
-通过另一种调用约定‘RecordBatch()’记录多个度量，这是提高性能的一个很好的选择，因为处理标签的成本分散在多个度量中。
-直接调用约定是最方便的，但通过API输入度量值是性能最差的调用约定。
+metric 的 API 性能取决于输入新度量数据时的成本，通常由处理标签的成本决定。
+调用绑定的 instruments 是性能最高的调用方式，因为它们可以在多次使用中分摊处理标签的成本。
+通过另一种调用约定 `RecordBatch()` 记录多个原始数据，这是提高性能的一个很好的选择，因为处理标签的成本分散在多个度量中。
+直接调用约定是最方便的，但通过 API 输入度量值是性能最差的调用约定。
 
-#### 绑定调用instrument约定
+#### 绑定 instrument 调用约定
 
-在需要性能的情况下，并且使用同一套标签重复使用`metric instrument`的情况下，开发人员可以选择使用绑定调用`instruments`约定作为优化。
-为了使绑定的`instrument`受益，它要求特定的`instrument`将被重新使用并带有特定的标签。
-如果一个`instrument`将多次使用相同的标签，则获得与这些标签相对应的绑定`instrument`可确保获得最高的性能。
+在对性能有一定要求的情况下，并且常常会使用同一套标签集合 metric instrument 的情况下，开发人员可以选择使用调用绑定 instruments 作为优化。
+为了从使用绑定的 instrument 当中受益，它要求与重复使用的标签绑定的特定的 instrument 被重新使用。
+如果一个 instrument 将多次使用相同的标签，则使用与这些标签相对应的绑定 instrument 可确保获得最高的性能。
 
-要绑定一个`instrument`，请使用`Bind(labels...)`方法返回支持相应同步API（即 `Add()`或`Record()`）的接口。
-绑定的`instrument`在没有标签的情况下被调用；相应的`metric event`与绑定到`instrument`的标签相关联。
+要绑定一个 instrument ，使用 `Bind(labels...)` 方法将会返回一个支持相应同步 API （即 `Add()` 或 `Record()` ）的接口。
+绑定的 instrument 在调用的时候不需要声明标签；相应的 metric event 将会与绑定到 instrument 的标签相关联。
 
-由于其性能优势，绑定的`instrument`也会消耗SDK中的资源。绑定的`instrument`必须支持一种`Unbind()`方法，以指示用户完成绑定并释放关联的资源。
-请注意，`Unbind()`这并不意味着删除时间序列，它仅允许SDK在没有待处理的更新后忘记存在的时间序列。
+由于其性能优势，绑定的 `instrument` 也会消耗SDK中的资源。绑定的 instrument 必须支持 `Unbind()` 方法，使用户可以结束绑定并释放关联的资源。
+请注意， `Unbind()` 这并不意味着删除时间序列，它仅允许 SDK 在没有待处理的更新后忘记时间序列的存在。
 
 例如，要重复更新具有相同标签的计数器：
 
@@ -608,9 +608,9 @@ func (s *server) processStream(ctx context.Context) {
 }
 ```
 
-#### 直接调用instrument约定
+#### 直接调用 instrument 约定
 
-当调用时的便利性比性能更重要，或者提前不知道值时，用户可以选择直接在`metric instruments`上进行操作，
+当调用时的便利性比性能更重要，或者提前不知道值的时候，用户可以选择直接在 metric instruments 上进行操作，
 这意味着在调用的时候提供标签。这种方法提供了最大的便利。
 
 例如，要更新单个计数器：
@@ -625,15 +625,15 @@ func (s *server) method(ctx context.Context) {
         )
 }
 ```
-直接调用很方便，因为它们不需要分配和存储绑定的`instrument`。
-它们适用于很少使用`instrument`或很少使用同一组标签的情况。
-与绑定`instrument`不同，使用直接调用约定时，不会长期消耗SDK资源。
+直接调用很方便，因为它们不需要分配和存储绑定的 instrument 。
+它们适用于很少使用的 instrument 或很少使用同一组标签的情况。
+与绑定 instrument 不同，使用直接调用约定时，不会长期消耗SDK资源。
 
-#### RecordBatch调用约定
+#### RecordBatch 调用约定
 
-有一个用于输入测量值的最终API，就像直接访问调用约定一样，但支持多个同时测量。
-`RecordBatch`API的使用支持同时输入多个测量值，这意味着对几种`instrument`进行了语义上的原子更新。
-对`RecordBatch`的调用可以跨多个度量摊销标签处理的成本。
+有一个用于输入测量值的最终 API，就像直接访问调用约定一样，但其支持多个同时测量数据。
+`RecordBatch` API的使用支持同时输入多个测量值，这意味着对几种 instrument 进行了语义上的原子更新。
+对 `RecordBatch` 的调用可以跨多个度量摊销标签处理的成本。
 
 例如:
 
@@ -660,30 +660,30 @@ func (s *server) method(ctx context.Context) {
 ```
 
 使用批量处理调用约定在语义上与一系列直接调用相同，只是增加了原子性。
-因为值是在单个调用中输入的，从导出程序的角度来看，SDK有可能实现原子更新，因为SDK可以对单个批量更新进行排队，或者仅进行一次锁定。
-像直接调用约定一样，使用批处理调用约定时也不会长期消耗SDK资源。
+因为值是在单个调用中输入的，从导出程序的角度来看，SDK 有可能实现原子更新，因为打个比方， SDK 可以对单个批量更新进行排队，或者仅进行一次加锁。
+像直接调用约定一样，使用批处理调用约定时也不会长期消耗 SDK 资源。
 
 ### 与分布式上下文关联
 
-同步`instruments`在运行时与分布式
+同步 instruments 在运行时与分布式
 [上下文](../context/context.md)
-存在着隐式关联，它可能包括一个`Span`和`Baggage entries`。
-Metric SDK可以以多种方式使用这些信息，但OpenTelemetry中有一个有趣的特性（这里原文中未继续描述这个有趣的特性是什么）。
+存在着隐式关联，它可能包括 Span 和 Baggage entries 的信息。
+Metric SDK 可以采用以多种方式来使用这些信息，但在 OpenTelemetry 中有一个特性十分重要。
 
-#### Baggage中的metric标签
+#### Baggage 作为 metric 的标签
 
-`Baggage`在`OpenTelemetry`中得到支持，它是一种让标签在分布式计算中从一个进程传播到另一个进程的方法。
-有时，使用分布式`baggage entries`作为`metric`标签来聚合`metric`数据是有用的。
+Baggage 在 OpenTelemetry 中得到支持，它是一种让标签在分布式计算中从一个进程传播到另一个进程的方法。
+有时候使用分布式 baggage entries 作为 metric 标签来聚合 metric 数据是有用的。
 
-必须显式地配置`Baggage`的使用，使用[Views API (WIP)](https://github.com/open-telemetry/oteps/pull/89)
-来选择应作为标签来使用的特定关键`baggage entries`。默认SDK不会在出口管道中自动使用`Baggage`标签，
-因为使用`Baggage`标签可能会产生很大的消耗。
+必须显式地配置 Baggage 的使用，使用[Views API (WIP)](https://github.com/open-telemetry/oteps/pull/89)
+来选择应作为标签来使用的特定关键 baggage entries 。默认情况下 SDK 不会在出口管道中自动使用 Baggage 标签，
+因为使用 Baggage 标签可能会产生很大的消耗。
 
-为应用`Baggage`标签配置视图是一项[正在进行的工作](https://github.com/open-telemetry/oteps/pull/89)。
+为应用 Baggage 标签配置视图是一项[正在进行的工作](https://github.com/open-telemetry/oteps/pull/89) 。
 
-## 异步instrument细节
+## 异步 instrument 细节
 
-以下描述信息仅限于异步的`instruments`。
+以下描述信息仅限于异步的 instruments 。
 
 ### 异步调用约定
 
