@@ -21,7 +21,7 @@
   * [Adding instruments与grouping instruments比较](#Adding-instruments与grouping-instruments比较)
   * [单调和非单调instruments的比较](#单调和非单调instruments的比较)
   * [方法名称](#方法名称)
-- [Instrument说明](#Instrument说明)
+- [Instrument说明](#Instrument-说明)
   * [Counter](#counter)
   * [UpDownCounter](#updowncounter)
   * [ValueRecorder](#valuerecorder)
@@ -40,17 +40,17 @@
     + [RecordBatch调用约定](#RecordBatch调用约定)
   * [Association with distributed context](#与分布式上下文关联)
     + [Baggage中的metric标签](#Baggage中的metric标签)
-- [异步instrument细节](#异步instrument细节)
+- [异步instrument细节](#异步-instrument-细节)
   * [异步调用约定](#异步调用约定)
-    + [单一instrument的监测](#单一instrument的监测)
+    + [单一instrument的监测](#单一-instrument-的监测)
     + [Batch observer](#batch-observer)
-  * [Asynchronous observations form a current set](#asynchronous-observations-form-a-current-set)
+  * [异步观察构成一个当前的值集](#异步观察构成一个当前的值集)
     + [Asynchronous instruments define moment-in-time ratios](#asynchronous-instruments-define-moment-in-time-ratios)
 - [并发](#并发)
-- [Related OpenTelemetry work](#related-opentelemetry-work)
-  * [Metric Views](#metric-views)
-  * [OTLP Metric protocol](#otlp-metric-protocol)
-  * [Metric SDK default implementation](#metric-sdk-default-implementation)
+- [Related OpenTelemetry work](#相关的-OpenTelemetry-工作)
+  * [Metric 视图](#metric-视图)
+  * [OTLP Metric 协议](#OTLP-Metric-协议)
+  * [Metric SDK 默认实现](#Metric-SDK-默认实现)
 
 <!-- tocstop -->
 
@@ -687,18 +687,18 @@ Baggage 在 OpenTelemetry 中得到支持，它是一种让标签在分布式计
 
 ### 异步调用约定
 
-`metrics`的API提供了两种语义上等价的方法来使用异步`instruments`捕获度量数据，
-或者通过单一`instruments`回调，或者通过多个`instruments`进行批回调。
+metrics 的 API 提供了两种语义上等价的方法来使用异步 instruments 捕获度量数据，
+通过单一 instruments 回调，或者通过多个 instruments 进行批回调。
 
-无论是单个的还是批量的，异步`instruments`必须通过一个回调来观察。构造函数为`null``observer callbacks`返回无操作的`instruments`。
-任何一个异步`instruments`被指定了多个回调，都会被认为是一个异常。
+无论是单个的还是批量的，异步 instruments 必须通过一个回调来进行观察。当使用 `null` 会调构造函数将会返回无操作的 instruments 。
+任何一个异步 instruments 被指定了多个回调，都会被认为是一个异常操作。
 
-`Instruments`在每组不同的标签中，只能监测到一个值。
-当单个`Instruments`和标号组监测到多个值时，只会取最后一个监测值，并无错误地丢弃较早的数据。
+Instruments 在每组不同的标签中，key 只能对应到一个 value。
+当单个 Instruments 的标签集合中 key 重复的时候，只会取最后一个监测值，丢弃较早的数据，不会导致异常。
 
-#### 单一instrument的监测
+#### 单一 instrument 的监测
 
-一个单独的回调被绑定到一个`instrument`上。它的回调接收一个`ObserverResult`和一个`Observe(value, labels…)`函数。
+一个单独的回调与一个 instrument 所绑定。它的回调通过 `Observe(value, labels…)` 函数接受一个 `ObserverResult` 。
 
 ```golang
 func (s *server) registerObservers(.Context) {
@@ -721,10 +721,10 @@ func (s *server) registerObservers(.Context) {
 
 #### Batch observer
 
-一个`BatchObserver`支持在一个回掉中监测多个`instruments`。
-它的回调接收一个`BatchObserverResult`和一个`Observe(value, observations…)`函数。
+一个 `BatchObserver` 支持在一个回掉中监测多个 instruments 。
+它的回调支持通过 `Observe(value, observations…)` 函数接收一个 `BatchObserverResult` 。
 
-在异步`instrument`上，通过调用`Observation(value)`返回监测结果。
+在异 instrument 上，通过调用 Observation(value) 返回监测结果。
 
 ```golang
 func (s *server) registerObservers(.Context) {
@@ -746,60 +746,60 @@ func (s *server) registerObservers(.Context) {
 }
 ```
 
-### Asynchronous observations form a current set
+### 异步观察构成一个当前的值集
 
-异步仪器回调允许对每个`instrument`、每个不同的标签集、每个回调调用观察一个值。
-由一次回调调用记录的一组值代表`instrument`的当前快照；这一组值定义了`instrument`直到下一个收集间隔的最后一个值。
+异步 instrument 回调允许对每个 instrument 、每个不同的标签集、每次回调调用观察一个值。
+由一次回调调用记录的一组值代表 instrument 的当前快照；这一组值定义了 instrument 直到下一个收集间隔的最后一个值。
 
-异步`instrument`应记录每一个它认为是当前的标签集的监测结果。这意味着异步回调应该持续监测一个值，
-即使这个值自上次回调调用以来没有改变。不监测标签集意味着某个值不再是当前值。
-当最后一个值在一个收集时间间隔内没有被监测到时，它就不再是当前值，因此变成`undefined`。
+异步 instrument 应记录每一个它认为是"当前"的标签集的监测结果。这意味着异步回调应该持续监测一个值，
+即使这个值自上次回调调用以来没有改变。不监测标签集意味着某个值不再存在。
+当最后一个值在一个收集时间间隔内没有被监测到时，它就不再是当前值而是变成未定义。
 
-对于异步`instruments`来说，最后一个值的定义是可以存在的，因为它们是由SDK协调收集的，而且它们应该上报所有的当前测量值。
-该属性的另一个说法是，SDK可以在内存中保存一个集测量间隔区间，以查找任何`instrument`和标签集的当前最后值。
-通过这种方式，异步`instruments`支持使用单个时间点收集的数据查询当前值，而不依赖于采集间隔的持续时间。
+对于异步 instruments 来说，最后一个值的定义是可以存在的，因为它们是由 SDK 协调收集的，而且它们应该上报所有的当前测量值。
+该属性的另一个说法是，SDK 可以在内存中保存一个集测量间隔区间，以查找任何 instrument 和标签集的当前最后值。
+通过这种方式，异步 instruments 支持使用单个时间点收集的数据查询当前值，而不依赖于采集间隔的持续时间。
 
-回想一下，没有为同步`instruments`定义一个"最后一个值"的概念，这恰好是因为它没有一个明确的定义"当前"这个概念。
-因为没有机制可以确保在每个间隔内都记录当前值，所以要确定同步`instruments`的"最后记录"值，就可能需要检查多个数据收集窗口，。
+回想一下，没有为同步 instruments 定义一个"最后一个值"的概念，这恰好是因为它没有一个明确的定义"当前"这个概念。
+因为没有机制可以确保在每个间隔内都记录当前值，所以要确定同步 instruments 的"最后记录"值，就可能需要检查多个数据收集窗口，。
 
 #### Asynchronous instruments define moment-in-time ratios
 
-上面所描述的异步`instruments`的概念对于目前开发的检测率是用的。
-当`instruments`的一组测量值加起来是一个整体，那么每一个测量值可以除以同一区间的测量值的总和，以计算其这次测量的结果的相对贡献比例。
-目前相对贡献是这样定义的，多亏了异步`instruments`的特性做到了与收集间隔时间无关。
+上面所描述的异步 instruments 的当前值集的概念对于速率的检测是很有帮助的。
+当 instruments 的一组测量值加起来是一个整体，那么每一个测量值可以除以同一区间的测量值的总和，以计算其这次测量的结果的相对增长比例。
+受益于异步 instruments 的特性，当前相对增长就是这样定义做到与收集间隔无关。
 
 ## 并发
 
-对于支持并发执行的语言，Metrics API提供了一些具体的保障和安全性。但是并非所有的API函数都可以安全地被并发调用。
+对于支持并发执行的语言，Metrics API 提供了一些具体的保障和安全性。但是并非所有的 API 函数都可以安全地被并发调用。
 
 **MeterProvider** - 所有方法都可以安全地被并发调用。
 
 **Meter** - 所有方法都可以安全地被并发调用。
 
-**Instrument** - 任何`Instrument`的所有方法都可以安全地同时调用。
+**Instrument** - 任何 Instrument 的所有方法都可以安全地同时调用。
 
-**Bound Instrument** - 任何`Bound Instrument`的所有方法都可以安全地同时调用。
+**Bound Instrument** - 任何 Bound Instrument 的所有方法都可以安全地同时调用。
 
-## 相关的OpenTelemetry工作
+## 相关的 OpenTelemetry 工作
 
 在编写本规范时，正在进行一些持续的努力。
 
-### Metric视图
+### Metric 视图
 
-该API不支持`metric instruments`的可配置聚合。
+该 API 不支持 metric instruments 的可配置聚合。
 
-`View API`定义为SDK方式的接口，该方式支持配置聚合。
-包括应用哪个操作符（sum, p99, last-value, 等）和使用哪个维度。
+View API 定义为 SDK 方式的接口，该方式支持配置聚合。
+包括应用哪个操作符（sum, p99, last-value 等等）和使用哪个维度。
 
 可以查看[当前有关这个话题的讨论](https://github.com/open-telemetry/opentelemetry-specification/issues/466) 
-和[当前的OTEP草案](https://github.com/open-telemetry/oteps/pull/89)。
+和[当前的 OTEP 草案](https://github.com/open-telemetry/oteps/pull/89) 。
 
-### OTLP Metric协议
+### OTLP Metric 协议
 
-如上所述，OTLP协议旨在以无侵入的方式导出`metric`数据。该协议的几个细节正在制定中。请参阅
-[当前协议](https://github.com/open-telemetry/opentelemetry-proto/blob/master/opentelemetry/proto/metrics/v1/metrics.proto)。
+如上所述， OTLP 协议旨在以无侵入的方式导出 metric 数据。该协议的几个细节正在制定中。请参阅
+[当前协议](https://github.com/open-telemetry/opentelemetry-proto/blob/master/opentelemetry/proto/metrics/v1/metrics.proto) 。
 
-### Metric SDK default implementation
+### Metric SDK 默认实现
 
-OpenTelemetry SDK包含对`metric API`的默认支持。默认SDK的规范正在进行中，请参阅
+OpenTelemetry SDK 包含对 metric API 的默认支持。默认 SDK 的规范正在进行中，请参阅 
 [current draft](https://github.com/open-telemetry/opentelemetry-specification/pull/347).
