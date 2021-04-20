@@ -3,7 +3,7 @@
 `InstrumentationModule` 是 OpenTelemetry javaagent instrumentation 的核心部分。
 我们的 javaagent 使用了许多约束，在实现模块时必须按照许多不明显的规范。  
 
-本文档试图描述如何实现你的 javaagent instrumentation ，并记录可能影响插装的所有问题。在阅读这篇文档之前，我们建议你先行阅读 
+本文档试图描述如何实现你的 javaagent instrumentation ，并记录可能影响增强的所有问题。在阅读这篇文档之前，我们建议你先行阅读 
 `InstrumentationModule` 和 `TypeInstrumentation` 的 Javadoc ，因为它们经常提供关于如何使用某个特定方法的更详细的解释
 （以及为什么它是这样工作的）。      
 
@@ -94,7 +94,7 @@ public List<TypeInstrumentation> typeInstrumentations() {
 
 ## `TypeInstrumentation`
 
-一个 `TypeInstrumentation` 介绍了将会针对一个类型将会进行的改变。根据插被增强的库的不同，type instrumentations 需要被组合在一起使用
+一个 `TypeInstrumentation` 介绍了将会针对一个类型将会进行的改变。根据被插件增强的库的不同，type instrumentations 需要被组合在一起使用
 （组合在一个模块中）。       
 
 ```java
@@ -167,12 +167,12 @@ Instrumentation 模块被 agent 的类加载器所加载，这种字符串连接
 
 ## Advice classes
 
-Advice 类并不是实际的"类"，它们是将会直接拷贝增强到被增强库文件的零碎的代码碎片。你不应该把它们视为标准的 Java 类 - 许多标准并不适用于其：     
+Advice 类并不是实际的"类"，它们是将会直接拷贝增强到被增强库文件的零碎的代码碎片。你不应该把它们视为标准的 Java 类 - 许多标准并不适用于它：     
 
 * 它们必须只包含静态方法；      
 * 它们不能拥有任何状态（字段）- 静态常量也不行！只有 advice 方法的内容将会被拷贝到被增强的代码中，常量则不会；       
 * 通过提取通用方法或者父类来进行代码复用可能会无法正常工作：除非你可以创建一个额外的辅助类来存储被复用的代码；       
-* 它们不应该包含任何不被 `@Advice` 所修饰的注解。       
+* 它们不应该包含任何不被 `@Advice` 所修饰的方法。       
 
 ```java
 public static class MethodAdvice {
@@ -189,8 +189,7 @@ public static class MethodAdvice {
 ```
 
 在被 `@Advice` 上的注解声明 `suppress = Throwable.class` 选项非常的重要。 Advice 方法所抛出的异常将会被捕获并通过一个 
-OpenTelemetry javaagent 所定义的特殊 `ExceptionHandler` 。这个 handler 将会确保合适地将所有未预料到的异常记录在日志当中。         
-exceptions.
+OpenTelemetry javaagent 所定义的特殊 `ExceptionHandler` 。这个 handler 将会确保合适地将所有未预料到的异常记录在日志当中。        
 
 `OnMethodEnter` 和 `OnMethodExit` advice 方法常常会共享一部分信息。我们常常会使用 `otel` 前缀的变量来把上下文，作用域
 （还有一些别的）在两个方法之间传递。       
@@ -235,12 +234,12 @@ public static void onExit(@Advice.Argument(1) Object request,
 }
 ```
 
-你也许会意识到上面的这个例子没用使用 `Context.current()` ，而是一个 `Java8BytecodeBridge` 方法。这是故意的：如果你在增强一个
+你也许会意识到上面的这个例子没有使用 `Context.current()` ，而是一个 `Java8BytecodeBridge` 方法。这是故意的：如果你在增强一个
  Java 8 之前的库的时候，如果在这个库中国内发生内联的 Java 8 默认方法调用 （或者接口中的静态方法）的时候将会导致一个 
  `java.lang.VerifyError` 运行时异常，因为在 Java 7 （及之前）的字节码中时禁止 Java 8 的默认方法调用的。      
 因为 OpenTelemetry API 拥有许多默认或者静态的通用接口方法（比如 `Span.current()`）， `javaagent-api` 模块中的方法
  `Java8BytecodeBridge` 提供了静态方法在 advice 中调用这些默认方法。      
- 实际上，我们建议在 advice 类中避免使用 Java 8 的语音特性 - 有时候你无法预料到被增强的库使用什么样的字节码版本。        
+ 实际上，我们建议在 advice 类中避免使用 Java 8 的语法特性 - 有时候你无法预料到被增强的库使用什么样的字节码版本。        
 
 有时候需要将某些上下文的类与被增强库中的类所关联，并且这个库并没有提供实现这点的途径。 OpenTelemetry javaagent 提供了 `ContextStore` 
 来达到这个目的。       
