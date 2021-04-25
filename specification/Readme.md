@@ -23,22 +23,22 @@ OpenTelemetry 规范描述了所有 OpenTelemetry 协议实现的跨语言要求
 
 - [Overview](overview.md)  ✅
 - [Glossary](glossary.md)  ✅
-- [Library Guidelines](specification/library-guidelines.md)
-  - [Package/Library Layout](specification/library-layout.md)
-  - [General error handling guidelines](specification/error-handling.md)
+- [Library Guidelines](library-guidelines.md)
+  - [Package/Library Layout](library-layout.md)
+  - [General error handling guidelines](error-handling.md)
 - API Specification
   - [Baggage](baggage/api.md)
-    - [Propagators](specification/context/api-propagators.md)
+    - [Propagators](context/api-propagators.md)
   - [Tracing](trace/api.md)  🚧
-  - [Metrics](specification/metrics/api.md)
+  - [Metrics](metrics/api.md)
 - SDK Specification
-  - [Tracing](specification/trace/sdk.md)
-  - [Metrics](specification/metrics/sdk.md)
-  - [Resource](specification/resource/sdk.md)
-  - [Configuration](specification/sdk-configuration.md)
+  - [Tracing](trace/sdk.md)
+  - [Metrics](metrics/sdk.md)
+  - [Resource](resource/sdk.md)
+  - [Configuration](sdk-configuration.md)
 - Data Specification
   - [Semantic Conventions](overview.md#semantic-conventions)
-  - [Protocol](specification/protocol/README.md)
+  - [Protocol](protocol/README.md)
 - About the Project
   - [项目 Timeline](#项目-Timeline)
   - [符号约定和合规性](#符号约定和合规性)
