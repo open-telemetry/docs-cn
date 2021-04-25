@@ -4,7 +4,7 @@
 
 Span定义以下语义约定：
 
-* [General](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/span-general.md)：描述不同类型的操作时使用的通用语义属性。
+* [General](./span-general.md)：描述不同类型的操作时使用的通用语义属性。
 * [HTTP](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md)：HTTP客户端/服务器中的Span。
 * [Database](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/database.md)：SQL或NoSQL客户端调用的Span。
 * [RPC/RMI](rpc.md)：远程调用的Span （例如，gRPC）。
