@@ -77,7 +77,8 @@ include 'instrumentation:yarpc-1.0:testing'
 对 `testing` 持有 test 引用。Agent instrumentation 定义了一系列针对类的匹配规则去进行字节码增强。你将会常常对 library 的测试中使用的类进行增强，比如
 说客户端的构造器。或者是创建构造器的方法，比如说构造器的构造方法。Agent instrumentation 可以在构造方法返回的时候进行字节码注入，比如说进行 `registerInterceptor`
 方法的调用并初始化集成部分。你在字节码增强部分所开发的代码常常会与你在之前写的测试代码类似，agent 承担了 instrumentation 库初始化的职责，因此用户不需要再去
-做类似的操作。
+做类似的操作。     
+你可以在[这里](writing-instrumentation-module.md)看到一个详细的 javaagent instrumentation 指引。       
 
 在完成上述的开发之后，需要为 agent instrumentation 添加单元测试。我们需要保证在用户不知情的前提下能够集成成功。添加一个测试类集成自刚才你在 test 部分开发的
 基本测试类，但与之前不同的是，这里客户端的初始化需要不使用我们项目中的任何一个 API，包括 library 部分所提供的。并为你的测试类实现 `AgentTestRunner` trait 来保证
@@ -92,7 +93,7 @@ include 'instrumentation:yarpc-1.0:testing'
 
 理想情况下，javaagent 的集成部分只是一个对于 instrumentation 库的简单封装，所以并不需要专门开发针对 javaagent instrumentation 中类的逻辑。
 
-但是如果你还是希望针对 javaagent instrumentation 开发单元测试，添加另一个叫做 `javaagent-unittests` 的 module。例子如下：
+但是如果你还是希望针对 javaagent instrumentation 开发单元测试，添加另一个叫做 `javaagent-unit-tests` 的 module。例子如下：
 
 ```
 instrumentation ->
@@ -100,39 +101,14 @@ instrumentation ->
     yarpc-1.0 ->
         javaagent
             yarpc-1.0-javaagent.gradle
-        javaagent-unittest
-            yarpc-1.0-javaagent-unittest.gradle
+        javaagent-unit-test
+            yarpc-1.0-javaagent-unit-test.gradle
         ...
 ```
 
-### Java agent instrumentation 需要格外注意的地方
+## 一些需要格外注意的地方
 
-#### 在 advice 中调用 Java 8 的默认方法
-
-如果你在对 java 8 版本之前的库进行集成，那么内联 java 8 默认的方法的调用将会在运行时导致 `java.lang.VerifyError`，因为 Java 8 默认方法的调用将在
-Java 7（以及之前）的字节码中非法。
-
-因为 OpenTelemetry API 有许多的默认方法，（比如 `Span.current()`）， `javaagent-api` 中的类 `Java8BytecodeBridge` 提供了静态方法使得在
-advice 中可以调用这些默认方法。
-
-#### 为什么对 advice 的类名进行硬编码?
-
-`TypeInstrumentation` 的实现类常常会将 advice 的类作为静态内部类定义。这些类经常会通过名字在 `transform()` 方法中被 advice 类的方法描述符
-被引用。
-
-作为例子，这个 `MyInstrumentationModule` 定义了单个 advice 来匹配一个叫做 `execute` 的方法：
-
-```
-transformers.put(
-  isMethod().and(named("execute")),
-  MyInstrumentationModule.class.getName() + "$WonderfulAdvice");
-```
-
-虽然相对于这里的字符串拼接，简单通过 `getName()` 方法引用一个内部类明显会更具有可读性。但是记得一点： **这是故意为之** 并且需要保持下去。
-
-集成模块将会被 agent 的类加载器所加载，这里的字符串拼接是防止 advice 类被加载所做的优化。
-
-#### 如果被集成的对象是无法访问的 maven 依赖
+### 如果被集成的对象是无法访问的 maven 依赖
 
 如果被集成的服务端或库的 jar 包无法从 maven 仓库进行访问，你可以创建一个 module，其中的 stub 类只声明几个你需要进行集成的方法。在 stub 类中的方法可以只
 抛出 `throw new UnsupportedOperationException()`， 这些类将会只在 advice 类的编译过程中被使用，并不会直接被打包到 agent 中去。在运行过程

@@ -35,7 +35,21 @@ public MyLibraryInstrumentationModule() {
 ```
 
 关于 `InstrumentationModule` 名称更详细的信息请参阅 
-`InstrumentationModule#InstrumentationModule(String, String...)` 的 Javadoc 。     
+`InstrumentationModule#InstrumentationModule(String, String...)` 的 Javadoc 。   
+
+### `order()`
+
+如果你需要你的 instrumentation 按照特定的顺序生效（比如你的自定义 instrumentation 增强了内置的 servlet 因此需要在其之后运行）你可以覆盖
+`order()` 方法去定义顺序：      
+
+```java
+@Override
+public int order() {
+  return 1;
+}
+```
+
+越高的 `order()` 意味着 instrumentation 模块将会越迟被生效。默认值都是0。      
 
 ### `isHelperClass()`
 
@@ -161,7 +175,7 @@ public Map<?extends ElementMatcher<? super MethodDescription>, String> transform
 this.getClass().getName() + "$MethodAdvice"
 ```
 
-简单的引用内部类并调用 `getName()` 方法的方式相对于上述这种混合的防暑便于阅读也更便于理解，但是请煮鱼，这是**故意的**并应该保持。      
+简单的引用内部类并调用 `getName()` 方法的方式相对于上述这种混合的方式便于阅读也更便于理解，但是请煮鱼，这是**故意的**并应该保持。      
 
 Instrumentation 模块被 agent 的类加载器所加载，这种字符串连接也是一种防止实际的 advice 类被加载到 agent 类加载器而做的优化。       
 
@@ -169,8 +183,10 @@ Instrumentation 模块被 agent 的类加载器所加载，这种字符串连接
 
 Advice 类并不是实际的"类"，它们是将会直接拷贝增强到被增强库文件的零碎的代码碎片。你不应该把它们视为标准的 Java 类 - 许多标准并不适用于它：     
 
+* 如果它们是内部类，那么它们必须是静态的
 * 它们必须只包含静态方法；      
-* 它们不能拥有任何状态（字段）- 静态常量也不行！只有 advice 方法的内容将会被拷贝到被增强的代码中，常量则不会；       
+* 它们不能拥有任何状态（字段）- 静态常量也不行！只有 advice 方法的内容将会被拷贝到被增强的代码中，常量则不会；   
+* 在 `InstrumentationModule` 或者 `TypeInstrumentation` 中定义的内部 advice 类禁止使用其他类的成员（日志，常量等等）；
 * 通过提取通用方法或者父类来进行代码复用可能会无法正常工作：除非你可以创建一个额外的辅助类来存储被复用的代码；       
 * 它们不应该包含任何不被 `@Advice` 所修饰的方法。       
 
