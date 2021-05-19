@@ -175,7 +175,7 @@ public Map<?extends ElementMatcher<? super MethodDescription>, String> transform
 this.getClass().getName() + "$MethodAdvice"
 ```
 
-简单的引用内部类并调用 `getName()` 方法的方式相对于上述这种混合的方式便于阅读也更便于理解，但是请煮鱼，这是**故意的**并应该保持。      
+简单的引用内部类并调用 `getName()` 方法的方式相对于上述这种混合的方式便于阅读也更便于理解，但是请注意，这是**故意的**并应该保持。      
 
 Instrumentation 模块被 agent 的类加载器所加载，这种字符串连接也是一种防止实际的 advice 类被加载到 agent 类加载器而做的优化。       
 
