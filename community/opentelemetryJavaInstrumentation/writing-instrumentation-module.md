@@ -146,14 +146,20 @@ public ElementMatcher<? super TypeDescription> typeMatcher() {
 }
 ```
 
-### `transformers()`
-最后的 `TypeInstrumentation` 方法描述了哪些方法应该被 advice 类所使用并增强。这里建议尽可能的使方法 matcher 更加严格 - 
-type instrumentation 应该只去增强那些应该被增强的类，也仅仅是这些。      
+### `transformers(TypeTransformer)`
+最后的 `TypeInstrumentation` 方法描述了对于所匹配的类型将会进行怎样的增强。 `TypeTransformer` （agent 内部所实现的接口） 定义
+了一系列你可以使用的增强操作的集合：
+
+* 调用 `applyAdviceToMethod(ElementMatcher<? super MethodDescription>, String)` 方法允许你使用一个 advice 类（第二个参数）对
+所有符合条件的方法（第一个参数）进行增强。这里建议尽可能的使方法 matcher 更加严格 - type instrumentation 应该只去增强那些应该被增强的类，也仅仅是这些。
+  
+* `applyTransformer(AgentBuilder.Transformer)` 允许你去使用一个任意的 ByteBuddy 转换器。这是一个激进，并不推荐的做法，这会导致其并不会
+被 muzzle 和 helper 类的检测 - 使用前请保持谨慎。 
 
 ```java
 @Override
-public Map<?extends ElementMatcher<? super MethodDescription>, String> transformers() {
-  return Collections.singletonMap(
+public void transform(TypeTransformer transformer) {
+  transformer.applyAdviceToMethod(
     isPublic()
         .and(named("someMethod"))
         .and(takesArguments(2))
@@ -167,7 +173,7 @@ public Map<?extends ElementMatcher<? super MethodDescription>, String> transform
  matcher 来进行匹配。    
 
 `TypeInstrumentation` 的实现常常会定义 advice 类作为其静态内部类。通常在 `transform()` 方法中，
-这些类在从方法描述符到advice class的映射中被通过名称引用。     
+这些类在从方法名与 advice class 的映射中被通过名称引用。     
 
 你可能已经注意到在例子当中 advice 类被一种有点奇怪的方式被引用：      
 
