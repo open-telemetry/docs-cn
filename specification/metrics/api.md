@@ -3,43 +3,44 @@
 <!-- toc -->
 
 - [总览](#总览)
-  * [测量](#测量)
+  * [在没有安装SDK情况下的API行为](#在没有安装SDK情况下的API行为)
+  * [数据测量](#数据测量)
   * [Metric Instruments](#metric-instruments)
   * [标签](#标签)
   * [Meter Interface](#meter-interface)
   * [聚合](#聚合)
   * [时间](#时间)
   * [Metric Event格式](#Metric-Event格式)
-- [Meter provider](#meter-provider)
-  * [获取一个Meter](#获取一个Meter)
-  * [全局 Meter provider](#全局-Meter-provider)
-    + [获取全局的MeterProvider](#获取全局的MeterProvider)
-    + [设置全局的MeterProvider](#设置全局的MeterProvider)
-- [Instrument属性](#Instrument属性)
-  * [Instrument命名要求](#Instrument命名要求)
-  * [同步和异步instruments比较](#同步和异步instruments比较)
-  * [Adding instruments与grouping instruments比较](#Adding-instruments与grouping-instruments比较)
-  * [单调和非单调instruments的比较](#单调和非单调instruments的比较)
-  * [方法名称](#方法名称)
+- [Meter provider](#获取一个-MeterProvider)
+  * [获取一个Meter](#获取一个-Meter)
+  * [全局 MeterProvider](#全局-MeterProvider)
+    + [获取全局的MeterProvider](#获取全局的-MeterProvider)
+    + [设置全局的MeterProvider](#设置全局的-MeterProvider)
+- [Instrument属性](#Instrument-属性)
+  * [Instrument命名要求](#Instrument-命名要求)
+  * [同步和异步instruments比较](#同步和异步-instruments-比较)
+  * [Adding instruments与grouping instruments比较](#Adding-instruments-与-grouping-instruments-比较)
+  * [单调和非单调instruments的比较](#单调和非单调-instruments-的比较)
+  * [函数名称](#函数名称)
 - [Instrument说明](#Instrument-说明)
-  * [Counter](#counter)
-  * [UpDownCounter](#updowncounter)
-  * [ValueRecorder](#valuerecorder)
-  * [SumObserver](#sumobserver)
-  * [UpDownSumObserver](#updownsumobserver)
-  * [ValueObserver](#valueobserver)
-  * [Interpretation](#解释)
+  * [Counter](#Counter)
+  * [UpDownCounter](#UpDownCounter)
+  * [ValueRecorder](#ValueRecorder)
+  * [SumObserver](#SumObserver)
+  * [UpDownSumObserver](#UpDownSumObserver)
+  * [ValueObserver](#ValueObserver)
+  * [解释](#解释)
   * [构造函数](#构造函数)
 - [标签集合](#标签集合)
   * [标签性能](#标签性能)
-  * [Option: Ordered labels](#option-ordered-labels)
-- [同步instrument详情](#同步instrument详情)
+  * [可以选择的能力：经过排序的标签](#可以选择的能力：经过排序的标签)
+- [同步instrument详情](#同步-instrument-详情)
   * [同步调用约定](#同步调用约定)
-    + [绑定调用instrument约定](#绑定调用instrument约定)
-    + [直接调用instrument约定](#直接调用instrument约定)
-    + [RecordBatch调用约定](#RecordBatch调用约定)
-  * [Association with distributed context](#与分布式上下文关联)
-    + [Baggage中的metric标签](#Baggage中的metric标签)
+    + [绑定调用instrument约定](#绑定-instrument-调用约定)
+    + [直接调用instrument约定](#直接-instrument-调用约定)
+    + [RecordBatch调用约定](#RecordBatch-调用约定)
+  * [与分布式上下文关联](#与分布式上下文关联)
+    + [Baggage 作为 metric 的标签](#Baggage-作为-metric-的标签)
 - [异步instrument细节](#异步-instrument-细节)
   * [异步调用约定](#异步调用约定)
     + [单一instrument的监测](#单一-instrument-的监测)
@@ -232,7 +233,7 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 同步的`events`还有一个附加属性，即当时所处于的有效的分布式
 [上下文](../context/context.md) (包括 `Span`，`Baggage`等等)。
 
-## 获取一个 Meter provider
+## 获取一个 MeterProvider
 
 `MeterProvider` 通过初始化和配置 `OpenTelemetry Metrics SDK` 来获得具体实例。
 本文档未指定如何构建SDK，仅说明它们必须实现 `MeterProvider`。
@@ -253,7 +254,7 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 这使得某个 instrument 可以在不同的集成库使用的相同名名称上报 `metrics` 。
 但是 `Meter` 的名称明显不会作为 instruments 的名称的一部分，因为这会导致集成库去捕获同名的 `metrics` 。
 
-### 全局 Meter provider
+### 全局 MeterProvider
 
 在许多情况下，全局实例的使用可能被视为一种反面模式，但是在大多数情况下，它却是观测数据采集的合理方案，
 这种实现以便从一批相互依赖的库当中的获取观测数据，从而避免了依赖注入，因此，`openTelemetry` 所提供针对编程语言的 API 应该提供一个全局实例。
@@ -534,7 +535,7 @@ Prometheus 客户端的一些用户目前面临着类似的情况，他们可以
 SDK 支持对进程进行聚合来找到源于一个 instrument 并具有相同标签集组合活跃记录的能力。这允许将测量数据组合在一起。
 通过使用绑定的同步 instruments 和批处理方法( `RecordBatch` ， `BatchObserver` )可以降低标签处理成本。
 
-### 可以选择的能力： 经过排序的标签
+### 可以选择的能力：经过排序的标签
 
 考虑到编程语言的能力，API 可以支持对标签键进行排序。
 在这种情况下，用户可以指定标签键的有序序列，该序列是用来从一个类似有序的标签值序列中创建一个无序的标签集的。
@@ -607,7 +608,7 @@ func (s *server) processStream(ctx context.Context) {
 }
 ```
 
-#### 直接调用 instrument 约定
+#### 直接 instrument 调用约定
 
 当调用时的便利性比性能更重要，或者提前不知道值的时候，用户可以选择直接在 metric instruments 上进行操作，
 这意味着在调用的时候提供标签。这种方法提供了最大的便利。
@@ -642,8 +643,8 @@ func (s *server) method(ctx context.Context) {
 
     s.meter.RecordBatch(ctx, labels,
         s.instruments.counter.Measurement(1),
-        s.instruments.updowncounter.Measurement(10),
-        s.instruments.valuerecorder.Measurement(123.45),
+        s.instruments.upDownCounter.Measurement(10),
+        s.instruments.valueRecorder.Measurement(123.45),
     )
 }
 ```
@@ -653,8 +654,8 @@ func (s *server) method(ctx context.Context) {
 ```java
     meter.RecordBatch(labels).
         put(s.instruments.counter, 1).
-        put(s.instruments.updowncounter, 10).
-        put(s.instruments.valuerecorder, 123.45).
+        put(s.instruments.upDownCounter, 10).
+        put(s.instruments.valueRecorder, 123.45).
         record();
 ```
 
