@@ -3,43 +3,44 @@
 <!-- toc -->
 
 - [总览](#总览)
-  * [测量](#测量)
+  * [在没有安装SDK情况下的API行为](#在没有安装SDK情况下的API行为)
+  * [数据测量](#数据测量)
   * [Metric Instruments](#metric-instruments)
   * [标签](#标签)
   * [Meter Interface](#meter-interface)
   * [聚合](#聚合)
   * [时间](#时间)
   * [Metric Event格式](#Metric-Event格式)
-- [Meter provider](#meter-provider)
-  * [获取一个Meter](#获取一个Meter)
-  * [全局 Meter provider](#全局-Meter-provider)
-    + [获取全局的MeterProvider](#获取全局的MeterProvider)
-    + [设置全局的MeterProvider](#设置全局的MeterProvider)
-- [Instrument属性](#Instrument属性)
-  * [Instrument命名要求](#Instrument命名要求)
-  * [同步和异步instruments比较](#同步和异步instruments比较)
-  * [Adding instruments与grouping instruments比较](#Adding-instruments与grouping-instruments比较)
-  * [单调和非单调instruments的比较](#单调和非单调instruments的比较)
-  * [方法名称](#方法名称)
+- [Meter provider](#获取一个-MeterProvider)
+  * [获取一个Meter](#获取一个-Meter)
+  * [全局 MeterProvider](#全局-MeterProvider)
+    + [获取全局的MeterProvider](#获取全局的-MeterProvider)
+    + [设置全局的MeterProvider](#设置全局的-MeterProvider)
+- [Instrument属性](#Instrument-属性)
+  * [Instrument命名要求](#Instrument-命名要求)
+  * [同步和异步instruments比较](#同步和异步-instruments-比较)
+  * [Adding instruments与grouping instruments比较](#Adding-instruments-与-grouping-instruments-比较)
+  * [单调和非单调instruments的比较](#单调和非单调-instruments-的比较)
+  * [函数名称](#函数名称)
 - [Instrument说明](#Instrument-说明)
-  * [Counter](#counter)
-  * [UpDownCounter](#updowncounter)
-  * [ValueRecorder](#valuerecorder)
-  * [SumObserver](#sumobserver)
-  * [UpDownSumObserver](#updownsumobserver)
-  * [ValueObserver](#valueobserver)
-  * [Interpretation](#解释)
+  * [Counter](#Counter)
+  * [UpDownCounter](#UpDownCounter)
+  * [ValueRecorder](#ValueRecorder)
+  * [SumObserver](#SumObserver)
+  * [UpDownSumObserver](#UpDownSumObserver)
+  * [ValueObserver](#ValueObserver)
+  * [解释](#解释)
   * [构造函数](#构造函数)
 - [标签集合](#标签集合)
   * [标签性能](#标签性能)
-  * [Option: Ordered labels](#option-ordered-labels)
-- [同步instrument详情](#同步instrument详情)
+  * [可以选择的能力：经过排序的标签](#可以选择的能力：经过排序的标签)
+- [同步instrument详情](#同步-instrument-详情)
   * [同步调用约定](#同步调用约定)
-    + [绑定调用instrument约定](#绑定调用instrument约定)
-    + [直接调用instrument约定](#直接调用instrument约定)
-    + [RecordBatch调用约定](#RecordBatch调用约定)
-  * [Association with distributed context](#与分布式上下文关联)
-    + [Baggage中的metric标签](#Baggage中的metric标签)
+    + [绑定调用instrument约定](#绑定-instrument-调用约定)
+    + [直接调用instrument约定](#直接-instrument-调用约定)
+    + [RecordBatch调用约定](#RecordBatch-调用约定)
+  * [与分布式上下文关联](#与分布式上下文关联)
+    + [Baggage 作为 metric 的标签](#Baggage-作为-metric-的标签)
 - [异步instrument细节](#异步-instrument-细节)
   * [异步调用约定](#异步调用约定)
     + [单一instrument的监测](#单一-instrument-的监测)
@@ -55,52 +56,52 @@
 <!-- tocstop -->
 
 ## 总览
-`OpenTelemetry Metrics API`支持获取计算机程序在运行时有关执行情况的原始测量数据，
-`Metrics API`是专门为处理原始测量数据而设计的，通常是为了高效且并行的对这些测量结果进行连续的统计分析。
-以下，`API`是指`OpenTelemetry Metrics API`。
+`OpenTelemetry Metrics API`（`OpenTelemetry`的指标`API`）支持获取计算机程序在运行时，有关执行情况的原始的指标测量数据。
+这个`API`是专门为处理原始的测量指标数据采集而设计的，
+`Metrics API`是专门为处理原始测量数据而设计，通常是为了采用并行的方式，高效的对这些测量结果进行连续地统计与记录。
+在下文中，`API`是指`OpenTelemetry Metrics API`。
 
-`API`通过提供基于不同性能级别的调用约束的函数来抓取原始测量数据。
-无论什么样的调用约束, 我们都将`metric event`定义为新的测量数据被捕获时发生的逻辑事件。
-捕获的这一时刻（在运行期中）也定义了一个隐式时间戳，该时间戳是SDK在该时刻从系统时钟读取到的。
+`API`通过提供基于不同性能级别的调用函数来采集原始测量指标数据。
+无论什么样的调用约束, 我们都将`metric event`定义为指标被捕获时发生的逻辑事件。
+当指标被获取到时，我们也在指标中定义了一个隐方的时间戳，这个时间戳是SDK从系统时钟中读取到的当前时间的时间戳。【该时间戳无法进行手动调整】。
 
-这里使用的`semantic`或者`semantics`一词是指我们如何为`metric events`赋予含义，
-该术语在本文档中得到广泛使用，以定义和解释这些API函数以及我们应如何解释它们。
-尽可能地，此处使用的术语试图传达预期的语义，下面将描述一个标准实现，以帮助我们理解它们的含义。
-标准实现对每种`metric event`执行与默认解释对应的聚合。
+在本文中使用`semantic`或者`semantics`或者`语义`来指代我们如何为指标事件来赋予他所应有的含义。
+`语义`在本文档中得到广泛使用，用以定义和解释这些API函数。
+在定义函数名称时，需要尽可能地贴合其原本所指代的含义。
 
-监控和报警系统一般使用`metric events`所提供的数据, 这些数据经过[聚合](#聚合)并转换为各种展示格式的数据。
-然而，我们还发现`metric events`的数据还有许多其他用途，例如在Tracing和日志系统中记录聚合的或原始测量数据。
+监控与告警系统，一般会使用`指标事件`所提供的`指标`数据，这些数据经过[聚合](#聚合)并转换为各种不同展示格式的数据。
+然而，我们还发现`指标事件`的数据还有许多其他用途，例如在链路和日志系统中记录聚合的或原始`指标数据`。
 因此，
 [OpenTelemetry需要将API与SDK分开](../library-guidelines.md#requirements)
 以便可以在运行时配置不同的SDK。
 
 ### 在没有安装SDK情况下的API行为
 
-在没有安装Metrics SDK的情况下，Metrics API仅可以由`无操作`组成，API的调用都将不具备任何的意义。 
-`Meters`必须返回任何`instruments`的无操作实现，从用户的角度来看，应在不引发错误的情况下忽略对它们的调用
-（即，如果一个语言会在返回`null`引用时触发异常，则不要这样做）。
-API不得在对其进行的任何调用上引发异常。
+在没有安装`Metrics SDK`（指标的SDK）的情况下，指标的`API`只可以由`无操作`的输出来构成，
+任何的指标`API`的调用都将没有任何的实际意义，采集到的数据都会被直接丢弃。
+在任何的`指标`的`API`都必须要默认返回一个由无操作实现构成的`instruments`（采集器）。从用户的角度来说，应该在引发任何错误的情况下，忽略对他们的调用。
+例如：不要因为一个`API`返回了`null`引用时，触发异常。API在被调用时，不应该触发任何的异常。
 
-### 测量
-本文档中使用术语`捕获`（capture）来描述用户将一份测量数据传递给API时所执行的操作。
-`捕获`（capture）的结果取决于所配置的SDK，如果SDK没有被安装，则默认操作是不会执行捕获的事件。
+### 数据测量
+
+本文中使用术语`capture`（捕获）来描述用户将一份指标的测量数据传递给`API`时所执行的操作。
+`capture`（捕获）的结果取决于所配置的SDK，如果SDK没有被安装，则默认操作是不会执行捕获的事件。
 这种用法的目的是，根据不同的SDK来传达任何可能会发生的测量结果，但是这也意味着用户已经为了获取这一部分测量数据付出了成本。
 出于性能和语义（semantic）方面的考虑，API允许用户在这两种测量方式之间进行选择。
 
-术语`求和`（adding）用于指定某些测量的特征，在该种测量下，只有总和才会被认为是有意义的信息。
-这些是可以使用算术加法（通常是某些事物的实际数量，例如字节数）进行组合的测量数据。
+术语`adding`（求和）用于指定某些测量的特征，在该种测量下，只有总和才会被认为是有意义的信息。
+这些是可以使用算术加法进行组合的测量数据（通常是某些事物的实际数量，例如网络传输的IO字节数，可以是一个始终持续增长的指标）。
 
-分组度量在一组值的集合自身具有一定的意义的时候适合被使用。
-分组度量是一种你不会使用算术加法进行组合的测量数据（例如请求延迟），或者当你对于关心的值的分布更感兴趣的时候（例如队列的大小）所采取的方案。
-在分组度量中，中位数也是有用的信息。
+分组测量工具，在一组值的集合自身具有一定的意义时进行使用。
+当一个测量指标，在进行累加后不具备含义，或者当你对于值的分布更加感兴趣时，需要采取的方案。（例如网络的延迟情况，某个队列当前的小）
 
 分组工具在功能上比求和工具能够捕获更多的信息。根据其定义，分组测量数据比求和测量数据会消耗更高的性能。
-用户应该优先选择求和工具，除非他们希望从有关单个数据的额外信息中获取到其他价值。当然这些都不能阻止SDK根据
-配置重新组织解释原始数据。原始数据可以被随意加工处理。
+用户应该优先选择求和工具，除非他们希望从有关单个数据的额外信息中获取到其他价值。
+当然这些都不能阻止SDK根据配置重新组织与解释原始数据。原始数据可以被随意加工处理。
 
 ### Metric Instruments
 
-`metric instrument` 是用于在API中捕获原始测量值的组件。
+`metric instrument`（指标的测量工具）是用于在API中捕获原始指标值的组件。
 下表中列出的标准的`instrument`，每一种都有特定的用途，在API中刻意避免了改变`instrument`的可选特性; 
 相反，API更喜欢支持单一方法的`instrument`，每个方法都有固定的实现。
 
@@ -110,11 +111,11 @@ API捕获的所有度量数据都与用于进行度量的`instrument`相关联�
 `instrument`通过以下的几种方式进行区分：
 1.同步性：同步`instrument`由用户在处于分布式
   [上下文](../context/context.md)
-  下的情况调用（即，具有关联的`Span`，`Baggage`等）。在没有上下文的情况下，SDK会在每个收集间隔调用一次异步工具。
+  下的情况调用（即，具有关联的`Span`，`Baggage`等）。在不具备上下文的情况下，SDK会在每一个收集间隔中，调用异步工具，从`instrument`的缓存中去获取指标数据。
 2.`求和`与`分组`：求和工具是一种记录添加测量值的工具，与上述的分组工具相反。
 3.单调性：`monotonic instrument`是一种`adding instrument`，但是其值永远不会下降。`monotonic instrument`对于监视速率信息很有用。
 
-度量工具名称以及它们是否`synchronous`，`adding`或`monotonic`显示在下面表格中。
+指标测量工具的名称以及它们是否`synchronous`，`adding`或`monotonic`的情况显示在下面表格中。
 
 | 名称 | Synchronous | Adding | Monotonic |
 | ---- | ----------- | -------- | --------- |
@@ -125,22 +126,22 @@ API捕获的所有度量数据都与用于进行度量的`instrument`相关联�
 | UpDownSumObserver | 否 | 是 | 否 |
 | ValueObserver     | 否 | 否 | 否 |
 
-`synchronous instruments`对于在处于分布式
+`synchronous instruments`（异步测量工具）对于处于分布式
 [上下文](../context/context.md)
-下（即，具有关联的`span`，`Baggage`等）收集的测量很有用。
-当测量成本很高时，`asynchronous instruments`很有用，因此应定期收集。在下面阅读更多
+中（即，具有关联的`span`，`Baggage`等）测量的指标很有用。
+当指标的测量成本很高时，`asynchronous instruments`很有用，因此应定期收集。在此处阅读更多：
 [同步和异步instruments的特性](#同步和异步instruments比较)
 
-同步和异步`adding instruments`有很大的区别：同步`instruments`用于捕获总和的变化，而异步工具用于直接捕获总和。在下面阅读
+同步和异步加法指标测量工具`adding instruments`有很大的区别：同步指标测量工具用于捕获总和的变化，而异步工具用于直接捕获总和。在下面阅读
 [`adding instruments`的特征](#Adding-instruments与grouping-instruments比较)。
 
 `monotonic adding instrument`是重要的工具，因为他们支持速率计算。阅读
 [选择`metric instruments`](#单调和非单调instruments的比较)
 以获取更多的信息。
 
-一个`instrument`的定义，描述了这个`instrument`的一些特性，包括他的名称和类型。
-`metric instrument`的一些其他属性是可配置的，包括其介绍说明和度量单位。
-一个`instrument`的定义取决于其产生的数据特性。
+`instrument`（测量工具）的定义，描述了这个`instrument`的一些特性，包括它的类型与名称。
+`metric instrument`（指标测量工具）中的一些属性是可以进行配置的，包括其名称、说明信息以及测量的单位。
+一个`instrument`需要如何定义，取决于其产生的数据的也行。
 
 ### 标签
 
@@ -148,8 +149,7 @@ API捕获的所有度量数据都与用于进行度量的`instrument`相关联�
 [Span attribute](../trace/api.md#span)。
 每个标签可以对`metric event`进行分类，从而可以对其进行过滤和分组以进行分析。
 
-每一个`instrument`的调用约定（在下面详细说明）都接受一组标签作为参数。
-标签的集合定义为从Key到Value的唯一映射。
+每一个`instrument`的调用接口中，都可以填写标签信息。标签的集合定义为从Key到Value的唯一映射信息。
 通常，标签以键值对列表的形式传递给API，在这种情况下，当key发生重复的时候以列表中的最后一个同名key为准。
 
 同步`instrument`的测量数据通常可以与其他具有完全相同 label 集合数据进行组合来达到一定的性能优化的目的。
@@ -159,12 +159,13 @@ API捕获的所有度量数据都与用于进行度量的`instrument`相关联�
 
 API定义了一个Meter接口。该接口由一组`instrument`构造器，和一个使用原子方式批量获取测量值的工具组成。
 
-有一个全局Meter实例可供使用，以便在与第三方代码的自动适配中使用。
-使用此实例可以使代码静态初始化`metric instruments`实例，而无需显式依赖注入。
+使用时建议创建一个全局Meter实例可供使用，以便在第三方代码的自动适配时使用。
+使用这个实例，可以使用静态的方式来对`metric instruments`实例进行初始化，而无需要显示的依赖注入。
+
 全局`Meter`实例在应用程序中服务提供者或者特定语言所支持的SDK被成功初始化之前将会不执行任何逻辑。
 请注意，不要直接去使用全局实例：OpenTelemetry SDK的多个实例可能同时运行。
 
-作为强制性的步骤，API要求调用者在获得`Meter`实现时提供`instrumenting`库的名称（可选，版本）。
+在使用时，API要求调用者在获得`Meter`实现时提供`instrumenting`库的名称（可选，版本）。
 库名称旨在用于标识从该库产生的检测，例如禁用检测，配置聚合和应用采样策略。有关更多详细信息，请参见
 [TracerProvider](../trace/api.md#tracerprovider)
 上的规范。
@@ -173,9 +174,9 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 
 聚合是指将多个维度的度量，合并为程序执行期间的时间间隔内发生的具体或者预估的测量数据的统计信息的过程。
 每个`instrument`都指定一个适合该工具语义的默认聚合，用于解释其属性并使用户了解如何使用它。
-在没有任何配置替代的情况下，`instrument`可以提供开箱即用的简约的汇总。
+在没有配置其他替代方案的情况下，`instrument`可以提供开箱即用的简单汇总。
 
-`adding instruments` (`Counter`, `UpDownCounter`, `SumObserver`,`UpDownSumObserver`)在默认的情况下使用的是求和聚合
+`adding instruments`（加法测量工具，`Counter`, `UpDownCounter`, `SumObserver`,`UpDownSumObserver`)在默认的情况下使用的是求和聚合
 用于计算聚合数据的详细信息有所不同，但是从用户的角度来说，这意味着他们将能够监测捕获的值的总和。
 同步与异步的`instruments`之间的区别，对于指定 exporter 的工作方式至关重要。
 这是
@@ -186,7 +187,7 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 [TBD issue 636](https://github.com/open-telemetry/opentelemetry-specification/issues/636)
 默认聚集。
 
-`ValueObserver``instrument`默认使用LastValue聚集。此聚合跟踪所观察到的最后一个值和它的时间戳。
+`ValueObserver``instrument`默认使用最后一个采集到的指标值来进行聚合。此聚合跟踪所观察到的最后一个值和它的时间戳。
 
 对于`grouping instruments`来说，其他聚合方式也是可行的，
 我们普遍关心的各种不同的报表，例如直方图，分位数报表，基数估计和其他种类的数据结构。
@@ -197,23 +198,22 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 
 ### 时间
 
-时间是`Metric Event`的基本属性，但不是必须的属性。用户不为`Metric Event`提供显式的时间戳。
-不建议SDK捕获每个事件的当前时间戳（通过读取时钟），除非明确需要每个`Event`都需要计算高精度的时间戳。
+时间是 `Metric Event`（指标事件）的基本属性，但不是必须的属性。用户不需要为指标事件提供显式的时间戳。
+不建议SDK在捕获每个事件时通过读取时钟来获取当前时间戳，除非明确需要每个 `Event` 都需要计算高精度的时间戳。
 
-这是在上报`metric`的时候的常见优化，该优化是将`metric`数据收集间隔配置为相对较小的时间间隔（例如1秒），并使用单个时间戳来描述一批导出的数据，
-因此在对所需要的精度是在跨数分钟或数小时的时间段内的数据进行汇总的时候，精度上的损失很小。
+这是在上报 `metric` 的时候的常见优化，该优化是将 `metric` 数据收集间隔配置为相对较小的时间间隔（例如1秒），并使用单个时间戳来描述一批导出的数据，
+因此在对所需要的精度是在分钟级别或者小时级别的时间段内的数据进行汇总的时候，精度损失很小。
 
-聚合通常通过一系列事件进行计算，这些事件属于一个连续的时间区域，而这一时间区域称为收集间隔。
+聚合通常通过一系列事件进行计算，这些事件属于一个连续的时间区间，而这个时间区间称为收集间隔。
 由于SDK控制着是否开始收集，因此可以收集聚合的指标数据的同时在每个收集间隔仅读取一次时钟。
 默认的SDK就是使用这种方法。
 
-`synchronous instruments`产生的`Metric events`会在瞬间发生，因此，它会和属于同一个收集间隔中来自同一`instrument`和标签集的其他事件
-组合在一起。
-因为`events`可能同时发生复数个，所以最近的事件并没有在技术上有着很好的定义。
+`synchronous instruments`（同步测量工具）产生的`Metric events` 会在很短的时间内发生，因此，
+它会和属于同一个收集间隔中来自同一`instrument`和标签集的其他事件组合在一起。
+因为 `events` 可能在同一时间发生多次，所以并不能很好的定义最近的一次事件。
 
-异步`instruments`允许SDK通过每个收集间隔进行一次观察来评估`metric instruments`。
-由于这种与集合的耦合(与同步`instruments`不同)，这些`instruments`明确地定义了最近的事件。
-我们将会把对某个时刻的`instruments`和标签集的“最后一个值”定义为最近一次收集间隔内测得的值。
+`asynchronous instruments`（异步指标采集工具）允许SDK通过每个收集间隔调用一次异步指标工具来进行数据采集。
+由于这种数据采集方式，明确的定义了最近的指标采集事件，我们将会把某个时刻的指标与标签集的“最后一个值”定义为最近一次收集间隔内测得的值。
 
 由于`metric events`带有隐式时间戳，因此我们可以将一系列`metric events`称为`时间序列`。
 但是，我们保留使用此术语作为SDK规范，以指代在序列中显式表示有时间戳的值的一种数据格式，
@@ -221,11 +221,11 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 
 ### Metric Event格式
 
-无论`instrument`是那种类型，`Metric events`都具有相同的逻辑形式。
+无论`instrument`（测量工具）是那种类型，`Metric events`（告警事件）都具有相同的逻辑形式。
 通过任何工具捕获的`Metric events`都具有以下属性：
 
 - timestamp (隐式的时间戳)
-- instrument definition (`instrument`的定义，包括名称/种类/描述/计量单位)
+- instrument definition (测量工具的定义，包括名称、种类、描述、计量单位)
 - label set (标签集合，keys和values)
 - value (有符号整数或浮点数)
 - [资源](../resource/sdk.md) （启动时与SDK相关的资源）.
@@ -233,7 +233,7 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 同步的`events`还有一个附加属性，即当时所处于的有效的分布式
 [上下文](../context/context.md) (包括 `Span`，`Baggage`等等)。
 
-## Meter provider
+## 获取一个 MeterProvider
 
 `MeterProvider` 通过初始化和配置 `OpenTelemetry Metrics SDK` 来获得具体实例。
 本文档未指定如何构建SDK，仅说明它们必须实现 `MeterProvider`。
@@ -246,7 +246,7 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 
 - name（必填）：这个名称应该作为集成库的名称（例如`io.opentelemetry.contrib.mongodb`），而不是被集成库的名称。
   如果指定了非法的名称（ `null` 或空字符串`""`），一个默认的 Meter 应该被返回，而不是返回 null 或引发异常。
-  如果应用程序所有者配置SDK认为这个库已经过期而不应该产生任何观测数据，那么返回的 `MeterProvider` 应该不做任何操作。
+  如果应用程序所有者配置SDK认为这个库已经过期而不应该产生任指标何观测数据，那么返回的 `MeterProvider` 应该不做任何操作。
 
 - version（选填）：指定集成库的版本（例如 1.0.0）。
 
@@ -254,10 +254,10 @@ API定义了一个Meter接口。该接口由一组`instrument`构造器，和一
 这使得某个 instrument 可以在不同的集成库使用的相同名名称上报 `metrics` 。
 但是 `Meter` 的名称明显不会作为 instruments 的名称的一部分，因为这会导致集成库去捕获同名的 `metrics` 。
 
-### 全局 Meter provider
+### 全局 MeterProvider
 
-在许多情况下，全局实例的使用可能被视为一种反面模式，但是在大多数情况下，它却是观测数据的合理方案，
-这种实现以便从一批相互依赖的库当中的获取观测数据从而避免依赖注入，因此，`openTelemetry` 所提供针对编程语言的 API 应该提供一个全局实例。
+在许多情况下，全局实例的使用可能被视为一种反面模式，但是在大多数情况下，它却是观测数据采集的合理方案，
+这种实现以便从一批相互依赖的库当中的获取观测数据，从而避免了依赖注入，因此，`openTelemetry` 所提供针对编程语言的 API 应该提供一个全局实例。
 当在一种语言中提供全局实例时，必须保证通过这些 `Meter` 实例是全局的 `MeterProvider` 所分配的并且集成库所获取到的 `Meter` 实例的初始化将会
 延迟到全局 SDK 的第一次初始化之后。
 
@@ -287,7 +287,7 @@ Metric instruments 主要由其名称定义，这是我们在外部系统中对�
 4. 后续字符必须属于字母数字字符和`_`，`.`和`-`。
 
 Metric instruments 的名称属于一个命名空间，这个命名空间由这关联的 `Meter` 实例建立。
-当多个 instruments 以相同的名称注册时， `Meter` 的实现必须要返回一个错误。
+当多个 `instruments` 以相同的名称注册时， `Meter` 的实现必须要返回一个错误。
 
 TODO: [以下段落是为了后续更详细文档的占位符。](https://github.com/open-telemetry/opentelemetry-specification/issues/600)
 
@@ -397,24 +397,24 @@ Grouping instruments 在默认情况下，使用了与记录完整数据相比�
 - 捕获喷油器的喷嘴压力
 - 捕获MIDI按键的速度
 
-例如在 `adding` 工具使用 `ValueRecorder` 的捕获度量数据的示例，这些数据正在相加，
-但是我们不仅对值的总和感兴趣，可能对值的分布也比较感兴趣：
+例如在 `adding` 工具中，这些数据会进行相加，但在有的时候，我们不仅对值的总和感兴趣，可能对值的分布也比较感兴趣。
+在这时我们就可以使用 `ValueRecorder`来捕获所需要的数据。
 
 - 捕获一个请求的大小
-- 取得帐户余额
-- 捕获队列长度
+- 捕获一个帐户的余额
+- 捕获一个队列的长度
 - 捕获一些木材板的大小
 
-上述这些例子表明，尽管它们本质上是相加的，但选择 `ValueRecorder` 而不是使用 `Counter` 或 `UpDownCounter` 
-表明着我们不仅对于总和的统计存在兴趣。如果你对收集数据的分布不感兴趣，则可以选择其中一种 adding instruments ，
+在上述的这些例子中，尽管它们本质上是相加的，但应该选择 `ValueRecorder` ，而不是使用 `Counter` 或 `UpDownCounter`，
+这表明着我们不仅对于总和的统计存在兴趣。如果你对收集数据的分布不感兴趣，则可以选择其中一种 `adding instruments` ，
 使用`ValueRecorder`的意义在于对数据的分布进行分析。
 
-请谨慎的使用 `ValueRecorder` ，因为它会消耗比 adding instruments 更多的性能。
+请谨慎的使用 `ValueRecorder` ，因为它会消耗比 `adding instruments` 更多的性能。
 
 ### SumObserver
 
 `SumObserver` 对应 `Counter` 的异步形式，用于捕获 `Observe(sum)` 单调求和数据。
-名称中会出现“总和”，以提醒用户直接用于捕获总和。
+名称中会出现 `Sum` ，以提醒用户直接用于捕获数据总和。
 使用` SumObserver` 捕获任何从零开始并在整个过程生命周期中上升并且永不下降的值。
 
 `SumObserver`的示例用法.
@@ -470,7 +470,7 @@ Grouping instruments 在默认情况下，使用了与记录完整数据相比�
 
 ### 解释
 
-这些工具有什么区别，为什么只有三个？为什么不是一个 instrument ？那么又为什么不是十个呢？
+这些工具有什么区别，为什么只有三个？为什么不是一个？那么又为什么不是十个呢？
 
 正如我们所看到的，这些工具根据它们是否同步，支持相加以及与或关系和单调性而分类。
 这种方式通过为每个工具赋予其语义，能够提高 metric events 的性能并使其更容易被理解。
@@ -503,7 +503,7 @@ OpenTelemetry API将会为每种 instrument 支持2个不同类型的构造函�
 将 instrument 绑定到单个 `Meter` 实例有两个好处:
 
 1. instrument 在第一次使用之可以在零状态的情况下导出，不需要显式注册调用
-2. 库的名称和版本与 metric event 隐式关联
+2. 库的名称和版本与 `metric event` 隐式关联
 
 一些现有的 metric 系统支持支持静态分配 metric instruments ，并在使用时提供等效的 `Meter` 接口。
 在一个示例中，典型的statsD客户端，现有的代码可能没有一个方便的地方来存储新的度量工具。
@@ -535,7 +535,7 @@ Prometheus 客户端的一些用户目前面临着类似的情况，他们可以
 SDK 支持对进程进行聚合来找到源于一个 instrument 并具有相同标签集组合活跃记录的能力。这允许将测量数据组合在一起。
 通过使用绑定的同步 instruments 和批处理方法( `RecordBatch` ， `BatchObserver` )可以降低标签处理成本。
 
-### 可以选择的能力： 经过排序的标签
+### 可以选择的能力：经过排序的标签
 
 考虑到编程语言的能力，API 可以支持对标签键进行排序。
 在这种情况下，用户可以指定标签键的有序序列，该序列是用来从一个类似有序的标签值序列中创建一个无序的标签集的。
@@ -579,10 +579,10 @@ metric 的 API 性能取决于输入新度量数据时的成本，通常由处�
 为了从使用绑定的 instrument 当中受益，它要求与重复使用的标签绑定的特定的 instrument 被重新使用。
 如果一个 instrument 将多次使用相同的标签，则使用与这些标签相对应的绑定 instrument 可确保获得最高的性能。
 
-要绑定一个 instrument ，使用 `Bind(labels...)` 方法将会返回一个支持相应同步 API （即 `Add()` 或 `Record()` ）的接口。
-绑定的 instrument 在调用的时候不需要声明标签；相应的 metric event 将会与绑定到 instrument 的标签相关联。
+要绑定一个 `instrument`，使用 `Bind(labels...)` 方法，这个方法将会返回一个支持相应同步 API （即 `Add()` 或 `Record()` ）的接口。
+绑定的 `instrument` 在调用的时候不需要声明标签；相应的 `metric event` 将会与绑定到 `instrument` 的标签相关联。
 
-由于其性能优势，绑定的 `instrument` 也会消耗SDK中的资源。绑定的 instrument 必须支持 `Unbind()` 方法，使用户可以结束绑定并释放关联的资源。
+由于其性能优势，绑定的 `instrument` 也会消耗SDK中的资源。绑定的 `instrument` 必须支持 `Unbind()` 方法，使用户可以结束绑定并释放关联的资源。
 请注意， `Unbind()` 这并不意味着删除时间序列，它仅允许 SDK 在没有待处理的更新后忘记时间序列的存在。
 
 例如，要重复更新具有相同标签的计数器：
@@ -608,7 +608,7 @@ func (s *server) processStream(ctx context.Context) {
 }
 ```
 
-#### 直接调用 instrument 约定
+#### 直接 instrument 调用约定
 
 当调用时的便利性比性能更重要，或者提前不知道值的时候，用户可以选择直接在 metric instruments 上进行操作，
 这意味着在调用的时候提供标签。这种方法提供了最大的便利。
@@ -643,8 +643,8 @@ func (s *server) method(ctx context.Context) {
 
     s.meter.RecordBatch(ctx, labels,
         s.instruments.counter.Measurement(1),
-        s.instruments.updowncounter.Measurement(10),
-        s.instruments.valuerecorder.Measurement(123.45),
+        s.instruments.upDownCounter.Measurement(10),
+        s.instruments.valueRecorder.Measurement(123.45),
     )
 }
 ```
@@ -654,8 +654,8 @@ func (s *server) method(ctx context.Context) {
 ```java
     meter.RecordBatch(labels).
         put(s.instruments.counter, 1).
-        put(s.instruments.updowncounter, 10).
-        put(s.instruments.valuerecorder, 123.45).
+        put(s.instruments.upDownCounter, 10).
+        put(s.instruments.valueRecorder, 123.45).
         record();
 ```
 
