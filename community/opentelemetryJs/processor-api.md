@@ -43,9 +43,9 @@ export class AverageAggregator implements Aggregator {
 }
 ```
 
-Now we will need to implement our own processor to configure the sdk to use our new aggregator. To simplify even more, we will just extend the `UngroupedProcessor` (which is the default) to avoid re-implementing the whole `Aggregator` interface.
+现在我们需要实现我们自己的处理器来配置 sdk 以使用我们的新聚合器。 为了进一步简化，我们将只扩展 `UngroupedProcessor`（这是默认设置）以避免重新实现整个 `Aggregator` 接口。
 
-Here the result:
+结果如下：
 
 ```ts
 import {
@@ -75,7 +75,7 @@ export class CustomProcessor extends UngroupedProcessor {
 }
 ```
 
-Finally, we need to specify to the `MeterProvider` to use our `CustomProcessor` when creating new meter:
+最后，我们需要指定`MeterProvider`在创建新仪表时使用我们的`CustomProcessor`：
 
 ```ts
 import {
