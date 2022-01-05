@@ -12,6 +12,9 @@ OpenTelemetry Collector 是一个可以接受观测数据并对其有选择地�
 接收，一组可选的从 Receivers 那里获取数据并进行转换的 Processors ，和一组从 Processors 当中获取数据并将数据发送到收集器外的 Exporters。 一个
 receiver 可以把数据发送给多个 Pipelines ，而多个 Pipelines 可以把数据发送给同一个 Exporter 。
 
+![Architecture](https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/iconography/Otel_Collector.svg)
+
+
 ## Pipelines
 
 Pipeline 定义了 Collector 中一条从数据接收开始，然后进过进一步处理或者修改后，最后通过 exporters 离开 Collector 的数据处理流程。
