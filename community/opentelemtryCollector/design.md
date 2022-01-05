@@ -6,22 +6,29 @@
 
 OpenTelemetry Collector 是一个可以接受观测数据并对其有选择地进行转换并进一步转发的可执行程序。
 
-这个 Collector 支持接收并发送基于多种流行的开源协议的数据，并且提供了一个可插拔的体系结构以便添加更多的协议类型。
+Collector 包含了下面基础的组件:
 
-数据的接收，转换与发送都是通过都是通过 Pipelines 来实现。 Collector 可以配置一个或多个 Pipelines 。 每个 Pipelines 都包括一组 Receivers 来负责数据的
-接收，一组可选的从 Receivers 那里获取数据并进行转换的 Processors ，和一组从 Processors 当中获取数据并将数据发送到收集器外的 Exporters。 一个
-receiver 可以把数据发送给多个 Pipelines ，而多个 Pipelines 可以把数据发送给同一个 Exporter 。
+- <img width="32" src="https://raw.github.com/open-telemetry/opentelemetry.io/main/iconography/32x32/Receivers.svg"></img>
+`receivers`: 数据如何进入到Collector，它们可以是pull或者push方式
+- <img width="32" src="https://raw.github.com/open-telemetry/opentelemetry.io/main/iconography/32x32/Processors.svg"></img>
+`processors`: 数据接受后如何处理
+- <img width="32" src="https://raw.github.com/open-telemetry/opentelemetry.io/main/iconography/32x32/Exporters.svg"></img>
+`exporters`: 接受后数据发送到哪里，它们可以是pull或者push方式
+
+Collector 支持接收并发送基于多种流行的开源协议的数据，并且提供了一个可插拔的体系结构以便添加更多的协议类型。
 
 ![Architecture](https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/iconography/Otel_Collector.svg)
 
+数据的接收，转换与发送都是通过 Pipelines 来实现。 Collector 可以配置一个或多个 Pipelines 。 每个 Pipelines 都包括一组 Receivers 来负责数据的
+接收，一组可选的从 Receivers 那里获取数据并进行转换的 Processors ，和一组从 Processors 当中获取数据并将数据发送到收集器外的 Exporters。 一个
+Receiver 可以把数据发送给多个 Pipelines ，而多个 Pipelines 可以把数据发送给同一个 Exporter 。
 
 ## Pipelines
 
-Pipeline 定义了 Collector 中一条从数据接收开始，然后进过进一步处理或者修改后，最后通过 exporters 离开 Collector 的数据处理流程。
+Pipeline 定义了 Collector 中一个从数据接收开始，然后经过进一步处理，最后通过 Exporters 离开 Collector 的数据处理流程。
 
-Pipelines 可以操作两种类型的观测数据：traces 和 metrics 。Pipelines 中处理的数据类型是作为其的一个配置属性进行描述。 Pipelines 中的 Receivers
-， Processors 和 Exporters 都应该支持 Pipelines 所支持的类型， 否则在装载的过程中将会报告 `ErrDataTypeIsNotSupported` 。一个 Pipeline
-的结构可以通过一下方式进行概括：
+Pipelines 可以操做的观测数据：traces、 metrics 和 logs  。Pipelines 中处理的数据类型是作为其的一个配置属性进行描述。 
+每个 Receiver/Processor/Exporter 能够在一个或者多个Pipelines使用. 在有多个Pipelines的流程中, 每个 Pipeline 都是一个独立的进程. 但是反过来，多个Pipelines公用一个 Receiver/Exporter。一个 Pipeline的结构可以通过一下方式进行概括：
 
 ![Pipelines](images/design-pipelines.png)
 
