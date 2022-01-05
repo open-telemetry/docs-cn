@@ -185,9 +185,7 @@ service:
 Library 进行部署。一旦这个 Agent 被部署并运行，它应该能够从 Library 中获取 spans/stats/metrics 并将其导出到别的后端当中。我们当然也可以给予
 其推送配置（比如采样率）到 Library 的能力。对于不能在进程中进行状态聚合的语言而言，它们还需要发送原始数据到 Agent 当中进行聚合。
 
-TODO: 更新下发的图表.
-
-![agent-architecture](https://user-images.githubusercontent.com/10536136/48792454-2a69b900-eca9-11e8-96eb-c65b2b1e4e83.png)
+![agent-architecture](https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/images/design-collector-agent.png)
 
 对于别的 Library 的开发者/maintainer 来说： Agent 也可以从别的 链路/监控 Library 中接收 spans/stats/metrics 数据，比如 zipkin 和
 prometheus 等等。这可以通过添加特定的 Receiver 来实现，可以查看 [Receivers](#receivers) 来查看更多细节。
@@ -197,9 +195,7 @@ prometheus 等等。这可以通过添加特定的 Receiver 来实现，可以�
 OpenTelemetry Collector 也可以作为一个独立实例运行并且接收由其他 Agent 或者 Library 所导出或者所支持的协议内的 task/agent 所导出的
 spans 和 metrics 数据。 Collector 可以配置为发送数据到多个配置的 exporter 上。下面的图片总结了部署体系结构：
 
-TODO: 更新下面的图表。
-
-![OpenTelemetry Collector Architecture](https://user-images.githubusercontent.com/10536136/46637070-65f05f80-cb0f-11e8-96e6-bc56468486b3.png "OpenTelemetry Collector Architecture")
+![OpenTelemetry Collector Architecture](https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/images/design-collector-service.png "OpenTelemetry Collector Architecture")
 
 OpenTelemetry Collector 通过其他配置方式部署，比如通过其 Recevier 所支持的数据格式之一从别的 agent 或者客户端处接收数据。
 
