@@ -9,3 +9,4 @@
 - [快速入门](QUICKSTART.md)
 - 上手指南
     - [Java指南非官方](https://github.com/chenmudu/open-telemetry-java-guides)
+    - [Java最新OpenTelemetry+Jaeger集成指南非官方](https://github.com/laziobird/opentelemetry-jaeger)
