@@ -81,7 +81,7 @@ service:
 
 当 Collector 通过上述的配置进行加载后的结果将会如下所示（为了更加简洁，图中省略了 Processor 和 Exporter 部分）：
 
-![Receivers](images/design-receivers.png)
+![Receivers](https://github.com/laziobird/opentelemetry-collector/blob/main/docs/images/design-receivers.png)
 
 重要：当多个 Pipeline 引用了同一个 Receiver 的时候，该 Receiver 仅会在运行期间创建一个实例。该实例将会把数据发送到 `FanOutConnector` 中，
 而后者将会把数据发送到每一个 Pipeline 中的第一个 Processor 当中。从 Receiver 到 `FanOutConnector` 最后到 Processor 的这个数据传播的过程
