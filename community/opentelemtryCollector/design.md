@@ -6,19 +6,29 @@
 
 OpenTelemetry Collector 是一个可以接受观测数据并对其有选择地进行转换并进一步转发的可执行程序。
 
-这个 Collector 支持接收并发送基于多种流行的开源协议的数据，并且提供了一个可插拔的体系结构以便添加更多的协议类型。
+Collector 包含了下面基础的组件:
 
-数据的接收，转换与发送都是通过都是通过 Pipelines 来实现。 Collector 可以配置一个或多个 Pipelines 。 每个 Pipelines 都包括一组 Receivers 来负责数据的
+- <img width="32" src="https://raw.github.com/open-telemetry/opentelemetry.io/main/iconography/32x32/Receivers.svg"></img>
+`receivers`: 数据如何进入到Collector，它们可以是pull或者push方式
+- <img width="32" src="https://raw.github.com/open-telemetry/opentelemetry.io/main/iconography/32x32/Processors.svg"></img>
+`processors`: 数据接受后如何处理
+- <img width="32" src="https://raw.github.com/open-telemetry/opentelemetry.io/main/iconography/32x32/Exporters.svg"></img>
+`exporters`: 接受后数据发送到哪里，它们可以是pull或者push方式
+
+Collector 支持接收并发送基于多种流行的开源协议的数据，并且提供了一个可插拔的体系结构以便添加更多的协议类型。
+
+![Architecture](https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/iconography/Otel_Collector.svg)
+
+数据的接收，转换与发送都是通过 Pipelines 来实现。 Collector 可以配置一个或多个 Pipelines 。 每个 Pipelines 都包括一组 Receivers 来负责数据的
 接收，一组可选的从 Receivers 那里获取数据并进行转换的 Processors ，和一组从 Processors 当中获取数据并将数据发送到收集器外的 Exporters。 一个
-receiver 可以把数据发送给多个 Pipelines ，而多个 Pipelines 可以把数据发送给同一个 Exporter 。
+Receiver 可以把数据发送给多个 Pipelines ，而多个 Pipelines 可以把数据发送给同一个 Exporter 。
 
 ## Pipelines
 
-Pipeline 定义了 Collector 中一条从数据接收开始，然后进过进一步处理或者修改后，最后通过 exporters 离开 Collector 的数据处理流程。
+Pipeline 定义了 Collector 中一个从数据接收开始，然后经过进一步处理，最后通过 Exporters 离开 Collector 的数据处理流程。
 
-Pipelines 可以操作两种类型的观测数据：traces 和 metrics 。Pipelines 中处理的数据类型是作为其的一个配置属性进行描述。 Pipelines 中的 Receivers
-， Processors 和 Exporters 都应该支持 Pipelines 所支持的类型， 否则在装载的过程中将会报告 `ErrDataTypeIsNotSupported` 。一个 Pipeline
-的结构可以通过一下方式进行概括：
+Pipelines 可以操做的观测数据：traces、 metrics 和 logs  。Pipelines 中处理的数据类型是作为其的一个配置属性进行描述。 
+每个 Receiver/Processor/Exporter 能够在一个或者多个Pipelines使用. 在有多个Pipelines的流程中, 每个 Pipeline 都是一个独立的进程. 但是反过来，多个Pipelines公用一个 Receiver/Exporter。一个 Pipeline的结构可以通过一下方式进行概括：
 
 ![Pipelines](images/design-pipelines.png)
 
@@ -71,7 +81,7 @@ service:
 
 当 Collector 通过上述的配置进行加载后的结果将会如下所示（为了更加简洁，图中省略了 Processor 和 Exporter 部分）：
 
-![Receivers](images/design-receivers.png)
+![Receivers](https://github.com/laziobird/opentelemetry-collector/blob/main/docs/images/design-receivers.png)
 
 重要：当多个 Pipeline 引用了同一个 Receiver 的时候，该 Receiver 仅会在运行期间创建一个实例。该实例将会把数据发送到 `FanOutConnector` 中，
 而后者将会把数据发送到每一个 Pipeline 中的第一个 Processor 当中。从 Receiver 到 `FanOutConnector` 最后到 Processor 的这个数据传播的过程
@@ -175,9 +185,7 @@ service:
 Library 进行部署。一旦这个 Agent 被部署并运行，它应该能够从 Library 中获取 spans/stats/metrics 并将其导出到别的后端当中。我们当然也可以给予
 其推送配置（比如采样率）到 Library 的能力。对于不能在进程中进行状态聚合的语言而言，它们还需要发送原始数据到 Agent 当中进行聚合。
 
-TODO: 更新下发的图表.
-
-![agent-architecture](https://user-images.githubusercontent.com/10536136/48792454-2a69b900-eca9-11e8-96eb-c65b2b1e4e83.png)
+![agent-architecture](https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/images/design-collector-agent.png)
 
 对于别的 Library 的开发者/maintainer 来说： Agent 也可以从别的 链路/监控 Library 中接收 spans/stats/metrics 数据，比如 zipkin 和
 prometheus 等等。这可以通过添加特定的 Receiver 来实现，可以查看 [Receivers](#receivers) 来查看更多细节。
@@ -187,29 +195,8 @@ prometheus 等等。这可以通过添加特定的 Receiver 来实现，可以�
 OpenTelemetry Collector 也可以作为一个独立实例运行并且接收由其他 Agent 或者 Library 所导出或者所支持的协议内的 task/agent 所导出的
 spans 和 metrics 数据。 Collector 可以配置为发送数据到多个配置的 exporter 上。下面的图片总结了部署体系结构：
 
-TODO: 更新下面的图表。
-
-![OpenTelemetry Collector Architecture](https://user-images.githubusercontent.com/10536136/46637070-65f05f80-cb0f-11e8-96e6-bc56468486b3.png "OpenTelemetry Collector Architecture")
+![OpenTelemetry Collector Architecture](https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/images/design-collector-service.png "OpenTelemetry Collector Architecture")
 
 OpenTelemetry Collector 通过其他配置方式部署，比如通过其 Recevier 所支持的数据格式之一从别的 agent 或者客户端处接收数据。
 
-### <a name="agent-communication"></a>OpenCensus 协议
-
-TODO: 该部分应该被移到其他地方么，因为本文档主旨为介绍非协议特定的部分
-
-OpenCensus Protocol 使用双向的 gRPC stream 。发送方需要初始化连接，因为 Agent 处只有一个专用端口，而可能会有多个进行传输的进程。在默认情况下，
-Collector 使用端口 55678。
-
-#### <a name="agent-protocol-workflow"></a>Protocol 工作流
-
-1. 发送方将会尝试为了 Config 和 Export 的流而直接打开连接。
-2. 发送方必须在每一条的第一个消息中发送其身份标识符。发送方的每个身份标识符都应该是在虚拟机或者容器中独一无二的。如果在第一个消息中没有携带这个身份标识符。
-   那么 Collector 将会丢弃消息并返回一个错误给客户端。此外，第一条消息中也可能携带其他信息（比如 `Span`）。只要发送了有效的身份标识符，那么
-   Collector 就应该像这些数据是通过后续消息发送过来的那样正常处理这些数据。一旦流被建立，身份标识符就不再被需要。
-3. 在发送方这端如果和 Collector 所建立的连接失败了，发送方应该在可用/配置的内存缓冲大小下无限期的地重试下去（这么做的原因是考虑到这样的场景：用户的
-   应用已经通过 OpenTelemetry Library 进行观测，但是 Collector 还没有部署。也许在未来的某个时候我们简单地将 Collector 部署到这个环境中， Library
-   将会在不断的重试中自动连接到 Collector 上。而在这个过程中，我们不需要对应用进行任何的修改）。取决于编程语言的实现，重试将会在后台或者守护线程
-   中进行。重试应该以一定的频率进行（而不是指数衰减），以便获得一个可预期的连接成功的时间。
-4. 在 Collector 端，如果一个以建立的流被关闭，相应的连接对应的身份标识符也会被视为过期。发送者应该重新建立一个连接并重新携带一个不会重复的身份标识
-   符（也许可与和之前的不一样）。
 
