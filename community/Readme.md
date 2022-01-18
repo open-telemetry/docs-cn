@@ -7,5 +7,5 @@
 - 沟通交流
     - [ ] [通用交流](https://github.com/open-telemetry/community#Communication)
     - 中国开发者:QQ群773124426 
-## ![QQ Group](../assets/qq.jpg) 
+### ![QQ Group](../assets/qq.jpg) 
 
