@@ -6,7 +6,7 @@
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
     <a href="https://github.com/open-telemetry/docs-cn">中文文档使用指南<a/>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://gitter.im/open-telemetry/docs-cn">参与中文文档贡献<a/>
+    <a href="https://github.com/open-telemetry/docs-cn/blob/main/community/Readme.md">参与中文文档贡献<a/>
   </strong>
 </p>
 
