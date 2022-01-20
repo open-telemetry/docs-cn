@@ -8,4 +8,4 @@
 - [社区入口](community/Readme.md)
 - [快速入门](QUICKSTART.md)
 - 上手指南
-    - [Java指南非官方](https://github.com/chenmudu/open-telemetry-java-guides)
+    - [Kubernetes官方指南](community/opentelemtryCollector/kubernetes-guide.md)
