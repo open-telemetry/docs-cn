@@ -1,4 +1,4 @@
-# 循序渐进开发一个 `InstrumentationModule` 
+# 循序渐进开发一个 `InstrumentationModule`
 
 `InstrumentationModule` 是 OpenTelemetry javaagent instrumentation 的核心部分。
 我们的 javaagent 使用了许多约束，在实现模块时必须按照许多不明显的规范。  
@@ -7,7 +7,7 @@
 `InstrumentationModule` 和 `TypeInstrumentation` 的 Javadoc ，因为它们经常提供关于如何使用某个特定方法的更详细的解释
 （以及为什么它是这样工作的）。      
 
-## `InstrumentationModule`
+## 每个javaagent检测的核心：`InstrumentationModule`
 
 一个 `InstrumentationModule` 描述了一组独立的 `TypeInstrumentation` ，它们需要组合在一起才能为一个库准确进行增强。 
 Type instrumentations 被组合在一个模块当中并共享辅助类和[运行时 muzzle 校验](muzzle.md)，并处于相同的类加载器之中，它们将会一起
@@ -17,7 +17,6 @@ OpenTelemetry javaagent 将会使用 Java `ServiceLoader` API 来寻找所有的
 正确的 `META-INF/services/` 处于 javaagent 的 jar 包之中。当然最简单的方式是使用 `@AutoService` 注解：       
 
 ```java
-
 @AutoService(InstrumentationModule.class)
 class MyLibraryInstrumentationModule extends InstrumentationModule {
   // ...
@@ -37,7 +36,7 @@ public MyLibraryInstrumentationModule() {
 关于 `InstrumentationModule` 名称更详细的信息请参阅 
 `InstrumentationModule#InstrumentationModule(String, String...)` 的 Javadoc 。   
 
-### `order()`
+### 使用`order()`进行排序
 
 如果你需要你的 instrumentation 按照特定的顺序生效（比如你的自定义 instrumentation 增强了内置的 servlet 因此需要在其之后运行）你可以覆盖
 `order()` 方法去定义顺序：      
@@ -51,10 +50,10 @@ public int order() {
 
 越高的 `order()` 意味着 instrumentation 模块将会越迟被生效。默认值都是0。      
 
-### `isHelperClass()`
+### 重写`isHelperClass()`方法
 
 OpenTelemetry javaagent 将会收集在 instrumentation/advice 类中使用的辅助类并将其注入到应用类路径之上。这些类可以自动被
-找到（查看 [muzzle 文档](muzzle.md#编译阶段的引用收集)来查看更多信息），但是也可以通过实现 `isHelperClass(String)` 来
+找到，但是也可以通过实现 `isHelperClass(String)` 来
 显示声明哪些包和方法应该被视为辅助类。      
 
 ```java
@@ -64,7 +63,9 @@ public boolean isHelperClass(String className) {
 }
 ```
 
-### `helperResourceNames()`
+查看 [muzzle 文档](muzzle.md#%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5%E7%9A%84%E5%BC%95%E7%94%A8%E6%94%B6%E9%9B%86)来查看更多信息
+
+### 使用`helperResourceNames（）`方法注入其他资源
 
 有些库可以通过其 SPI 接口轻松地让你实现指标收集的能力。 OpenTelemetry javaagent 可以将 `ServiceLoader` 的文件注入，
 但是需要如下声明：       
@@ -147,14 +148,15 @@ public ElementMatcher<? super TypeDescription> typeMatcher() {
 ```
 
 ### `transformers(TypeTransformer)`
+
 最后的 `TypeInstrumentation` 方法描述了对于所匹配的类型将会进行怎样的增强。 `TypeTransformer` （agent 内部所实现的接口） 定义
 了一系列你可以使用的增强操作的集合：
 
 * 调用 `applyAdviceToMethod(ElementMatcher<? super MethodDescription>, String)` 方法允许你使用一个 advice 类（第二个参数）对
-所有符合条件的方法（第一个参数）进行增强。这里建议尽可能的使方法 matcher 更加严格 - type instrumentation 应该只去增强那些应该被增强的类，也仅仅是这些。
-  
+  所有符合条件的方法（第一个参数）进行增强。这里建议尽可能的使方法 matcher 更加严格 - type instrumentation 应该只去增强那些应该被增强的类，也仅仅是这些。
+
 * `applyTransformer(AgentBuilder.Transformer)` 允许你去使用一个任意的 ByteBuddy 转换器。这是一个激进，并不推荐的做法，这会导致其并不会
-被 muzzle 和 helper 类的检测 - 使用前请保持谨慎。 
+  被 muzzle 和 helper 类的检测 - 使用前请保持谨慎。 
 
 ```java
 @Override
