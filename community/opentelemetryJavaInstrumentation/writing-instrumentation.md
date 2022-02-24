@@ -47,7 +47,6 @@ instrumentation ->
 并在最顶层的 `settings.gradle` 进行如下配置
 
 ```groovy
-
 include 'instrumentation:yarpc-1.0:javaagent'
 include 'instrumentation:yarpc-1.0:library'
 include 'instrumentation:yarpc-1.0:testing'
@@ -125,4 +124,3 @@ apply from: "$rootDir/gradle/java.gradle"
 ```
 compileOnly project(':instrumentation:xxx:compile-stub')
 ```
-
