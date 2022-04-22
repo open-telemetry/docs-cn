@@ -18,7 +18,7 @@ Table of Contents
     + [Measure](#measure)
     + [Measurement](#measurement)
   * [使用预定义的聚合方式记录指标](#使用预定义的聚合方式记录指标)
-  * [指标数据模型（Metrics Data Model）和SDK](#指标数据模型metrics-data-model和sdk)
+  * [指标数据模型(Metrics Data Model)和SDK](#指标数据模型metrics-data-model和sdk)
 - [Logs](#logs)
   * [数据模型](#数据模型)
 - [Baggage](#baggage)
@@ -40,8 +40,8 @@ Table of Contents
 
 ### Trace(一种数据结构，代表了分布式跟踪链路)
 
-**Traces** 在OpenTelemetry中是通过**Spans**来进一步定义的.  我们可以把一个**Trace**想像成由
-**Spans**组成的有向无环图（DAG）, 图的每条边代表了**Spans**之间的关系——父子关系。
+**Traces** 在OpenTelemetry中是通过**Spans**来进一步定义的。我们可以把一个**Trace**想像成由
+**Spans**组成的有向无环图(DAG)，图的每条边代表了**Spans**之间的关系——父子关系。
 
 For example, the following is an example **Trace** made up of 6 **Spans**:
 
@@ -80,10 +80,10 @@ For example, the following is an example **Trace** made up of 6 **Spans**:
 - 一个操作名An operation name
 - 开始/结束时间戳A start and finish timestamp
 - Key:Value形式的属性集合，Key必须是字符串，Value可以是字符串、布尔或者数字类型
-- 0个或者多个事件(Event), 每个事件都是一个Key:Value Map和一个时间戳
+- 0个或者多个事件(Event)，每个事件都是一个Key：Value Map和一个时间戳
 - 该Span的父Span ID
 - [**Links**(链接)](#Span之间的Links(链接))到0个或多个有因果关系的**Spans**
-  (通过那些**Spans**的**SpanContext**).
+  (通过那些**Spans**的**SpanContext**)。
 - 一个Span的**SpanContext** ID
 
 ### SpanContext(Span上下文)
@@ -91,11 +91,11 @@ For example, the following is an example **Trace** made up of 6 **Spans**:
 包含所有能够识别**Trace**中某个**Span**的信息，而且该信息必须要跨越进程边界传播到子Span中。
 一个**SpanContext**包含了将会由父**Span**传播到子**Span**的跟踪ID和一些设置选项。
 
-- **TraceId** 是一条Trace的全局唯一ID，由16个随机生成的字节组成,TraceID用来把该次请求链路的所有Spans组合到一起
+- **TraceId** 是一条Trace的全局唯一ID，由16个随机生成的字节组成，TraceID用来把该次请求链路的所有Spans组合到一起
 - **SpanId** 是Span的全局唯一ID，由8个随机生成的字节组成，当一个SpanID被传播到子Span时，该ID就是子Span的父SpanID
 - **TraceFlags** 代表了一条Trace的设置标志，由一个字节组成(里面8个bit都是设置位) 
-  - 例如采样Bit位 -  设置了该Trace是否要被采样（掩码`0x1`).
-- **Tracestate** 携带了具体的跟踪内容，表现为[{key:value}]的键指对形式,**Tracestate** 允许不同的APM提供商加入额外的自定义内容和对于旧ID的转换处理，更多内容请查看[这里](https://w3c.github.io/trace-context/#tracestate-field).
+  - 例如采样Bit位 -  设置了该Trace是否要被采样(掩码`0x1`)。
+- **Tracestate** 携带了具体的跟踪内容，表现为[{key:value}]的键指对形式，**Tracestate** 允许不同的APM提供商加入额外的自定义内容和对于旧ID的转换处理，更多内容请查看[这里](https://w3c.github.io/trace-context/#tracestate-field).
 
 ### Span之间的Links(链接) 
 
@@ -137,7 +137,7 @@ OpenTelemetry允许用户使用预定义的聚合方法和标签记录原始数�
 
 #### Measurement
 
-`Measurement` 描述了该如何采集数据（采集的数据就是 `Measure`）.
+`Measurement` 描述了该如何采集数据(采集的数据就是 `Measure`).
 
 `Measurement` 是一个空的API接口，这个接口由具体的采集SDK实现。
 
@@ -196,13 +196,13 @@ Kubernetes集群、命名空间、Pod和容器名称等信息。
 [proto](https://github.com/open-telemetry/opentelemetry-proto/blob/a46c815aa5e85a52deb6cb35b8bc182fb3ca86a0/src/opentelemetry/proto/agent/common/v1/common.proto#L28-L96)
 
 ## Context Propagation
-所有OpenTelemetry中的关注点（比如trace和metric指标）都共享一个底层上下文机制，用于在分布式事务的整个生命周期内存储状态和访问数据。    
+所有OpenTelemetry中的关注点(比如trace和metric指标)都共享一个底层上下文机制，用于在分布式事务的整个生命周期内存储状态和访问数据。    
 
 详情可以查看[这里](context/context.md)。
 
 ## Propagators(传播者)
 
-OpenTelemetry使用`Propagators`来序列化和反序列化中的关注点，比如Span（通常仅限于SpanContext部分）和Baggage。
+OpenTelemetry使用`Propagators`来序列化和反序列化中的关注点，比如Span(通常仅限于SpanContext部分)和Baggage。
 不同的`Propagator`的类型定义了特定传输方式下的限制并将其绑定到一个数据类型上。     
 传播者Propagators API定义了一个`Propagator`类型：
 
@@ -211,7 +211,7 @@ OpenTelemetry使用`Propagators`来序列化和反序列化中的关注点，比
 ## Collector
 
 OpenTelemetry collector是由一系列组件组成的，这些组件可以使用OpenTelemetry或三方SDK(Jaeger、Prometheus等)收集trace跟踪、metric指标和日志等数据，
-然后对这些数据进行聚合、智能采样，再导出到一个监控后端。Collector将允许加工转换收集到的数据（比如添加额外属性或者删除隐私数据）。
+然后对这些数据进行聚合、智能采样，再导出到一个监控后端。Collector将允许加工转换收集到的数据(比如添加额外属性或者删除隐私数据)。
 
 OpenTelemetry服务由两个主要的模型：Agent(一个本地代理)和Collector(一个独立运行的服务)。
 
