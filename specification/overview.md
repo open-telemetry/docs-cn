@@ -172,7 +172,7 @@ API允许构造一个指定类型的`Metric`，SDK则定义了一个被导出的
 定义了OpenTelemetry如何理解日志和事件。
 
 ## Baggage
-除了Trace传播之外，OpenTelemetry还提供了一个简单的机制来传播键指对，这一机制被称为**Baggage**。**Baggage**可以为一个服务查看可观测事件提供索引，
+除了Trace传播之外，OpenTelemetry还提供了一个简单的机制来传播键值对，这一机制被称为**Baggage**。**Baggage**可以为一个服务查看可观测事件提供索引，
 其属性则是由同一个事务的前一个服务提供。这有助于在各个事件之间建立因果关系。    
 
 虽然**Baggage**也为其他横切关注点的实现提供了原型，但是这一机制主要还是为了在OpenTelemetry所观测的系统之间进行值传递。     
