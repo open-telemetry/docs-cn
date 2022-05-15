@@ -17,8 +17,7 @@ api
    │   └── propagation
    ├── baggage
    │   └── propagation
-   ├── internal
-   └── logs
+   └── internal
 ```
 
 > 选择全小写、驼峰命名还是蛇形命名规则取决于使用的语言。
@@ -77,21 +76,22 @@ sdk
 
 本目录包含 api/metrics 的 SDK 实现。
 
-### [/sdk/resource](resource/sdk.md)
+### `/sdk/resource`
 
 resource 目录主要定义了 [Resource](overview.md#resources) 类型。该类型包含了统计和跟踪实体的信息。比如，
 Kubernetes 可以导出指向 Kubernetes 集群、命名空间、 Pod 和容器名称的 Metrics 。
 
 ### `/sdk/baggage`
 
+
 ### [/sdk/trace](trace/sdk.md)
 
-本目录包含api/trace的SDK实现。
+本目录包含sdk/trace的SDK实现。
 
 ### `/sdk/internal` (_Optional_)
 
 私有应用和库代码。
 
-### `/sdk/logs` (_In the future_)
+### `/sdk/logs` 
 
-> TODO: 日志操作
+本目录包含sdk/logs的SDK实现。
