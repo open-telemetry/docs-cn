@@ -80,15 +80,15 @@ Collector 保证了 logs, traces and metrics 里包含了同样的属性名、�
 
 
 
-## Events and Logs
+## 事件和日志
 
 
 
-## Legacy and Modern Log Sources
+## 传统和现在日志源
 
 
 
-### System Logs
+### 系统日志
 
 
 
