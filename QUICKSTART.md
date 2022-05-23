@@ -1,18 +1,18 @@
 # OpenTelemetry 快速入门
 
 
-- [追踪（Tracing）](#追踪（Tracing）)
+- [追踪（Tracing）](#追踪Tracing)
   * [创建基础Span](#创建基础Span)
   * [创建嵌套Span](#创建嵌套Span)
   * [Span属性](#Span属性)
   * [创建带事件的Span](#创建带事件的Span)
-  * [创建带链接Span](#[创建带链接Span)
+  * [创建带链接Span](#创建带链接Span)
   * [上下文传播](#上下文传播)
-- [指标（Metrics）](#指标（Metrics）)
+- [指标（Metrics）](#指标Metrics)
 - [Tracing SDK配置](#Tracing-SDK配置)
-  * [采样器（Sampler）](#采样器（Sampler）)
+  * [采样器（Sampler）](#采样器Sampler)
   * [Span处理器](#span-processor)
-  * [导出器（Exporter）](#导出器（Exporter）)
+  * [导出器（Exporter）](#导出器Exporter)
 
 OpenTelemetry可用于测量采集遥测数据的代码。有关更多详细信息，请访问[OpenTelemetry Website]
 
@@ -367,4 +367,4 @@ tracerProvider.addSpanProcessor(BatchSpanProcessor.newBuilder(
 [OpenTelemetry Registry]: https://opentelemetry.io/registry/?s=exporter
 [OpenTelemetry Website]: https://opentelemetry.io/
 [Obtaining a Tracer]: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#obtaining-a-tracer
-[Semantic Conventions]: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-semantic-conventions.md
+[Semantic Conventions]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/README.md
