@@ -166,11 +166,12 @@ API允许构造一个指定类型的`Metric`，SDK则定义了一个被导出的
 因为上面的原因，指标对于数据本身是做了最小限制的(例如在标签Key中支持哪些字符)，处理指标的代码应该避免对这些指标数据进行
 验证和净化。你应该做的是：把这些数据传到服务器端，让服务器端来做验证，然后从服务器端接收错误。
 
-## Logs
-### 数据模型
-[Log数据模型](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/logs/data-model.md)
-定义了OpenTelemetry如何理解日志和事件。
-
+## 日志 
+[日志总览](/specification/logs/overview.md)
+### 日志 RoadMap
+ - [OTLP](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/logs/data-model.md)：`Opentelemetry Log Protocol` 日志协议标准现在已经是稳定版本 
+ - [Log数据模型](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/logs/data-model.md)：现在已经是稳定版本
+ - OpenTelemetry Collector Log：测试阶段
 ## Baggage
 除了Trace传播之外，OpenTelemetry还提供了一个简单的机制来传播键值对，这一机制被称为**Baggage**。**Baggage**可以为一个服务查看可观测事件提供索引，
 其属性则是由同一个事务的前一个服务提供。这有助于在各个事件之间建立因果关系。    
