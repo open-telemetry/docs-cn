@@ -377,11 +377,13 @@ B3抽取数据时，Propagators:
 [b3-multi]: https://github.com/openzipkin/b3-propagation#multiple-headers
 
 举个例子, 下面就是多Header的编码链路字段:
-
+```
 X-B3-TraceId: 80f198ee56343ba864fe8b2a57d3eff7
 X-B3-ParentSpanId: 05e3ac9a4f6e3b90
 X-B3-SpanId: e457b5a2e4d86bd1
 X-B3-Sampled: 1
-
+```
 下面就是单Header模式，其实就是一个分割字符串:
+```
 b3: 80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-1-05e3ac9a4f6e3b90
+```
