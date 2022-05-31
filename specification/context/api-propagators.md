@@ -23,13 +23,13 @@
       - [Keys](#keys)
       - [Get](#get)
 - [自定义注入和提取接口](#injectors-and-extractors-as-separate-interfaces)
-- [链路传递的组装](#composite-propagator)
+- [复合传播](#composite-propagator)
   * [Create a Composite Propagator](#create-a-composite-propagator)
   * [Composite Extract](#composite-extract)
   * [Composite Inject](#composite-inject)
-- [Global Propagators](#global-propagators)
-  * [Get Global Propagator](#get-global-propagator)
-  * [Set Global Propagator](#set-global-propagator)
+- [全局传播](#global-propagators)
+  * [Get 全局传播](#get-global-propagator)
+  * [Set 全局传播](#set-global-propagator)
 - [分布式链路传递协议汇总](#propagators-distribution)
   * [B3 必要条件](#b3-requirements)
     + [B3 提取](#b3-extract)
@@ -116,26 +116,28 @@ Carrier在client和server间传递的数据往往是一个HTTP request.
 为了提高兼容性，key/values 键值对只包含US-ASCII 字符，这样保证每次请求HTTP header的有效性，参考[RFC 7230](https://tools.ietf.org/html/rfc7230#section-3.2).
 
 
-`Getter` 和 `Setter` 方法分别帮助组件实现注入和提取，而且来自Carrier中独立的对象，避免运行时分配。
+`Getter` 和 `Setter` 分别帮助组件实现注入和提取，而且来自Carrier中独立的对象，避免运行时分配。
 同时在访问上下文时，也不用单独实现Carrier 额外接口.
 
 
-`Getter` 和 `Setter` 方法必须无状态和允许保存的是常量，这也是为了有效避免运行时分配资源。
+`Getter` 和 `Setter` 必须无状态和允许保存的是常量，这也是为了有效避免运行时分配资源。
 
 ### 字段
 
 The predefined propagation fields. If your carrier is reused, you should delete the fields here
 before calling [inject](#inject).
 
-Fields are defined as string keys identifying format-specific components in a carrier.
+在Carrier 中字段定义成string键来识别特定格式的组件.
 
 For example, if the carrier is a single-use or immutable request object, you don't need to
 clear fields as they couldn't have been set before. If it is a mutable, retryable object,
 successive calls should clear these fields first.
+比如，Carrier 是一个单例或者不变的Request对象，你在做Set之前不需要去清除老的字段。
+如果它是一个易变，回收的对象，要成功调用先要清除这些字段。
 
-The use cases of this are:
+这里有些使用的案例
 
-- allow pre-allocation of fields, especially in systems like gRPC Metadata
+- 允许预先分配字段, 特别系统中的 gRPC Metadata
 - allow a single-pass over an iterator
 
 Returns list of fields that will be used by the `TextMapPropagator`.
@@ -146,40 +148,38 @@ variable names. To get a full list of fields for a specific carrier object, use 
 
 ### TextMap 注入
 
-Injects the value into a carrier. The required arguments are the same as defined by
-the base [Inject](#inject) operation.
+注入一个值到Carrier中.  必须的参数和基本的[Inject](#inject) 操作一样.
 
-Optional arguments:
+可选的参数:
 
-- A `Setter` to set a propagation key/value pair. Propagators MAY invoke it multiple times in order to set multiple pairs.
-  This is an additional argument that languages are free to define to help inject data into the carrier.
+- 一个`Setter` 设置一个 传播键值对. Propagators 可以多次调用生成多对键值对.
+  它可以帮助编程语言自由地注入数据到Carrier过程中
 
-#### Setter argument
+#### Setter 的参数
 
-Setter is an argument in `Inject` that sets values into given fields.
+Setter  是注入 `Inject` 方法一个参数： 它把相应的值写入字段中.
 
-`Setter` allows a `TextMapPropagator` to set propagated fields into a carrier.
+`Setter` 允许一个 `TextMapPropagator` 对象把所有传递字段写入到Carrier.
 
-One of the ways to implement it is `Setter` class with `Set` method as described below.
+具体一种实现：带有`Set`方法的一个`Setter`类。类似下面描述
 
 ##### Set
 
-Replaces a propagated field with the given value.
+等价一个传递的Propagator
 
-Required arguments:
+必要的参数:
 
 - the carrier holding the propagation fields. For example, an outgoing message or an HTTP request.
-- the key of the field.
-- the value of the field.
+- key 类型.
+- value 字段.
 
-The implementation SHOULD preserve casing (e.g. it should not transform `Content-Type` to `content-type`) if the used protocol is case insensitive, otherwise it MUST preserve casing.
+方法实现应该保持大小写敏感，(比如，`Content-Type`不应该转化成`content-type`)，除非使用协议大小写不敏感，否则必须保持大小写敏感
 
 ### TextMap 提取
 
-Extracts the value from an incoming request. The required arguments are the same as defined by
-the base [Extract](#extract) operation.
+从一个输入请求中提取值。 它必须参数和基本的 [Extract](#extract) 操作一样.
 
-Optional arguments:
+可选参数:
 
 - A `Getter` invoked for each propagation key to get. This is an additional
   argument that languages are free to define to help extract data from the carrier.
@@ -229,11 +229,9 @@ responsibilities further into individual `Injector`s and `Extractor`s. A
 `Propagator` can be implemented by composing individual `Injector`s and
 `Extractors`.
 
-## Composite Propagator
+## 复合Propagator
 
-Implementations MUST offer a facility to group multiple `Propagator`s
-from different cross-cutting concerns in order to leverage them as a
-single entity.
+提供了把不同横切关注点的一组`Propagator`聚合成一个单体实例的实现。
 
 A composite propagator can be built from a list of propagators, or a list of
 injectors and extractors. The resulting composite `Propagator` will invoke the `Propagator`s, `Injector`s, or `Extractor`s, in the order they were specified.
@@ -278,22 +276,18 @@ If the `TextMapPropagator`'s `Inject` implementation accepts the optional `Sette
 
 - The `Setter` to set a propagation key/value pair. Propagators MAY invoke it multiple times in order to set multiple pairs.
 
-## Global Propagators
+## 全局 Propagators
 
-The OpenTelemetry API MUST provide a way to obtain a propagator for each
-supported `Propagator` type. Instrumentation libraries SHOULD call propagators
-to extract and inject the context on all remote calls. Propagators, depending on
-the language, MAY be set up using various dependency injection techniques or
-available as global accessors.
+凡是支持 `Propagator` 类型组件，OpenTelemetry API 要提供一种方式可以获取到`Propagator`.
+检测库可以支持所有远程调用操作上下文的注入和提取.
+通过各种依赖技术或者一个全局访问对象，Propagators 在各种语言平台上就可以被创建。
 
-**Note:** It is a discouraged practice, but certain instrumentation libraries
-might use proprietary context propagation protocols or be hardcoded to use a
-specific one. In such cases, instrumentation libraries MAY choose not to use the
-API-provided propagators and instead hardcode the context extraction and injection
-logic.
+**Note:** 这样做法不值得提倡：在某些组件库使用专有的上下文传播协议或者硬编码的形式去使用一个具体的全局Propagator.
+在某些场景下，组件库可能并不是选择API，而是直接用硬编码做上下文的注入和提取.
+
 
 The OpenTelemetry API MUST use no-op propagators unless explicitly configured
-otherwise. Context propagation may be used for various telemetry signals -
+otherwise. 上下文传播 propagation may be used for various telemetry signals -
 traces, metrics, logging and more. Therefore, context propagation MAY be enabled
 for any of them independently. For instance, a span exporter may be left
 unconfigured, although the trace context propagation was configured to enrich logs or metrics.
@@ -304,21 +298,21 @@ propagators. If pre-configured, `Propagator`s SHOULD default to a composite
 `Propagator` specified in the [Baggage API](../baggage/api.md#propagation).
 These platforms MUST also allow pre-configured propagators to be disabled or overridden.
 
-### Get Global Propagator
+### Get 全局 Propagator
 
-This method MUST exist for each supported `Propagator` type.
+只要有`Propagator` 类型的地方这个方法一定要有的.
 
-Returns a global `Propagator`. This usually will be composite instance.
+返回一个全局的 `Propagator`. 它通常是一个复合实例。
 
-### Set Global Propagator
+### Set 全局 Propagator
 
-This method MUST exist for each supported `Propagator` type.
+只要有`Propagator` 类型的地方这个方法一定要有的.
 
-Sets the global `Propagator` instance.
+设置成一个全局 `Propagator` 实例.
 
-Required parameters:
+必要的 :
 
-- A `Propagator`. This usually will be a composite instance.
+- 一个 `Propagator`对象. 它通常是一个复合实例.
 
 ## 分发传递协议
 
