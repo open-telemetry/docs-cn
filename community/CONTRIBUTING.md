@@ -104,7 +104,7 @@ OpenTelemetry是社区项目，因此，我们需要完全依赖社区才能提�
 
 对于通用的问题，请查看[沟通的标准方式](https://github.com/open-telemetry/community#Communication).
 
-对于中国开发者，可以加入QQ群773124426进行沟通交流。
+对于中国开发者，可以加入QQ群773124426或者微信号nizhanali进行沟通交流。
 
 ## GitHub工作流(workflow)
 
