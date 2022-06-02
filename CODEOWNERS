@@ -12,6 +12,6 @@
 #  https://help.github.com/en/articles/about-code-owners
 #
 
-* @addname @Sunface @tensorchen @WPH95
+* @addname @Sunface @tensorchen @WPH95 @laziobird
 
-CODEOWNERS @Sunface @tensorchen
+CODEOWNERS @Sunface @tensorchen 
