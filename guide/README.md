@@ -9,3 +9,4 @@
 - [Opentelemetry Collector集成指南:Collector部署和采样示例](https://github.com/laziobird/otel-collector-java)
 - [.Net指南:Opentelemetry+Jaeger](https://github.com/iioter/ExploringIoTDistributedTracingNet6)
 - [Go指南:Opentelemetry+Jaeger+Grafana](https://github.com/cloudwego/kitex-examples/tree/main/opentelemetry)
+- [Python指南:Opentelemetry+Jaeger/Tempo+Grafana](https://github.com/xs-samples/opentelemetry-samples/tree/main/opentelemetry-python)

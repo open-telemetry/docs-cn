@@ -259,11 +259,11 @@ public static void onExit(@Advice.Argument(1) Object request,
 ```
 
 你也许会意识到上面的这个例子没有使用 `Context.current()` ，而是一个 `Java8BytecodeBridge` 方法。这是故意的：如果你在增强一个
- Java 8 之前的库的时候，如果在这个库中国内发生内联的 Java 8 默认方法调用 （或者接口中的静态方法）的时候将会导致一个 
- `java.lang.VerifyError` 运行时异常，因为在 Java 7 （及之前）的字节码中时禁止 Java 8 的默认方法调用的。      
+ Java 8 之前的库的时候，如果在这个库内插桩了 Java 8 才支持的接口 default 方法调用 （或者接口中的静态方法）的时候将会导致一个 
+ `java.lang.VerifyError` 运行时异常，因为在 Java 7 （及之前）是不支持这部分在 Java 8 才加入的语法的。      
 因为 OpenTelemetry API 拥有许多默认或者静态的通用接口方法（比如 `Span.current()`）， `javaagent-api` 模块中的方法
  `Java8BytecodeBridge` 提供了静态方法在 advice 中调用这些默认方法。      
- 实际上，我们建议在 advice 类中避免使用 Java 8 的语法特性 - 有时候你无法预料到被增强的库使用什么样的字节码版本。        
+ 实际上，我们建议在 advice 类中避免使用 Java 8 的语法特性 - 有时候你无法预料到被增强的库使用什么样的 Java 版本来编译。        
 
 有时候需要将某些上下文的类与被增强库中的类所关联，并且这个库并没有提供实现这点的途径。 OpenTelemetry javaagent 提供了 `ContextStore` 
 来达到这个目的。       
@@ -273,7 +273,7 @@ ContextStore<Runnable, Context> contextStore =
     InstrumentationContext.get(Runnable.class, Context.class);
 ```
 
-一个 `ContextStore` 与 map 概念上非常类似。但这并不是一个简单的 map ：javaagent 使用了大量字节码修改魔技巧来实现这种优化。    
-正是因为如此，检索一个` ContextStore` 实例受到了一定限制： `InstrumentationContext#get()` 方法只能被 advice 方法所调用，
+一个 `ContextStore` 与 map 概念上非常类似。但这并不是一个简单的 map ：javaagent 使用了大量字节码修改技巧来实现这种优化。    
+正是因为如此，检索一个` ContextStore` 实例受到了一定限制： `InstrumentationCon text#get()` 方法只能被 advice 方法所调用，
 并且其只能接受类的引用作为参数 - 它不能配合变量即方法参数正常工作。     
 作为 key 的类与上下文类必须在编译期间可以访问到。        
