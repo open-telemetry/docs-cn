@@ -29,7 +29,7 @@ OpenTelemetry是社区项目，因此，我们需要完全依赖社区才能提�
 请注意，考虑到我们的团队已经在处理大量的issues，因此我们无法提供完成issues所需的技术支持。若你对于开发流程有疑问，请加入我们的
 社群进行交流:
 - 英文：[Gitter Channel](https://gitter.im/open-telemetry/community) .
-- 中文： QQ群773124426
+- 中文：QQ群773124426或者关注微信公众号OpenTelemetry
 
 同时你也可以在[Stack Overflow](https://stackoverflow.com/questions/tagged/opentelemetry)上提问.
 
@@ -104,7 +104,7 @@ OpenTelemetry是社区项目，因此，我们需要完全依赖社区才能提�
 
 对于通用的问题，请查看[沟通的标准方式](https://github.com/open-telemetry/community#Communication).
 
-对于中国开发者，可以加入QQ群773124426进行沟通交流。
+对于中国开发者，可以加入QQ群773124426或者关注微信公众号OpenTelemetry进行沟通交流。
 
 ## GitHub工作流(workflow)
 
@@ -159,7 +159,7 @@ Review](http://sage.thesharps.us/2014/09/01/the-gentle-art-of-patch-review/)，
 ## 沟通交流
 
 - [通用交流](https://github.com/open-telemetry/community#Communication)
-- 中国开发者, 可以加入QQ群773124426进行沟通交流。
+- 中国开发者, 可以加入QQ群773124426或者关注微信公众号OpenTelemetry进行沟通交流。
 
 ## 活动
 

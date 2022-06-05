@@ -1,22 +1,7 @@
 <!-- # Baggage API -->
 # Baggage API (背包 API)
->[原文](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/baggage/api.md)更新时间: 2021-02-04
->翻译时间：2021-03-08
-
 <!-- **Status**: [Stable, Feature-freeze](../document-status.md) -->
-**状态**： [稳定， 功能冻结](../document-status.md)。
-
-<!-- Table of Contents -->
-<!-- - [Overview](#overview) -->
-<!-- - [Operations](#operations) -->
-<!--   - [Get Value](#get-value) -->
-<!--   - [Get All Values](#get-all-values) -->
-<!--   - [Set Value](#set-value) -->
-<!--   - [Remove Value](#remove-value) -->
-<!-- - [Context Interaction](#context-interaction) -->
-<!--   - [Clear Baggage in the Context](#clear-baggage-in-the-context) -->
-<!-- - [Propagation](#propagation) -->
-<!-- - [Conflict Resolution](#conflict-resolution) -->
+**状态**： [稳定， 功能冻结](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/document-status.md)。
 
 <details>
 <summary>
@@ -29,22 +14,16 @@
   - [获取全部值](#获取全部值)
   - [设置值](#设置值)
   - [删除值](#删除值)
-- [与 Context 交互](#与Context交互)
-  - [清除 Context 中的 Baggage](#清除Context中的Baggage)
+- [与Context交互](#与Context交互)
+  - [清除Context中的Baggage](#清除Context中的Baggage)
 - [传播](#传播)
-- [冲突解决](#[冲突解决)
+- [冲突解决](#冲突解决)
 </details>
 
 
 ## 概述
 
-<!-- `Baggage` is used to annotate telemetry, adding context and information to -->
-<!-- metrics, traces, and logs. It is a set of name/value pairs describing -->
-<!-- user-defined properties. Each name in `Baggage` MUST be associated with -->
-<!-- exactly one value. -->
  `Baggage` 用于注解遥测数据，给指标、追踪、日志增加上下文和信息。 它是一系列描述用户定义的属性的名字/值对。 `Baggage` 中的每个名称必须只关联一个值。
-
-<!-- The Baggage API consists of: -->
 
 Baggage API 由以下组成:
 
@@ -96,7 +75,7 @@ Baggage API 必须提供一个函数用于要访问名称/值对中的值，该�
 返回 `Baggage` 中的名称/值对。名称/值对的顺序必须不重要。取决于语言习惯，返回的值可以是一个不可变的集合，也可以是一个指向 `Baggage` 中的名称/值对集合的不可变迭代器。
 
 <!-- ### Set Value -->
-### 设置 baggage
+### 设置值
 
 <!-- To record the value for a name/value pair, the Baggage API MUST provide a -->
 <!-- function which takes a name, and a value as input. Returns a new `Baggage` -->

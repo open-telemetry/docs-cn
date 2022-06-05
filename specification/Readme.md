@@ -27,8 +27,9 @@ OpenTelemetry 规范描述了所有 OpenTelemetry 协议实现的跨语言要求
   - [Package/Library Layout](library-layout.md)
   - [General error handling guidelines](error-handling.md)
 - API Specification
+  - [Propagators](context/api-propagators.md)
+    - [Context](context/context.md)
   - [Baggage](baggage/api.md)
-    - [Propagators](context/api-propagators.md)
   - [Tracing](trace/api.md)  🚧
   - [Metrics](metrics/api.md)
 - SDK Specification
