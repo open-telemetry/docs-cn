@@ -32,7 +32,7 @@ npm test
 
 ### 在你开始贡献之前
 
-请阅读项目的 [贡献指南](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md) 中的 Opentelemetry 项目实践。
+请阅读项目的 [贡献指南](https://github.com/open-telemetry/community/blob/main/CONTRIBUTING.md) 中的 Opentelemetry 项目实践。
 
 #### 常规提交
 
@@ -70,7 +70,7 @@ git merge upstream/main
 
 保存你所有的工作记录到你本地中，你可能会从主分支中遇到代码冲突。
 
-请阅读 [GitHub workflow](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md#github-workflow) 的文章作为贡献指南。
+请阅读 [GitHub workflow](https://github.com/open-telemetry/community/blob/main/CONTRIBUTING.md#github-workflow) 的文章作为贡献指南。
 
 ## 开发
 

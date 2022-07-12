@@ -357,14 +357,14 @@ tracerProvider.addSpanProcessor(BatchSpanProcessor.newBuilder(
     jaegerExporter
 ).build());
 ```
-> 英文原文：https://github.com/open-telemetry/opentelemetry-java/blob/master/QUICKSTART.md
+> 英文原文：https://github.com/open-telemetry/opentelemetry-java/blob/main/QUICKSTART.md
 
 [AlwaysOnSampler]: https://github.com/open-telemetry/opentelemetry-java/blob/master/sdk/src/main/java/io/opentelemetry/sdk/trace/Samplers.java#L82--L105
 [AlwaysOffSampler]:https://github.com/open-telemetry/opentelemetry-java/blob/master/sdk/src/main/java/io/opentelemetry/sdk/trace/Samplers.java#L108--L131
 [Probability]:https://github.com/open-telemetry/opentelemetry-java/blob/master/sdk/src/main/java/io/opentelemetry/sdk/trace/Samplers.java#L142--L203
-[Library Guidelines]: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/library-guidelines.md
+[Library Guidelines]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/library-guidelines.md
 [OpenTelemetry Collector]: https://github.com/open-telemetry/opentelemetry-collector
 [OpenTelemetry Registry]: https://opentelemetry.io/registry/?s=exporter
 [OpenTelemetry Website]: https://opentelemetry.io/
-[Obtaining a Tracer]: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#obtaining-a-tracer
+[Obtaining a Tracer]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#obtaining-a-tracer
 [Semantic Conventions]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/README.md

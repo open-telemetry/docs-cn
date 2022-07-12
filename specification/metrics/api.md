@@ -797,7 +797,7 @@ View API 定义为 SDK 方式的接口，该方式支持配置聚合。
 ### OTLP Metric 协议
 
 如上所述， OTLP 协议旨在以无侵入的方式导出 metric 数据。该协议的几个细节正在制定中。请参阅
-[当前协议](https://github.com/open-telemetry/opentelemetry-proto/blob/master/opentelemetry/proto/metrics/v1/metrics.proto) 。
+[当前协议](https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/metrics/v1/metrics.proto) 。
 
 ### Metric SDK 默认实现
 

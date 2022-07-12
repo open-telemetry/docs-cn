@@ -46,7 +46,7 @@ _注意：我们只要求名称以Unicode序列表示。本规范没有定义Uni
   例如，`process.command_args`可能包含多个值：可执行文件名称和命令参数。
 
 - 当属性代表度量时， 应遵循
-  [Metric Name Pluralization Guidelines(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/semantic_conventions/README.md#pluralization)
+  [Metric Name Pluralization Guidelines(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/README.md#pluralization)
   作为属性名称。
 
 ## 给OpenTelemetry开发者的建议
@@ -54,10 +54,10 @@ _注意：我们只要求名称以Unicode序列表示。本规范没有定义Uni
 - 属于OpenTelemetry语义约定的所有名称都应属于命名空间。
 
 - 提出新的语义约定时，请确保检查
-  [Resources(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/resource/semantic_conventions/README.md)，
-  [Spans(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/README.md)，
+  [Resources(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md)，
+  [Spans(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/README.md)，
   和
-  [Metrics(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/semantic_conventions/README.md)，
+  [Metrics(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/README.md)，
   以查看新名称是否适合。
 
 - 当需要新的名称空间时，请考虑它应该是顶级命名空间（例如`service`）还是嵌套命名空间（例如`service.instance`）。
@@ -74,10 +74,10 @@ _注意：我们只要求名称以Unicode序列表示。本规范没有定义Uni
 ## 给应用开发者的建议
 
 作为应用程序开发人员，当您需要记录属性或标签时，请先咨询有关
-[Resources(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/resource/semantic_conventions/README.md)，
-[Spans(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/README.md)，
+[Resources(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md)，
+[Spans(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/README.md)，
 和
-[Metrics(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/semantic_conventions/README.md)
+[Metrics(暂未翻译)](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/README.md)
 的现有语义约定 。如果不存在合适的名称，则需要重新命名。为此，请考虑以下几种选择：
 
 - 该名称特定于您的公司，也可能在公司外部使用。为避免与其他公司引入的名称冲突（在使用多个供应商的应用程序的分布式系统中），

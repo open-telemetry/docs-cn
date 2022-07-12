@@ -158,7 +158,7 @@ API允许构造一个指定类型的`Metric`，SDK则定义了一个被导出的
 ### 指标数据模型（Metrics Data Model）和SDK
 
 指标数据模型是在SDK中定义的，基于
-[metrics.proto](https://github.com/open-telemetry/opentelemetry-proto/blob/master/opentelemetry/proto/metrics/v1/metrics.proto)协议。
+[metrics.proto](https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/metrics/v1/metrics.proto)协议。
 
 该数据模型被所有OpenTelemetry导出器(exporters)作为数据输入来使用。不同的导出器有不同的能力(例如支持哪种数据类型)，
 还有不同的限制(例如在标签Key中哪些字符被允许)。所有的导出器都通过OpenTelemetry SDK中定义的指标生产者接口(Metric Producer interface)从数据指标模型中消费数据，
@@ -169,8 +169,8 @@ API允许构造一个指定类型的`Metric`，SDK则定义了一个被导出的
 ## 日志 
 [日志总览](/specification/logs/overview.md)
 ### 日志 RoadMap
- - [OTLP](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/logs/data-model.md)：`Opentelemetry Log Protocol` 日志协议标准现在已经是稳定版本 
- - [Log数据模型](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/logs/data-model.md)：现在已经是稳定版本
+ - [OTLP](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md)：`Opentelemetry Log Protocol` 日志协议标准现在已经是稳定版本 
+ - [Log数据模型](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md)：现在已经是稳定版本
  - OpenTelemetry Collector Log：测试阶段
 ## Baggage
 除了Trace传播之外，OpenTelemetry还提供了一个简单的机制来传播键值对，这一机制被称为**Baggage**。**Baggage**可以为一个服务查看可观测事件提供索引，
@@ -217,16 +217,16 @@ OpenTelemetry collector是由一系列组件组成的，这些组件可以使用
 OpenTelemetry服务由两个主要的模型：Agent(一个本地代理)和Collector(一个独立运行的服务)。
 
 阅读更多 [Long-term
-Vision](https://github.com/open-telemetry/opentelemetry-service/blob/master/docs/vision.md).
+Vision](https://github.com/open-telemetry/opentelemetry-service/blob/main/docs/vision.md).
 
 
 ## Instrumentation Libraries
-详情可以查看[Instrumentation Libraries](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/glossary.md#instrumentation-library)。    
+详情可以查看[Instrumentation Libraries](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/glossary.md#instrumentation-library)。    
 
 这个项目的灵感在于通过让各个库和应用程序通过直接调用OpenTelemetry的API来达到开箱即用的目标。但是，大部分库不会做这样的集成，因此需要一个单独的库来注入
 这样这样的调用，通过诸如包装接口，订阅特定库的回调或者将当前的监测模型改为OpenTelemetry模型等机制来实现。
      
-一个被让另一个库实现OpenTelemetry观测能力的库叫做[Instrumentation Library](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/glossary.md#instrumentation-library)。    
+一个被让另一个库实现OpenTelemetry观测能力的库叫做[Instrumentation Library](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/glossary.md#instrumentation-library)。    
 一个Instrumentation Library的命名应该遵循任意关于对于这个库的命名规范(比如web框架的'中间件')。      
 如果没有已经确定的名称，建议在包前面加上“opentelemetry instrumentation”前缀，然后加上被集成的库名称本身。示例包括：     
 
@@ -235,9 +235,9 @@ Vision](https://github.com/open-telemetry/opentelemetry-service/blob/master/docs
 
 ## Semantic Conventions
 OpenTelemetry约定了Resource属性与Span属性的标准值与名称。 
-- [Resource约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/resource/semantic_conventions/README.md)
+- [Resource约定](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md)
 - [Span约定](trace/semantic_conventions/README.md)
-- [Metrics约定](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/semantic_conventions/README.md)
+- [Metrics约定](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/README.md)
 
  属性的类型应该在语义约定中指定。可以查阅[Attributes](common/common.md#属性)
  部分了解更多。

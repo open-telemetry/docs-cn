@@ -82,6 +82,6 @@ OpenTelemetry 项目的正式官方缩写为 "OTel"。
 
 ## License
 
-您需要同意您对 OpenTelemetry Specification 项目的贡献，将在 [Apache 2.0 License ](https://github.com/open-telemetry/specification/blob/master/LICENSE)许可证下。
+您需要同意您对 OpenTelemetry Specification 项目的贡献，将在 [Apache 2.0 License ](https://github.com/open-telemetry/specification/blob/main/LICENSE)许可证下。
 
-> 您对 OpenTelemetry doc-cn 项目的贡献，也将在  [Apache 2.0 License ](https://github.com/open-telemetry/specification/blob/master/LICENSE)许可证下。
+> 您对 OpenTelemetry doc-cn 项目的贡献，也将在  [Apache 2.0 License ](https://github.com/open-telemetry/specification/blob/main/LICENSE)许可证下。
