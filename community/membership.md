@@ -43,7 +43,7 @@ Group)被划分为多个子项目，因此这里的角色职责将限定在这�
   - 支持者必须来自不同的公司，证明是通过社区发生的联系
 - [创建申请issue](https://github.com/open-telemetry/community/issues/new?template=membership.md&title=REQUEST%3A%20New%20membership%20for%20%3Cyour-GH-handle%3E)
   - 在issue中通过`@mentioned`艾特你的支持者
-  - 完成checklist上每一项要求([预览当前版本的模版](https://github.com/open-telemetry/community/blob/master/.github/ISSUE_TEMPLATE/membership.md))
+  - 完成checklist上每一项要求([预览当前版本的模版](https://github.com/open-telemetry/community/blob/main/.github/ISSUE_TEMPLATE/membership.md))
   - 确保你填写的项目贡献能够代表你的工作(挑选最有价值的)
 - 让你的支持者回复`+1`进行确认
 - 一旦你的支持者确认，你的请求将被Steering Committe审核.  任何`SC`成员可以审核这些申请并且添加到组织中
