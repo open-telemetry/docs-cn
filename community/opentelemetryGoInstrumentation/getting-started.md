@@ -4,10 +4,10 @@ weight: 2
 ---
 
 Welcome to the OpenTelemetry for Go getting started guide! This guide will walk you through the basic steps in installing, instrumenting with, configuring, and exporting data from OpenTelemetry. Before you get started, be sure to have Go 1.16 or newer installed.
-欢迎来到 OpenTelemetry for Go 入门指南！ 本指南将引导您完成安装、检测、配置和从 OpenTelemetry 导出数据的基本步骤。 在开始之前，请确保已安装 Go 1.16 或更新版本
+欢迎来到 OpenTelemetry for Go 入门指南！ 本指南将引导您完成安装、监测、配置和从 OpenTelemetry 导出数据的基本步骤。 在开始之前，请确保已安装 Go 1.16 或更新版本。
 
 Understand how a system is functioning when it is failing or having issues is critical to resolving those issues. One strategy to understand this is with tracing. This guide shows how the OpenTelemetry Go project can be used to trace an example application. You will start with an application that computes Fibonacci numbers for users, and from there you will add instrumentation to produce tracing telemetry with OpenTelemetry Go.
-了解系统在出现故障时如何运行的，对于解决这些故障至关重要。 链路追踪可以做到这一点。 本指南展示了如何使用 OpenTelemetry Go 项目来跟踪示例应用程序。 您将从一个为用户计算斐波那契数的应用程序开始，然后您将添 instrumentation 以使用 OpenTelemetry Go 生成跟踪遥测。
+了解系统在出现故障时如何运行的，对于解决这些故障至关重要。 链路追踪可以做到这一点。 本指南展示了如何使用 OpenTelemetry Go 项目来跟踪示例应用程序。 您将从一个为用户计算斐波那契数的应用程序开始，然后您将添监测代码 以使用 OpenTelemetry Go 生成跟踪遥测。
 
 For reference, a complete example of the code you will build can be found [here](https://github.com/open-telemetry/opentelemetry-go/tree/main/example/fib).
 作为参考，可以在 [此处](https://github.com/open-telemetry/opentelemetry-go/tree/main/example/fib) 找到您将构建的代码的完整示例。
@@ -146,7 +146,7 @@ The application can be exited with CTRL+C. You should see a similar output as ab
 ## Trace Instrumentation
 
 OpenTelemetry is split into two parts: an API to instrument code with, and SDKs that implement the API. To start integrating OpenTelemetry into any project, the API is used to define how telemetry is generated. To generate tracing telemetry in your application you will use the OpenTelemetry Trace API from the `go.opentelemetry.io/otel/trace` package.
-OpenTelemetry 分为两部分：用于检测代码的 API 和实现 API 的 SDK。 在将 OpenTelemetry 集成到任何项目中时，API 用于定义遥测的生成方式。 要在您的应用程序中生成跟踪遥测，您可以使用 `go.opentelemetry.io/otel/trace` 包中的 OpenTelemetry Trace API。
+OpenTelemetry 分为两部分：用于监测代码的 API 和实现 API 的 SDK。 在将 OpenTelemetry 集成到任何项目中时，API 用于定义遥测的生成方式。 要在您的应用程序中生成跟踪遥测，您可以使用 `go.opentelemetry.io/otel/trace` 包中的 OpenTelemetry Trace API。
 
 First, you need to install the necessary packages for the Trace API. Run the following command in your working directory.
 首先，您需要为 Trace API 安装必要的包。 在您的工作目录中运行以下命令。
@@ -177,7 +177,7 @@ With the imports added, you can start instrumenting.
 添加导入后，您可以开始检测。
 
 The OpenTelemetry Tracing API provides a [`Tracer`] to create traces. These [`Tracer`]s are designed to be associated with one instrumentation library. That way telemetry they produce can be understood to come from that part of a code base. To uniquely identify your application to the [`Tracer`] you will use create a constant with the package name in `app.go`.
-OpenTelemetry Tracing API 提供了一个 `Tracer` 来创建跟踪。 这些 `Tracer` 旨在与一个`instrumentation library`相关联。 这样产生的遥测数据，可以理解为是有代码库的部分生产的。 为了让 `Tracer` 唯一标识您的应用程序，您需要在 `app.go` 中创建一个带有包名的常量。
+OpenTelemetry Tracing API 提供了一个 `Tracer` 来创建跟踪。 这些 `Tracer` 旨在与一个`instrumentation library`相关联。 这样产生的遥测数据，可以理解为是由代码库生产的。 为了让 `Tracer` 唯一标识您的应用程序，您需要在 `app.go` 中创建一个带有包名的常量。
 
 
 ```go
@@ -195,11 +195,10 @@ To back up a bit, a trace is a type of telemetry that represents work being done
 我们回头看一下，跟踪是一种遥测，遥测服务正在完成的工作。 跟踪是一种记录，记录处理请求参与者之间的连接信息，通常指的是客户端和服务器之间的请求或其他形式的通信。
 
 Each part of the work that a service performs is represented in the trace by a span. Those spans are not just an unordered collection. Like the call stack of our application, those spans are defined with relationships to one another. The "root" span is the only span without a parent, it represents how a service request is started. All other spans have a parent relationship to another span in the same trace.
-服务执行工作的每个部分在跟踪中由 `Span` 表示。 这些`Span`不仅仅是一个无序的集合。 就像我们应用程序的调用堆栈一样，这些 `Span` 相互之间是有关系的。 `根Span` 是唯一没有 `父Span` 的 `Span` ，它表示服务请求从哪开始的。 在同一个跟踪中其他所有`Span`之间都是有父子关系的。
+服务执行工作的每个部分在跟踪中由 `Span` 表示。 这些 `Span` 不仅仅是一个无序的集合。 就像我们应用程序的调用堆栈一样，这些 `Span` 相互之间是有关系的。 `根Span` 是唯一没有 `父Span` 的 `Span` ，它表示服务请求从哪开始的。 在同一个跟踪中其他所有 `Span` 之间都是有父子关系的。
 
 If this last part about span relationships doesn't make complete sense now, don't worry. The most important takeaway is that each part of your code, which does some work, should be represented as a span. You will have a better understanding of these span relationships after you instrument your code, so let's get started.
-
-如果对最后一部分关于`Span`关系的解释还没有完全理解，请不要担心。 最重要的一点是代码的每个部分，它做一些工作，都应该表示为一个`Span`。 集成你的代码后，您将对这些`Span`关系有更好的理解，所以让我们开始吧。
+如果对最后一部分关于 `Span` 关系的解释还没有完全理解，请不要担心。 最重要的一点是代码的每个部分，它做的一些工作，都应该表示为一个 `Span` 。 集成你的代码后，您将对这些 `Span` 关系有更好的理解，所以让我们开始吧。
 
 Start by instrumenting the `Run` method.
 首先运行`Run`方法启动监测。
@@ -224,8 +223,7 @@ func (a *App) Run(ctx context.Context) error {
 ```
 
 The above code creates a span for every iteration of the for loop. The span is created using a [`Tracer`] from the [global `TracerProvider`](https://pkg.go.dev/go.opentelemetry.io/otel#GetTracerProvider). You will learn more about [`TracerProvider`]s and handle the other side of setting up a global [`TracerProvider`] when you install an SDK in a later section. For now, as an instrumentation author, all you need to worry about is that you are using an appropriately named [`Tracer`] from a [`TracerProvider`] when you write `otel.Tracer(name)`.
-
-上面的代码为 for 循环的每次迭代创建了一个`Span`。 跨度是使用 [global `TracerProvider`](https://pkg.go.dev/go.opentelemetry.io/otel#GetTracerProvider) 中的 [`Tracer`] 创建的。 当您在后面的部分安装 SDK 时，你需要设置一个全局[`TracerProvider`] ，这将让你从另一个角度了解有关 [`TracerProvider`] 的更多信息。 现在，作为仪器作者，您需要关注的是，当您编写 `otel.Tracer(name)` 时，您需要给来自[`TracerProvider`]的[`Tracer`]设置适当的名字。
+上面的代码为 for 循环的每次循环创建了一个 `Span` 。 `Span` 是使用 [global `TracerProvider`](https://pkg.go.dev/go.opentelemetry.io/otel#GetTracerProvider) 中的 [`Tracer`] 创建的。 当您在后面的部分安装 SDK 时，你需要设置一个全局[`TracerProvider`] ，这将让你从另一个角度了解有关 [`TracerProvider`] 的更多信息。 现在，作为监测作者，您只需要关注的是，当您编写 `otel.Tracer(name)` 时，您需要给来自[`TracerProvider`]的[`Tracer`]设置适当的名字。
 
 Next, instrument the `Poll` method.
 接下来，检测`Poll`方法。
@@ -249,7 +247,7 @@ func (a *App) Poll(ctx context.Context) (uint, error) {
 ```
 
 Similar to the `Run` method instrumentation, this adds a span to the method to track the computation performed. However, it also adds an attribute to annotate the span. This annotation is something you can add when you think a user of your application will want to see the state or details about the run environment when looking at telemetry.
-类似于 `Run` 方法检测，这为方法添加了一个`Span`以跟踪计算的执行。 另外，它还添加了一个属性来注解`Span`。 当您认为应用程序的用户在查看遥测数据时希望查看有关运行环境的状态或详细信息时，您可以添加此注解。
+类似于 `Run` 方法检测，这为方法添加了一个 `Span` 以跟踪计算的执行。 另外，它还添加了一个属性来注解 `Span` 。 当您认为应用程序的用户在查看遥测数据时希望查看有关运行环境的状态或详细信息时，您可以添加此注解。
 
 Finally, instrument the `Write` method.
 最后，检测 `Write` 方法。
@@ -275,10 +273,10 @@ func (a *App) Write(ctx context.Context, n uint) {
 ```
 
 This method is instrumented with two spans. One to track the `Write` method itself, and another to track the call to the core logic with the `Fibonacci` function. Do you see how context is passed through the spans? Do you see how this also defines the relationship between spans?
-此方法使用两个`Span`进行检测。 一个跟踪`Write`方法本身，另一个跟踪使用`Fibonacci`函数对核心逻辑的调用。 你看到上下文是如何通过`Span`传递的吗？ 您是否看到这也定义了`Span`之间的关系？
+此方法使用两个 `Span` 进行检测。 一个跟踪 `Write` 方法本身，另一个跟踪使用 `Fibonacci` 函数对核心逻辑的调用。 你看到上下文是如何通过 `Span` 传递的吗？ 您是否看到这也定义了 `Span` 之间的关系？
 
 In OpenTelemetry Go the span relationships are defined explicitly with a `context.Context`. When a span is created a context is returned alongside the span. That context will contain a reference to the created span. If that context is used when creating another span the two spans will be related. The original span will become the new span's parent, and as a corollary, the new span is said to be a child of the original. This hierarchy gives traces structure, structure that helps show a computation path through a system. Based on what you instrumented above and this understanding of span relationships you should expect a trace for each execution of the run loop to look like this.
-在 OpenTelemetry 中，`Span`关系是使用 `context.Context` 显式定义的。 创建`Span`时，会和`Span`一起返回一个`Context`。 该`Context`将包含对创建的`Span`的引用。 如果在创建另一个`Span`时使用该上下文，则两个`Span`将相关。 原始`Span`将成为新`Span`的父`Span`，反之，新`Span`被称为原始`Span`的子级。 这种层次结构提供了链路跟踪结构，该结构有助于显示系统计算路径。 根据您在上面检测相关的代码以及对`Span`关系的理解，您的代码将展示如下所示的链路追踪信息：
+在 OpenTelemetry 中，`Span` 关系是使用 `context.Context` 显式定义的。 创建 `Span` 时，会和 `Span` 一起返回一个 `Context`。 该 `Context` 将包含对创建的 `Span` 的引用。 如果在创建另一个 `Span` 时使用该上下文，则两个 `Span` 将相关。 原始 `Span` 将成为新 `Span` 的父 `Span`，反之，新 `Span` 被称为原始 `Span` 的子级。 这种层次结构提供了链路跟踪结构，该结构有助于显示系统计算路径。 根据您在上面检测相关的代码以及对 `Span` 关系的理解，您的代码将展示如下所示的链路追踪信息：
 
 ```
 Run
@@ -288,7 +286,7 @@ Run
 ```
 
 A `Run` span will be a parent to both a `Poll` and `Write` span, and the `Write` span will be a parent to a `Fibonacci` span.
-`Run` `Span` 将是 `Poll` 和 `Write` `Span` 的父级，而 `Write` `Span` 将是 `Fibonacci` `Span` 的父级。
+`Run Span` 将是 `Poll` 和 `Write Span` 的父级，而 `Write Span` 将是 `Fibonacci Span` 的父级。
 
 Now how do you actually see the produced spans? To do this you will need to configure and install an SDK.
 现在你如何真正看到产生的`Span`？ 为此，您需要配置和安装 SDK。
@@ -297,7 +295,7 @@ Now how do you actually see the produced spans? To do this you will need to conf
 ## SDK 设置
 
 OpenTelemetry is designed to be modular in its implementation of the OpenTelemetry API. The OpenTelemetry Go project offers an SDK package, [`go.opentelemetry.io/otel/sdk`], that implements this API and adheres to the OpenTelemetry specification. To start using this SDK you will first need to create an exporter, but before anything can happen we need to install some packages. Run the following in the `fib` directory to install the trace STDOUT exporter and the SDK.
-`开放遥测库` 在其 开放遥测 API 的实现中被设计成模块化的。 `OpenTelemetry Go` 项目提供了一个 SDK 包 [`go.opentelemetry.io/otel/sdk`]，它实现了这个 API 并遵守 `开放遥测` 规范。 要开始使用此 SDK，您首先需要创建一个导出器，在这之前，我们需要安装一些包。 在 `fib` 目录中运行以下命令以安装 `标准输入输出导出器`和 SDK。
+`OpenTelemetry` 在其 API 的实现中被设计成模块化的。 `OpenTelemetry Go` 项目提供了一个 SDK 包 [`go.opentelemetry.io/otel/sdk`]，它实现了这个 API 并遵守 `OpenTelemetry规范`。 要开始使用此 SDK，您首先需要创建一个导出器，在这之前，我们需要安装一些包。 在 `fib` 目录中运行以下命令以安装 `标准输入输出导出器`和 SDK。
 
 ```sh
 $ go get go.opentelemetry.io/otel/sdk \
@@ -305,6 +303,7 @@ $ go get go.opentelemetry.io/otel/sdk \
 ```
 
 Now add the needed imports to `main.go`.
+现在将其导入到`main.go`
 
 ```go
 import (
@@ -373,7 +372,7 @@ Any information you would like to associate with all telemetry data the SDK hand
 ### 创建并设置 `Tracer Provider`
 
 You have your application instrumented to produce telemetry data and you have an exporter to send that data to the console, but how are they connected? This is where the [`TracerProvider`] is used. It is a centralized point where instrumentation will get a [`Tracer`] from and funnels the telemetry data from these [`Tracer`]s to export pipelines.
-您的应用程序被集成为生成遥测数据，并且您有一个导出器将该数据发送到控制台，但是它们是如何连接的？ 这就是 [`TracerProvider`] 的作用。 它是个中转点，仪器将从这里获取 [`Tracer`]， 遥测数据是从这些 [`Tracer`]s 中汇集到导出管道。
+您的应用程序被监测以便生成遥测数据，并且您有一个导出器将该数据发送到控制台，但是它们是如何连接的？ 这就是 [`TracerProvider`] 的作用。 它是个中转点，仪器将从这里获取 [`Tracer`]， 遥测数据是从这些 [`Tracer`]s 中汇集到`导出管道`。
 
 The pipelines that receive and ultimately transmit data to exporters are called [`SpanProcessor`]s. A [`TracerProvider`] can be configured to have multiple span processors, but for this example you will only need to configure only one. Update your `main` function in `main.go` with the following.
 接收数据并最终将数据传输到导出器的管道称为 [`SpanProcessor`]。 可以将 [`TracerProvider`] 配置为具有多个[`SpanProcessor`]，但对于此示例，这里您只需要配置一个。 使用以下内容更新 `main.go` 中的 `main` 函数。
@@ -433,7 +432,7 @@ goodbye
 ```
 
 A new file named `traces.txt` should be created in your working directory. All the traces created from running your application should be in there!
-你的工作目录中应该已经创建了一个名为`traces.txt`的新文件。 运行应用程序所创建的所有跟踪数据应该都在那这里！
+你的工作目录中应该已经创建了一个名为 `traces.txt` 的新文件。 运行应用程序所创建的所有跟踪数据应该都在那这里！
 
 ## (Bonus) Errors
 ## 错误处理
@@ -474,7 +473,7 @@ func Fibonacci(n uint) (uint64, error) {
 ```
 
 Great, you have fixed the code, but it would be ideal to include errors returned to a user in the telemetry data. Luckily, spans can be configured to communicate this information. Update the `Write` method in `app.go` with the following code.
-太好了，您已经修复了代码，但最好在遥测数据中包含返回给用户的错误。 幸运的是，可以配置`Span`来传达此信息。 使用以下代码更新 `app.go` 中的 `Write` 方法。
+太好了，您已经修复了代码，但最好在遥测数据中包含返回给用户的错误。 幸运的是，可以配置 `Span` 来传达此信息。 使用以下代码更新 `app.go` 中的 `Write` 方法。
 
 ```go
 // Write writes the n-th Fibonacci number back to the user.
@@ -498,7 +497,7 @@ func (a *App) Write(ctx context.Context, n uint) {
 ```
 
 With this change any error returned from the `Fibonacci` function will mark that span as an error and record an event describing the error.
-通过此更改，从 `Fibonacci` 函数返回的任何错误都会在`Span`中标记，并记录描述错误的事件。
+通过此更改，从 `Fibonacci` 函数返回的任何错误都会在 `Span` 中标记，并记录描述错误的事件。
 
 This is a great start, but it is not the only error returned in from the application. If a user makes a request for a non unsigned integer value the application will fail. Update the `Poll` method with a similar fix to capture this error in the telemetry data.
 这是一个很好的开始，但它并不是应用程序返回的唯一错误。 如果用户请求一个无符号整数值，应用程序将失败。 使用类似的修复更新 `Poll` 方法，以便在遥测数据中捕获此错误。
