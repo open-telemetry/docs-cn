@@ -6,7 +6,7 @@ OpenTelemetry Go 主要功能组件的现状如下：
 
 | Tracing | Metrics | Logging |
 | ------- | ------- | ------- |
-| 稳定的  | 内部测试   | 还未实现 |
+| 稳定的  | 内部测试(Alpha)   | 还未实现 |
 
 
 ## 深入了解
