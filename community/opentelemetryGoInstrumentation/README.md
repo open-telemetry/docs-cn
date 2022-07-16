@@ -8,6 +8,11 @@ OpenTelemetry Go 主要功能组件的现状如下：
 | ------- | ------- | ------- |
 | 稳定的  | 内部测试(Alpha)   | 还未实现 |
 
+## 目录
+[入门](getting-started.md)  
+[使用监测库](libraries.md)  
+[手动监测](manual.md)  
+[导出数据](exporting_data.md)  
 
 ## 深入了解
 
