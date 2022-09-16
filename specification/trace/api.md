@@ -1,6 +1,6 @@
 # Tracing API
 
-**状态**: [功能冻结](../document-status.md).
+**状态**: [稳定，功能冻结](../document-status.md).
 
 <details>
 <summary>
@@ -12,10 +12,11 @@ Table of Contents
     * [时间戳](#时间戳-timestamp)
     * [时长](#时长-duration)
 * [TracerProvider](#tracerprovider)
-  * [TracerProvider 操作](#tracerprovider-operations)
+  * [TracerProvider 操作](#tracerprovider-操作)
+    + [获取一个 Tracer](#获取一个-tracer)
 * [Context Interaction](#context-interaction)
 * [Tracer](#tracer)
-  * [Tracer operations](#tracer-operations)
+  * [Tracer operations](#tracer-操作)
 * [SpanContext](#spancontext)
   * [检索 TraceId 与 SpanId](#检索-traceid-与-spanid)
   * [IsValid](#isvalid)
@@ -23,7 +24,7 @@ Table of Contents
   * [TraceState](#TraceState)
 * [Span](#span)
   * [创建 Span](#创建-Span)
-    * [通过 Context 创建父 Span](#通过-Context-创建父-Span)
+    * [通过 Context 确定父 Span](#通过-context-确定-parent-span)
     * [指定链接](#指定链接)
   * [Span 操作](#span-operations)
     * [获得 Context](#获得-context)
@@ -91,9 +92,9 @@ or because its easier with dependency injection frameworks.
 
 `TracerProvider` 必须包含提供以下 API：
 
-- 获得一个 `Trace`
+- 获取一个 `Tracer`
 
-#### 获得一个 Trace
+#### 获取一个 Tracer
 
 本 API 必须接受以下参数：
 
@@ -122,7 +123,7 @@ or because its easier with dependency injection frameworks.
 API 必须提供以下功能来与 `Context` 实例进行交互:
 
 - 提取 `Span` 从一个 `Context` 实例中
-- 插入 `Span` 从一个`Context` 实例中
+- 插入 `Span` 到一个`Context` 实例中
 
 以上罗列的功能是必要的，因为 API 用户不应当通过 Tracing API 的实现访问 [Context Key](../context/context.md#create-a-key)。
 
@@ -139,7 +140,7 @@ API 必须提供以下功能来与 `Context` 实例进行交互:
 
 注意: `Tracers` 通常不负责进行配置，这是`TracerProvider` 的职责。
 
-Tracer 操作
+### Tracer 操作
 
  `Tracer` 必须包含以下功能：
 
@@ -286,7 +287,7 @@ API 必须接受以下参数：
 
 任何被创建的 `Span` 也必须被结束。这是使用者的责任。如果使用者忘记结束 `Span`，API 实现可能会泄漏内存或其他资源（例如，适用于所有 `Span` 的周期性工作的 CPU 时间）。
 
-#### 通过 Context 创建 Parent Span
+#### 通过 Context 确定 Parent Span
 
 当新的 Span 通过 Context 创建时，Context 可能已经包含一个代表当前活跃实例的 Span，并将其设置为新的 Span 的父 Span。如果 Context 中没有 Span，那么新创建的 Span 将是一个 Root Span。
 
