@@ -49,7 +49,8 @@ OpenTelemetry的核心工作目前主要集中在3个部分：
 
 >首先，再补充一下背景知识，之前提到了APM的两种监控子类：分布式跟踪和Metrics，其实还有第三种，就是Logging日志，目前常见的日志收集平台有EFK、Fluentd.
 
-目前，OpenTelemetry 官方最新解决方案，Logging 部分也日趋成熟
+目前，OpenTelemetry 官方最新解决方案，Logging 部分也日趋成熟。
+
 ![](./assets/unified-collection.png)
 
 ### 大一统
