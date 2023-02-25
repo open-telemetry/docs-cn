@@ -28,7 +28,7 @@ OpenTelemetry是社区项目，因此，我们需要完全依赖社区才能提�
 
 请注意，考虑到我们的团队已经在处理大量的issues，因此我们无法提供完成issues所需的技术支持。若你对于开发流程有疑问，请加入我们的
 社群进行交流:
-- 英文：[Gitter Channel](https://gitter.im/open-telemetry/community) .
+- 英文：[Slack Channel](https://cloud-native.slack.com/archives/CJFCJHG4Q) 
 - 中文：QQ群773124426或者关注微信公众号OpenTelemetry
 
 同时你也可以在[Stack Overflow](https://stackoverflow.com/questions/tagged/opentelemetry)上提问.
@@ -39,7 +39,7 @@ OpenTelemetry是社区项目，因此，我们需要完全依赖社区才能提�
 注释永远都有可以优化的地方；单元测试方面也一直有更多更好的需要。**所以你要意识到：如果你看到哪些东西你觉得需要
 修改,就勇敢的走出这一步，干就完了**
 
-你可以通过搜索标签**opentelemetry**来获取可以参与到的issue: 
+你可以通过搜索标签**opentelemetry**来获取可以参与到的issue:
 [up-for-grabs.net](https://up-for-grabs.net/#/filters?tags=opentelemetry).
 
 如果你对代码没有兴趣，也可以帮助改进文档、在社区回答问题等等。
@@ -49,7 +49,7 @@ OpenTelemetry是社区项目，因此，我们需要完全依赖社区才能提�
 在OpenTelemetry中有多个代码库。每个代码库都有对于初学者很友好的issues，它们可以帮你逐步的
 参与到贡献的过程中来。
 
-例如，[Java SDK](https://github.com/open-telemetry/opentelemetry-java/) 
+例如，[Java SDK](https://github.com/open-telemetry/opentelemetry-java/)
 有[help wanted](https://github.com/open-telemetry/opentelemetry-java/labels/help%20wanted)
 和 [good first issue](https://github.com/open-telemetry/opentelemetry-java/labels/good%20first%20issue)
 这些标签，它们无需对系统有很深入的了解就可以参与。
@@ -120,7 +120,7 @@ Pull requests通常缩写"PR". OpenTelemetry遵循标准的
 
 新贡献者提价PR时，常见的问题：
 
-- 在提交第一个PR前没有正确的[签名CLA](#CLA) 
+- 在提交第一个PR前没有正确的[签名CLA](#CLA)
 - 没有遵循SIG或者特定代码仓库的贡献者准则(查阅对应仓库中的CONTRIBUTING.md )
 - PR的测试用例没有通过或者跟你提交的代码变更无关
 - 引入变更需要首先通过TSC的证明，例如引入一个新的术语
