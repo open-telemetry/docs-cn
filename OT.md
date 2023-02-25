@@ -1,11 +1,11 @@
 > 大家应该都听说过APM(Application Performance Monitoring)，也应该听说过Distributed Tracing(分布式跟踪)，其中后者是前者的子集。分布式跟踪该名词是随着微服务的流行而兴起的，主要是为了解决微服务架构中请求链路过长导致的定位和监控难问题。
 目前该领域有名的产品有：Jaeger、Pinpoint、Zipkin等等，可以说是竞争异常激烈，但是由此带来一个问题：每一家都有自己的一套数据采集标准和SDK，虽然几乎都是基于谷歌Dapper协议，但是彼此的实现是大相径庭的。
-为了解决这个问题，国外的大神们在之前创建了OpenTracing和OpenCensus，我们先来分别看看这两个产品。 
+为了解决这个问题，国外的大神们在之前创建了OpenTracing和OpenCensus，我们先来分别看看这两个产品。
 
 # OpenTracing
 OpenTracing制定了一套平台无关、厂商无关的协议标准，使得开发人员能够方便的添加或更换底层APM的实现。
 
-在2016年11月的时候发生了一件里程碑事件，CNCF.io接受OpenTracing，同时这也是CNCF的第三个项目，前两个都已经鼎鼎大名了：Kubernetes和Prometheus，由此可见开源世界对APM的重视，对统一标准的重视和渴望。 
+在2016年11月的时候发生了一件里程碑事件，CNCF.io接受OpenTracing，同时这也是CNCF的第三个项目，前两个都已经鼎鼎大名了：Kubernetes和Prometheus，由此可见开源世界对APM的重视，对统一标准的重视和渴望。
 
 遵循OpenTracing协议的产品有Jaeger、Zipkin等等。
 
@@ -49,9 +49,9 @@ OpenTelemetry的核心工作目前主要集中在3个部分：
 
 >首先，再补充一下背景知识，之前提到了APM的两种监控子类：分布式跟踪和Metrics，其实还有第三种，就是Logging日志，目前常见的日志收集平台有EFK、Fluentd.
 
-上图中可以看到，缺失了Logging，主要有以下原因：
-1. 优先级是在上面提到的三个核心工作上，Logging目前优先级相对较低(P2)
-2. Logging一般是通过三方平台完成收集，目前如何与分布式跟踪、Metrics的数据进行整合，官方还没有给出设计方案
+目前，OpenTelemetry 官方最新解决方案中Logging部分也日趋成熟。
+
+![](./assets/unified-collection.png)
 
 ### 大一统
 有了以上的背景知识，我们就可以顶一下OpenTelemetry的终极目标了：实现Metrics、Tracing、Logging的融合及大一统，作为APM的数据采集终极解决方案。
