@@ -10,3 +10,4 @@
 - [Opentelemetry Collector集成指南:Collector部署和采样示例](https://github.com/laziobird/otel-collector-java)
 - [.Net指南:Opentelemetry+Jaeger](https://github.com/iioter/ExploringIoTDistributedTracingNet6)
 - [Go指南:Opentelemetry+Jaeger+Grafana](https://github.com/cloudwego/kitex-examples/tree/main/opentelemetry)
+- [Python 到 Java 相互间 Context Propagation 的示例](https://github.com/LronDC/ContextPropagationBetweenPythonAndJava/)
