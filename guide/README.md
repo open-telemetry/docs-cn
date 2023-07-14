@@ -3,7 +3,7 @@
 ## 目录
 ### 官方入门指南
 - [Kubernetes官方指南](../community/opentelemtryCollector/kubernetes-guide.md)
-- [社区官方多语言示例指南:Java+GO+.Net+NodeJs+Python]([../community/opentelemtryCollector/kubernetes-guide.md](https://github.com/open-telemetry/opentelemetry-demo-webstore))
+- [社区官方多语言示例指南:Java+GO+.Net+NodeJs+Python](https://github.com/open-telemetry/opentelemetry-demo-webstore)
 ### 非官方入门指南
 - [最新OpenTelemetry Java探针二次开发示例](https://github.com/laziobird/opentelemetry-java-instrumentation)
 - [最新Java指南:SpringBoot+Opentelemetry+Jaeger](https://github.com/laziobird/opentelemetry-jaeger)
