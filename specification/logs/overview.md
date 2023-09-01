@@ -71,7 +71,7 @@ Opentelemetry 相对于在 metrics、traces 目前有清晰设计，详细定义
 我们用Opentelemetry 约定数据格式去暴露logs, traces and metrics，发送采集数据到OpenTelemetry Collector，
 Collector 它可以统一方式丰富处理数据。比如，一个Kubernetes Pod 的描述，不需要应用程序单独做任何处理，
 这些描述Pod的属性自动通过Collector的 k8sprocessor 就能自动添加到遥测数据中。更重要的事，三个维度数据还被关联统一起来了。
-Collector 保证了 logs, traces and metrics 里包含了同样的属性名、熟悉值，这样能够准确无误描述这个Kubernetes Pod来做于哪里。
+Collector 保证了 logs, traces and metrics 里包含了同样的属性名、属性值，这样能够准确无误描述这个Kubernetes Pod来做于哪里。
 在后端就能够拿到这个Pod 清晰、准确的关联起来的Pod 数据。
 
 
