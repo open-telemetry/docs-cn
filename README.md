@@ -1,5 +1,10 @@
 # OpenTelemetry中文资料
 
+> [!IMPORTANT]
+> This repository is archived and will not receive any updates or accept issues or pull requests
+>
+> Localizations for the OpenTelemetry documentation and website are now part of the [website repository](https://github.com/open-telemetry/opentelemetry.io)
+
 ![](./assets/logo.png)
 
 ## 目录索引
